@@ -28,7 +28,7 @@ jobs:
       run: |
         chmod +x gradlew
     
-    - name: Export JAR with Gradle
+    - name: Run test
       run: |
         ./gradlew test --no-daemon
         

@@ -28,7 +28,7 @@ jobs:
       run: |
         chmod +x gradlew
     
-    - name: Export JAR with Gradle
+    - name: Run ktlint test
       run: |
         ./gradlew ktlintCheck --no-daemon
 
