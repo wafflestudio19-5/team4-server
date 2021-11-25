@@ -31,6 +31,12 @@ jobs:
     - name: Export JAR with Gradle
       run: |
         ./gradlew test --no-daemon
+        
+    - name: Publish test results
+      uses: EnricoMi/publish-unit-test-result-action@v1
+      if: ${{ always() }}
+      with:
+        files: ./build/test-results/**/*.xml
 
     - name: Cleanup Gradle Cache
       run: |
