@@ -1,0 +1,41 @@
+spring:
+  profiles:
+    active: local
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: local
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/reddit?serverTimezone=UTC
+    username: waffle-team6-server
+    password: wafflestudio
+    sql:
+      init:
+        mode: always
+    jpa:
+      generate-ddl: true
+      hibernate:
+        ddl-auto: create
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+  datasource:
+    url: jdbc:mysql://waffle-toy4-db.c44j4eo5ddlj.ap-northeast-2.rds.amazonaws.com:3306/reddit?serverTimezone=UTC
+    username: waffle-team6-server
+    password: wafflestudio
+    sql:
+      init:
+        mode: always
+    jpa:
+      generate-ddl: true
+      hibernate:
+        ddl-auto: update
