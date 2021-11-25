@@ -3,8 +3,6 @@ name: Deploy with AWS
 on:
   push:
     branches: [master]
-  pull_request:
-    branches: [master]
 
 jobs:
   build:
@@ -20,8 +18,8 @@ jobs:
 	
         - name: Cache Gradle packages
           uses: actions/cache@v2
-            with:
-              path: |
+          with:
+            path: |
               ~/.gradle/caches
               ~/.gralde/wrapper
             key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
@@ -32,7 +30,7 @@ jobs:
           run: chmod +x gradlew
 	
         - name: BootJar with Gradle
-          run: ./gradlew bootJar
+          run: ./gradlew bootJar --no-daemon
 
         - name: Make Directory for deliver
           run: mkdir deploy
@@ -70,4 +68,10 @@ jobs:
                 --file-exists-behavior OVERWRITE \
                 --s3-location bucket=waffle-team-4-server-s3,bundleType=zip,key=waffle-team-4-server-build.zip \
                 --region ap-northeast-2
+                
+        - name: Cleanup Gradle Cache
+          run: |
+            rm -f ~/.gradle/caches/modules-2/modules-2.lock
+            rm -f ~/.gradle/caches/modules-2/gc.properties
+
 
