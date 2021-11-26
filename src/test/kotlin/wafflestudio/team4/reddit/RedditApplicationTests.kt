@@ -9,5 +9,4 @@ class RedditApplicationTests {
     @Test
     fun contextLoads() {
     }
-
 }
