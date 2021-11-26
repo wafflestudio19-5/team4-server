@@ -11,8 +11,8 @@ spring:
 
   datasource:
     url: jdbc:mysql://localhost:3306/reddit?serverTimezone=UTC
-    username: admin
-    password: ??
+    username: waffle-team-4
+    password: waffleteam4
     sql:
       init:
         mode: always
