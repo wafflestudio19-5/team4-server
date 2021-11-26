@@ -30,7 +30,7 @@ spring:
 
   datasource:
     url: jdbc:mysql://waffle-toy4-db.c44j4eo5ddlj.ap-northeast-2.rds.amazonaws.com:3306/reddit?serverTimezone=UTC
-    username: admin
+    username: waffle-team-4
     password: waffleteam4
     sql:
       init:
