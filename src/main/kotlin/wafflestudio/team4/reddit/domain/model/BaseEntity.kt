@@ -1,9 +1,9 @@
 package wafflestudio.team4.reddit.domain.model
 
+import javax.persistence.MappedSuperclass
+import javax.persistence.Id
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
-import javax.persistence.Id
-import javax.persistence.MappedSuperclass
 
 @MappedSuperclass
 open class BaseEntity {

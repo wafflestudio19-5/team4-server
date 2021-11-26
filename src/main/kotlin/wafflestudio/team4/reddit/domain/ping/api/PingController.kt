@@ -12,7 +12,6 @@ class PingController {
     // api 명세 정해야댐
     @GetMapping("/")
     fun pong(): ResponseEntity<String> {
-        println("hi")
         return ResponseEntity.ok("pong!")
     }
 }
