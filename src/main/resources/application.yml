@@ -26,12 +26,12 @@ spring:
 spring:
   config:
     activate:
-      on-profile: prod
+      on-profile: prod1
 
   datasource:
     url: jdbc:mysql://waffle-toy4-db.c44j4eo5ddlj.ap-northeast-2.rds.amazonaws.com:3306/reddit?serverTimezone=UTC
     username: admin
-    password: waffle_toy4_backend
+    password: waffleteam4
     sql:
       init:
         mode: always
@@ -39,3 +39,5 @@ spring:
       generate-ddl: true
       hibernate:
         ddl-auto: update
+server:
+    port: 8081
