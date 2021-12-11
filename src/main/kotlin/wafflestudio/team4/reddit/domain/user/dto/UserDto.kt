@@ -2,6 +2,7 @@ package wafflestudio.team4.reddit.domain.user.dto
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import wafflestudio.team4.reddit.domain.user.model.User
+import wafflestudio.team4.reddit.global.validation.constraints.UniqueEmail
 import java.time.LocalDateTime
 import javax.validation.constraints.Email
 import javax.validation.constraints.NotBlank
@@ -23,7 +24,7 @@ class UserDto {
     }
 
     data class SignupRequest(
-        // @field:UniqueEmail
+        @field:UniqueEmail
         @field:NotBlank
         @field:Email
         val email: String,
