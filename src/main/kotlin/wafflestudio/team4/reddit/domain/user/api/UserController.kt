@@ -34,7 +34,7 @@ class UserController(
     fun getUser(@PathVariable("user_id") id: Long) {
     }
 
-    @PostMapping("/users/signup/")
+    @PostMapping("/")
     fun signup(@Valid @RequestBody signupRequest: UserDto.SignupRequest): ResponseEntity<UserDto.Response> {
         val user = userService.signup(signupRequest)
         val headers = HttpHeaders()
@@ -42,15 +42,15 @@ class UserController(
         return ResponseEntity.noContent().headers(headers).build()
     }
 
-    @PostMapping("/users/signin/")
+    @PostMapping("/signin/")
     fun signin() {
     }
 
-    @DeleteMapping("/users/me/")
+    @DeleteMapping("/me/")
     fun deleteUser() {
     }
 
-    @PutMapping("/users/me/")
+    @PutMapping("/me/")
     fun updateUser() {
     }
 }

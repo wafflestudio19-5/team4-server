@@ -1,6 +1,10 @@
 spring:
   profiles:
     active: local
+app:
+    jwt:
+        jwt-secret-key: wafflestudio
+        jwt-expiration-in-ms: 10800000
 
 ---
 
