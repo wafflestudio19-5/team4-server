@@ -10,7 +10,7 @@ import javax.validation.constraints.NotNull
 
 @Entity
 @Table(name = "reddit_user")
-class User (
+class User(
     @Column(unique = true)
     @field:NotBlank
     @field:Email
@@ -27,5 +27,7 @@ class User (
 
     @field:NotNull
     val isDeleted: Boolean = false,
-): BaseTimeEntity()
 
+    @field:NotNull
+    val roles: String = "",
+) : BaseTimeEntity()
