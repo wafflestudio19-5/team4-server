@@ -56,7 +56,7 @@ class SecurityConfig(
             .authorizeRequests()
             .antMatchers("/api/v1/users/signin/").permitAll() // Auth entrypoint
             .antMatchers(HttpMethod.POST, "/api/v1/users/").anonymous() // SignUp user
-            .antMatchers("/").permitAll() // .antMatchers(HttpMethod.POST, "/api/v1/seminars/").hasRole("INSTRUCTOR")
+            .antMatchers("/api/v1/ping/").permitAll() // .antMatchers(HttpMethod.POST, "/api/v1/seminars/").hasRole("INSTRUCTOR")
             .antMatchers("/profile").permitAll()
             .anyRequest().authenticated()
     }

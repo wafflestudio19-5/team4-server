@@ -30,4 +30,6 @@ class User(
 
     @field:NotNull
     val roles: String = "",
+
+    // TODO cascade
 ) : BaseTimeEntity()

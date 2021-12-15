@@ -50,8 +50,7 @@ class UserTest(private val mockMvc: MockMvc) {
             {
                 "email": "$username@snu.ac.kr",
                 "username": "$username",
-                "password": "$password",
-
+                "password": "$password"
             }
         """.trimIndent()
     }
@@ -95,7 +94,7 @@ class UserTest(private val mockMvc: MockMvc) {
     fun `로그인_정상`() {
         signin(toEmail(username1), password)
             .andExpect {
-                status { isOk() }
+                status { isNoContent() }
                 header { exists("Authentication") }
             }
         // TODO response body checking
@@ -111,12 +110,12 @@ class UserTest(private val mockMvc: MockMvc) {
 
         signin("wrongEmailFormat", password)
             .andExpect {
-                status { isBadRequest() }
+                status { isUnauthorized() }
             }
 
         signin("", "")
             .andExpect {
-                status { isBadRequest() }
+                status { isUnauthorized() }
             }
     }
 }

@@ -35,4 +35,13 @@ class UserDto {
         @field:NotBlank
         val password: String,
     )
+
+    data class SigninRequest(
+        @field:NotBlank
+        @field:Email
+        val email: String,
+
+        @field:NotBlank
+        val password: String,
+    )
 }

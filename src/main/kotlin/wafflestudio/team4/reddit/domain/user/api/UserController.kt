@@ -1,6 +1,7 @@
 package wafflestudio.team4.reddit.domain.user.api
 
 import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -14,12 +15,14 @@ import org.springframework.web.bind.annotation.RestController
 
 import wafflestudio.team4.reddit.domain.user.dto.UserDto
 import wafflestudio.team4.reddit.domain.user.service.UserService
+import wafflestudio.team4.reddit.global.auth.JwtTokenProvider
 import javax.validation.Valid
 
 @RestController
 @RequestMapping("/api/v1/users")
 class UserController(
     private val userService: UserService,
+    private val jwtTokenProvider: JwtTokenProvider,
 ) {
     @GetMapping("/")
     fun getUsers() {
@@ -38,12 +41,17 @@ class UserController(
     fun signup(@Valid @RequestBody signupRequest: UserDto.SignupRequest): ResponseEntity<UserDto.Response> {
         val user = userService.signup(signupRequest)
         val headers = HttpHeaders()
-        // headers.set("Authentication", jwtTokenProvider.generateToken(user.email))
-        return ResponseEntity.noContent().headers(headers).build()
+        headers.set("Authentication", jwtTokenProvider.generateToken(user.email))
+        return ResponseEntity<UserDto.Response>(UserDto.Response(user), headers, HttpStatus.CREATED)
     }
 
     @PostMapping("/signin/")
-    fun signin() {
+    fun signin(@Valid @RequestBody signinRequest: UserDto.SigninRequest): ResponseEntity<UserDto.Response> {
+        // TODO redirect filter to here
+        val user = userService.signin(signinRequest)
+        val headers = HttpHeaders()
+        headers.set("Authentication", jwtTokenProvider.generateToken(user.email))
+        return ResponseEntity<UserDto.Response>(UserDto.Response(user), headers, HttpStatus.OK)
     }
 
     @DeleteMapping("/me/")

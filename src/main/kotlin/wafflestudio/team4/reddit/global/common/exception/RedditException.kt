@@ -8,3 +8,4 @@ abstract class InvalidRequestException(errorType: ErrorType, detail: String = ""
 abstract class DataNotFoundException(errorType: ErrorType, detail: String = "") : RedditException(errorType, detail)
 abstract class NotAllowedException(errorType: ErrorType, detail: String = "") : RedditException(errorType, detail)
 abstract class ConflictException(errorType: ErrorType, detail: String = "") : RedditException(errorType, detail)
+abstract class UnauthorizedException(errorType: ErrorType, detail: String = "") : RedditException(errorType, detail)
