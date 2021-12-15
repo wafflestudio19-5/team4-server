@@ -52,7 +52,6 @@ class RedditControllerAdvice {
     fun dtoValidationFailed(e: MethodArgumentNotValidException): ErrorResponse {
         val bindingResult = e.bindingResult
         val stringBuilder = StringBuilder()
-        val errorName = "Validation failed"
 
         bindingResult.fieldErrors.forEach {
             fieldError ->

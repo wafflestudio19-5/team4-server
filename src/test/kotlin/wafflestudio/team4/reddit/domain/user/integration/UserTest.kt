@@ -1,7 +1,9 @@
 package wafflestudio.team4.reddit.domain.user.integration
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
@@ -10,18 +12,20 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.ResultActionsDsl
 import org.springframework.test.web.servlet.post
 import org.springframework.transaction.annotation.Transactional
+import wafflestudio.team4.reddit.global.util.TestHelper
 
 @AutoConfigureMockMvc
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 @SpringBootTest
-class UserTest(private val mockMvc: MockMvc) {
+class UserTest(
+    private val mockMvc: MockMvc,
+    private val objectMapper: ObjectMapper,
+) {
     private val username1 = "username1"
     private val username2 = "username2"
     private val password = "somepassword"
 
-    private fun toEmail(name: String): String {
-        return "$name@snu.ac.kr"
-    }
+    private val testHelper = TestHelper(objectMapper)
 
     private fun signin(email: String, password: String): ResultActionsDsl {
         return mockMvc.post("/api/v1/users/signin/") {
@@ -72,38 +76,45 @@ class UserTest(private val mockMvc: MockMvc) {
 
     @Test
     @Transactional
-    fun `회원 가입_정상`() {
+    fun `1_1_회원 가입_정상`() {
         signup(signupRequest("username3", password))
             .andExpect {
                 status { isCreated() }
                 header { exists("Authentication") }
             }
+            .andReturn()
+            .let { mvcResult ->
+                assertTrue(testHelper.compare(mvcResult, 1, 1))
+            }
     }
 
     @Test
     @Transactional
-    fun `회원 가입_중복 이메일`() {
+    fun `1_2_회원 가입_중복 이메일`() {
         signup(signupRequest(username1, password))
             .andExpect {
                 status { isBadRequest() }
             }
+            .andReturn()
+            .let { mvcResult ->
+                assertTrue(testHelper.compare(mvcResult, 1, 2))
+            }
     }
 
     @Test
     @Transactional
-    fun `로그인_정상`() {
-        signin(toEmail(username1), password)
+    fun `2_1_로그인_정상`() {
+        signin(testHelper.toEmail(username1), password)
             .andExpect {
                 status { isNoContent() }
                 header { exists("Authentication") }
             }
-        // TODO response body checking
     }
 
     @Test
     @Transactional
-    fun `로그인_정보 오류`() {
-        signin(toEmail(username1), "wrongPassword")
+    fun `2_2_로그인_정보 오류`() {
+        signin(testHelper.toEmail(username1), "wrongPassword")
             .andExpect {
                 status { isUnauthorized() }
             }
