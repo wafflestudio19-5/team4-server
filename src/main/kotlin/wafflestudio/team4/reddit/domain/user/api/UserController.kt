@@ -14,7 +14,9 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 import wafflestudio.team4.reddit.domain.user.dto.UserDto
+import wafflestudio.team4.reddit.domain.user.model.User
 import wafflestudio.team4.reddit.domain.user.service.UserService
+import wafflestudio.team4.reddit.global.auth.CurrentUser
 import wafflestudio.team4.reddit.global.auth.JwtTokenProvider
 import javax.validation.Valid
 
@@ -30,11 +32,14 @@ class UserController(
 
     @GetMapping("/me/")
     @Transactional
-    fun getCurrentUser() {
+    fun getCurrentUser(@CurrentUser user: User): UserDto.Response {
+        return UserDto.Response(user)
     }
 
     @GetMapping("/{user_id}/")
-    fun getUser(@PathVariable("user_id") id: Long) {
+    fun getUser(@PathVariable("user_id") id: Long): UserDto.Response {
+        val user = userService.getUserById(id)
+        return UserDto.Response(user)
     }
 
     @PostMapping("/")

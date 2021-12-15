@@ -5,24 +5,56 @@ import wafflestudio.team4.reddit.global.common.exception.ErrorResponse
 import wafflestudio.team4.reddit.global.common.exception.ErrorType
 
 object UserTestAnswer {
-    val ans_1_1 =
+    private val username1 = "username1"
+    private val username2 = "username2"
+    private val username3 = "username3"
+
+    private val ans1 = arrayOf(
+        // 1 1
         UserDto.Response(
             3,
-            "username3",
-            "username3@snu.ac.kr",
+            username3,
+            "$username3@snu.ac.kr",
             null,
-        )
+        ),
 
-    val ans_1_2 =
+        // 1 2
         ErrorResponse(
             ErrorType.USER_ALREADY_EXISTS.code,
             ErrorType.USER_ALREADY_EXISTS.name,
             "User already exists",
+        ),
+    )
+
+    // test 2: body non-required
+    private val ans2 = arrayOf("")
+
+    private val ans3 = arrayOf(
+        // 3 1
+        UserDto.Response(
+            1,
+            username1,
+            "$username1@snu.ac.kr",
+            null,
+        ),
+
+        // 3 2
+        UserDto.Response(
+            2,
+            username2,
+            "$username2@snu.ac.kr",
+            null,
+        ),
+
+        // 3 3: 404
+        ErrorResponse(
+            ErrorType.USER_NOT_FOUND.code,
+            ErrorType.USER_NOT_FOUND.name,
+            "User not found",
         )
+    )
 
-    private val ans1 = arrayOf(ans_1_1, ans_1_2)
-
-    val ans = arrayOf(ans1)
+    val ans = arrayOf(ans1, ans2, ans3)
 }
 
 object PostTestAnswer

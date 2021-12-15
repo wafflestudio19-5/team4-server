@@ -1,10 +1,12 @@
 package wafflestudio.team4.reddit.domain.user.service
 
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import wafflestudio.team4.reddit.domain.user.dto.UserDto
 import wafflestudio.team4.reddit.domain.user.exception.UnauthorizedSigninException
+import wafflestudio.team4.reddit.domain.user.exception.UserNotFoundException
 import wafflestudio.team4.reddit.domain.user.model.User
 import wafflestudio.team4.reddit.domain.user.repository.UserRepository
 
@@ -30,5 +32,9 @@ class UserService(
             signinRequest.email,
             passwordEncoder.encode(signinRequest.password)
         ) ?: throw UnauthorizedSigninException()
+    }
+
+    fun getUserById(userId: Long): User {
+        return userRepository.findByIdOrNull(userId) ?: throw UserNotFoundException()
     }
 }

@@ -15,4 +15,7 @@ enum class ErrorType(
 
     UNAUTHORIZED(4010),
     USER_WRONG_EMAIL_PASSWORD(4011),
+
+    NOT_FOUND(4040),
+    USER_NOT_FOUND(4041),
 }
