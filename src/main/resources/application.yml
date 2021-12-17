@@ -1,6 +1,10 @@
 spring:
   profiles:
     active: local
+app:
+    jwt:
+        jwt-secret-key: wafflestudio
+        jwt-expiration-in-ms: 10800000
 
 ---
 
@@ -13,13 +17,14 @@ spring:
     url: jdbc:mysql://localhost:3306/reddit?serverTimezone=UTC
     username: waffle-team-4
     password: waffleteam4
-    sql:
-      init:
-        mode: always
-    jpa:
-      generate-ddl: true
-      hibernate:
-        ddl-auto: create
+#    sql:
+#      init:
+#        mode: always
+  jpa:
+    generate-ddl: true
+    hibernate:
+      ddl-auto: create
+    show-sql: true
 
 ---
 
