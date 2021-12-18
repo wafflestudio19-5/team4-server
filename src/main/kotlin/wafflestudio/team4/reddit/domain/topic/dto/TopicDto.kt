@@ -7,8 +7,8 @@ class TopicDto {
     data class Response(
         val id: Long,
         val name: String
-    ){
-        constructor(topic: Topic): this(
+    ) {
+        constructor(topic: Topic) : this(
             id = topic.id,
             name = topic.name
         )
