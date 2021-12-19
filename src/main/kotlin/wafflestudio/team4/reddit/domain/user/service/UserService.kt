@@ -37,4 +37,11 @@ class UserService(
     fun getUserById(userId: Long): User {
         return userRepository.findByIdOrNull(userId) ?: throw UserNotFoundException()
     }
+
+    fun updateUser(user: User, updateRequest: UserDto.UpdateRequest): User {
+        val newEncodedPassword =
+            if (updateRequest.password != null) passwordEncoder.encode(updateRequest.password) else null
+        val updatedUser = user.updatedBy(updateRequest, newEncodedPassword)
+        return userRepository.save(updatedUser)
+    }
 }

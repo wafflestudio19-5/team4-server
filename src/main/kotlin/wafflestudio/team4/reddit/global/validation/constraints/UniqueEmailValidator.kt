@@ -8,7 +8,10 @@ import javax.validation.ConstraintValidatorContext
 
 @Component
 class UniqueEmailValidator(val userRepository: UserRepository) : ConstraintValidator<UniqueEmail, String> {
-    override fun isValid(email: String, context: ConstraintValidatorContext?): Boolean {
+    override fun isValid(email: String?, context: ConstraintValidatorContext?): Boolean {
+        if (email == null) {
+            return true
+        }
         val isDuplicate = userRepository.existsByEmail(email)
 
         if (isDuplicate) {

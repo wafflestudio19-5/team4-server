@@ -13,6 +13,7 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.ResultActionsDsl
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
+import org.springframework.test.web.servlet.put
 import org.springframework.transaction.annotation.Transactional
 import wafflestudio.team4.reddit.global.util.TestHelper
 
@@ -74,6 +75,23 @@ class UserTest(
             content = (body)
             contentType = (MediaType.APPLICATION_JSON)
             accept = (MediaType.APPLICATION_JSON)
+            if (authentication != null) {
+                header("Authentication", authentication)
+                // TODO header
+            }
+        }
+    }
+
+    private fun put(url: String, body: String, authentication: String?): ResultActionsDsl {
+        val targetUrl = if (url.startsWith("/")) url else "/$url"
+        println("Header: $authentication")
+        return mockMvc.put("/api/v1$targetUrl") {
+            content = (body)
+            contentType = (MediaType.APPLICATION_JSON)
+            accept = (MediaType.APPLICATION_JSON)
+            if (authentication != null) {
+                header("Authentication", authentication)
+            }
         }
     }
 
@@ -217,18 +235,18 @@ class UserTest(
                 {
                     "email": "updatename@snu.ac.kr",
                     "username": "updatename",
-                    "password": update_password"
+                    "password": "update_password"
                 }
             """.trimIndent()
 
         // without login
-        post(url, successFullBody, null)
+        put(url, successFullBody, null)
             .andExpect {
                 status { isUnauthorized() }
             }
 
         // with login, full
-        post(url, successFullBody, signinAndGetAuth(username2, password))
+        put(url, successFullBody, signinAndGetAuth(username2, password))
             .andExpect {
                 status { isOk() }
             }
@@ -245,10 +263,10 @@ class UserTest(
             """
                 {
                     "username": "updatename",
-                    "password": update_password"
+                    "password": "update_password"
                 }
             """.trimIndent()
-        post(url, successBodyWithoutEmail, signinAndGetAuth(username2, password))
+        put(url, successBodyWithoutEmail, signinAndGetAuth(username2, password))
             .andExpect {
                 status { isOk() }
             }
@@ -264,10 +282,10 @@ class UserTest(
             """
                 {
                     "email": "updatename@snu.ac.kr",
-                    "password": update_password"
+                    "password": "update_password"
                 }
             """.trimIndent()
-        post(url, successBodyWithoutName, signinAndGetAuth(username2, password))
+        put(url, successBodyWithoutName, signinAndGetAuth(username2, password))
             .andExpect {
                 status { isOk() }
             }
@@ -283,10 +301,10 @@ class UserTest(
             """
                 {
                     "email": "updatename@snu.ac.kr",
-                    "username": "updatename",
+                    "username": "updatename"
                 }
             """.trimIndent()
-        post(url, successBodyWithoutPassword, signinAndGetAuth(username2, password))
+        put(url, successBodyWithoutPassword, signinAndGetAuth(username2, password))
             .andExpect {
                 status { isOk() }
             }
@@ -302,10 +320,10 @@ class UserTest(
             """
                 {
                     "email": "$username1@snu.ac.kr",
-                    "username": "updatename",
-                {
+                    "username": "updatename"
+                }
             """.trimIndent()
-        post(url, duplicateEmailBody, signinAndGetAuth(username2, password))
+        put(url, duplicateEmailBody, signinAndGetAuth(username2, password))
             .andExpect {
                 status { isBadRequest() }
             }

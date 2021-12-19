@@ -46,8 +46,8 @@ class UserDto {
     )
 
     data class UpdateRequest(
-        @field:Email
         @field:UniqueEmail
+        @field:Email
         val email: String?,
 
         val username: String?,

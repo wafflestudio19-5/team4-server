@@ -1,6 +1,7 @@
 package wafflestudio.team4.reddit.domain.user.model
 
 import wafflestudio.team4.reddit.domain.model.BaseTimeEntity
+import wafflestudio.team4.reddit.domain.user.dto.UserDto
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.Table
@@ -14,22 +15,29 @@ class User(
     @Column(unique = true)
     @field:NotBlank
     @field:Email
-    val email: String,
+    var email: String,
 
     @field:NotBlank
-    val username: String,
+    var username: String,
 
     @field:NotBlank
-    val password: String,
+    var password: String,
 
     @field:NotNull
-    val online: Boolean = false,
+    var online: Boolean = false,
 
     @field:NotNull
-    val isDeleted: Boolean = false,
+    var isDeleted: Boolean = false,
 
     @field:NotNull
-    val roles: String = "",
+    var roles: String = "",
 
     // TODO cascade
-) : BaseTimeEntity()
+) : BaseTimeEntity() {
+    fun updatedBy(updateRequest: UserDto.UpdateRequest, encodedPassword: String?): User {
+        this.email = updateRequest.email ?: this.email
+        this.username = updateRequest.username ?: this.username
+        this.password = encodedPassword ?: this.password
+        return this
+    }
+}

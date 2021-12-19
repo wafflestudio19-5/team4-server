@@ -64,6 +64,11 @@ class UserController(
     }
 
     @PutMapping("/me/")
-    fun updateUser() {
+    fun updateUser(
+        @Valid @RequestBody updateRequest: UserDto.UpdateRequest,
+        @CurrentUser user: User,
+    ): UserDto.Response {
+        val updatedUser = userService.updateUser(user, updateRequest)
+        return UserDto.Response(updatedUser)
     }
 }
