@@ -68,6 +68,15 @@ class UserTest(
         }
     }
 
+    private fun post(url: String, body: String, authentication: String?): ResultActionsDsl {
+        val targetUrl = if (url.startsWith("/")) url else "/$url"
+        return mockMvc.post("/api/v1$targetUrl") {
+            content = (body)
+            contentType = (MediaType.APPLICATION_JSON)
+            accept = (MediaType.APPLICATION_JSON)
+        }
+    }
+
     private fun signupRequest(username: String, password: String): String {
         return """
             {
@@ -197,5 +206,108 @@ class UserTest(
             }
             .andReturn()
             .let { assertTrue(testHelper.compare(it, 3, 3)) }
+    }
+
+    @Test
+    @Transactional
+    fun `4_1_UPDATE_USER_정상`() {
+        val url = "/users/me/"
+        val successFullBody =
+            """
+                {
+                    "email": "updatename@snu.ac.kr",
+                    "username": "updatename",
+                    "password": update_password"
+                }
+            """.trimIndent()
+
+        // without login
+        post(url, successFullBody, null)
+            .andExpect {
+                status { isUnauthorized() }
+            }
+
+        // with login, full
+        post(url, successFullBody, signinAndGetAuth(username2, password))
+            .andExpect {
+                status { isOk() }
+            }
+            .andReturn()
+            .let { assertTrue(testHelper.compare(it, 4, 1)) }
+        // TODO password check
+    }
+
+    @Test
+    @Transactional
+    fun `4_2_UPDATE_USER_WITHOUT_EMAIL`() {
+        val url = "/users/me/"
+        val successBodyWithoutEmail =
+            """
+                {
+                    "username": "updatename",
+                    "password": update_password"
+                }
+            """.trimIndent()
+        post(url, successBodyWithoutEmail, signinAndGetAuth(username2, password))
+            .andExpect {
+                status { isOk() }
+            }
+            .andReturn()
+            .let { assertTrue(testHelper.compare(it, 4, 2)) }
+    }
+
+    @Test
+    @Transactional
+    fun `4_3_UPDATE_USER_WITHOUT_NAME`() {
+        val url = "/users/me/"
+        val successBodyWithoutName =
+            """
+                {
+                    "email": "updatename@snu.ac.kr",
+                    "password": update_password"
+                }
+            """.trimIndent()
+        post(url, successBodyWithoutName, signinAndGetAuth(username2, password))
+            .andExpect {
+                status { isOk() }
+            }
+            .andReturn()
+            .let { assertTrue(testHelper.compare(it, 4, 3)) }
+    }
+
+    @Test
+    @Transactional
+    fun `4_4_UPDATE_USER_WITHOUT_PASSWORD`() {
+        val url = "/users/me/"
+        val successBodyWithoutPassword =
+            """
+                {
+                    "email": "updatename@snu.ac.kr",
+                    "username": "updatename",
+                }
+            """.trimIndent()
+        post(url, successBodyWithoutPassword, signinAndGetAuth(username2, password))
+            .andExpect {
+                status { isOk() }
+            }
+            .andReturn()
+            .let { assertTrue(testHelper.compare(it, 4, 4)) }
+    }
+
+    @Test
+    @Transactional
+    fun `4_5_UPDATE_USER_DUPLICATE_EMAIL`() {
+        val url = "/users/me/"
+        val duplicateEmailBody =
+            """
+                {
+                    "email": "$username1@snu.ac.kr",
+                    "username": "updatename",
+                {
+            """.trimIndent()
+        post(url, duplicateEmailBody, signinAndGetAuth(username2, password))
+            .andExpect {
+                status { isBadRequest() }
+            }
     }
 }
