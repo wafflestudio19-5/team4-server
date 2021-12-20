@@ -25,6 +25,7 @@ class UserTest(
     private val mockMvc: MockMvc,
     private val objectMapper: ObjectMapper,
 ) {
+    // TODO db check
     private val username1 = "username1"
     private val username2 = "username2"
     private val password = "somepassword"
@@ -77,7 +78,6 @@ class UserTest(
             accept = (MediaType.APPLICATION_JSON)
             if (authentication != null) {
                 header("Authentication", authentication)
-                // TODO header
             }
         }
     }
@@ -252,7 +252,13 @@ class UserTest(
             }
             .andReturn()
             .let { assertTrue(testHelper.compare(it, 4, 1)) }
-        // TODO password check
+
+        // password check
+        signin("updatename", "update_password")
+            .andExpect {
+                status { isNoContent() }
+                header { exists("Authentication") }
+            }
     }
 
     @Test
@@ -272,6 +278,13 @@ class UserTest(
             }
             .andReturn()
             .let { assertTrue(testHelper.compare(it, 4, 2)) }
+
+        // password check
+        signin(username2, "update_password")
+            .andExpect {
+                status { isNoContent() }
+                header { exists("Authentication") }
+            }
     }
 
     @Test
@@ -291,6 +304,13 @@ class UserTest(
             }
             .andReturn()
             .let { assertTrue(testHelper.compare(it, 4, 3)) }
+
+        // password check
+        signin("updatename", "update_password")
+            .andExpect {
+                status { isNoContent() }
+                header { exists("Authentication") }
+            }
     }
 
     @Test

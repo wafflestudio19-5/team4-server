@@ -18,6 +18,7 @@ class UserService(
     @Transactional
     fun signup(signupRequest: UserDto.SignupRequest): User {
         val encodedPassword = passwordEncoder.encode(signupRequest.password)
+        // TODO deleted된 user와의 email uniqueness는 어떻게??
 
         val newUser = User(
             email = signupRequest.email,
@@ -43,5 +44,10 @@ class UserService(
             if (updateRequest.password != null) passwordEncoder.encode(updateRequest.password) else null
         val updatedUser = user.updatedBy(updateRequest, newEncodedPassword)
         return userRepository.save(updatedUser)
+    }
+
+    fun deleteUser(user: User) {
+        user.isDeleted = true
+        userRepository.save(user)
     }
 }

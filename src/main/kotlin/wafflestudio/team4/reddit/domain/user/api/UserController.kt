@@ -60,7 +60,9 @@ class UserController(
     }
 
     @DeleteMapping("/me/")
-    fun deleteUser() {
+    fun deleteUser(@CurrentUser user: User): ResponseEntity<String> {
+        userService.deleteUser(user)
+        return ResponseEntity.noContent().build()
     }
 
     @PutMapping("/me/")
