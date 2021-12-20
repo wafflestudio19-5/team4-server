@@ -21,7 +21,7 @@ jobs:
       with:
           path: |
             ~/.gradle/caches
-            ~/.gralde/wrapper
+            ~/.grae/wrapper
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
