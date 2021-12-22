@@ -1,5 +1,7 @@
 package wafflestudio.team4.reddit.domain.user.service
 
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
@@ -37,6 +39,11 @@ class UserService(
 
     fun getUserById(userId: Long): User {
         return userRepository.findByIdOrNull(userId) ?: throw UserNotFoundException()
+    }
+
+    fun getUsersPage(lastUserId: Long, size: Int): Page<User> {
+        val pageRequest = PageRequest.of(0, size)
+        return userRepository.findByIdLessThanOrderByIdDesc(lastUserId, pageRequest)
     }
 
     fun updateUser(user: User, updateRequest: UserDto.UpdateRequest): User {

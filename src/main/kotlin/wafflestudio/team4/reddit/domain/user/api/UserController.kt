@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 import wafflestudio.team4.reddit.domain.user.dto.UserDto
@@ -18,6 +19,9 @@ import wafflestudio.team4.reddit.domain.user.model.User
 import wafflestudio.team4.reddit.domain.user.service.UserService
 import wafflestudio.team4.reddit.global.auth.CurrentUser
 import wafflestudio.team4.reddit.global.auth.JwtTokenProvider
+import wafflestudio.team4.reddit.global.common.dto.PageLinkDto
+import wafflestudio.team4.reddit.global.common.dto.PageResponse
+import java.lang.Long.max
 import javax.validation.Valid
 
 @RestController
@@ -27,7 +31,27 @@ class UserController(
     private val jwtTokenProvider: JwtTokenProvider,
 ) {
     @GetMapping("/")
-    fun getUsers() {
+    fun getUsersPage(
+        @RequestParam(required = false, defaultValue = Long.MAX_VALUE.toString()) lastUserId: Long,
+        @RequestParam(required = false, defaultValue = "10") size: Int,
+    ): PageResponse<UserDto.Response> {
+        // TODO order
+        // deleted users
+        val usersPage = userService.getUsersPage(lastUserId, size)
+        val userLinks = buildPageLink(lastUserId, size)
+        return PageResponse(usersPage.map { UserDto.Response(it) }, userLinks)
+    }
+
+    private fun buildPageLink(lastUserId: Long, size: Int): PageLinkDto {
+        val first = "size=$size"
+        val self = "lastUserId=$lastUserId&size=$size"
+        val last = "lastUserId=${size + 1}&size=$size"
+
+        val next = "lastUserId=${max(0, lastUserId - size)}&size=$size"
+        val prev = "lastUserId=" +
+            "${if ((lastUserId - Long.MAX_VALUE) + size > 0) Long.MAX_VALUE else lastUserId + size}&size=$size"
+
+        return PageLinkDto(first, prev, self, next, last)
     }
 
     @GetMapping("/me/")
