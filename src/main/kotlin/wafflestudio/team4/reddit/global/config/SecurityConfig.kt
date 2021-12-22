@@ -45,6 +45,7 @@ class SecurityConfig(
     }
 
     override fun configure(http: HttpSecurity) {
+//        userPrincipalDetailService.passwordEncoder = passwordEncoder()
         http
             .csrf().disable()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -53,6 +54,7 @@ class SecurityConfig(
             .and()
             .addFilter(
                 SigninAuthenticationFilter(authenticationManager(), jwtTokenProvider, userPrincipalDetailService)
+//                SigninAuthenticationFilter(authenticationManager(), jwtTokenProvider)
             )
             .addFilter(JwtAuthenticationFilter(authenticationManager(), jwtTokenProvider))
             .authorizeRequests()

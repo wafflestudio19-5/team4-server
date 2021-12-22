@@ -31,7 +31,7 @@ class SigninAuthenticationFilter(
         authResult: Authentication
     ) {
         // TODO redirect to filter
-        // val parsedRequest: LoginRequest = parseRequest(request)
+//        val parsedRequest: LoginRequest = parseRequest(request)
         if (this.loginRequest == null) {
             response.status = HttpServletResponse.SC_UNAUTHORIZED
             return

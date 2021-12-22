@@ -11,6 +11,7 @@ import org.springframework.http.MediaType
 import org.springframework.test.context.TestConstructor
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.ResultActionsDsl
+import org.springframework.test.web.servlet.delete
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
 import org.springframework.test.web.servlet.put
@@ -84,11 +85,25 @@ class UserTest(
 
     private fun put(url: String, body: String, authentication: String?): ResultActionsDsl {
         val targetUrl = if (url.startsWith("/")) url else "/$url"
-        println("Header: $authentication")
         return mockMvc.put("/api/v1$targetUrl") {
             content = (body)
             contentType = (MediaType.APPLICATION_JSON)
             accept = (MediaType.APPLICATION_JSON)
+            if (authentication != null) {
+                header("Authentication", authentication)
+            }
+        }
+    }
+
+    private fun delete(url: String, body: String?, authentication: String?): ResultActionsDsl {
+        val targetUrl = if (url.startsWith("/")) url else "/$url"
+        return mockMvc.delete("/api/v1$targetUrl") {
+            if (body != null) {
+                content = (body)
+                contentType = (MediaType.APPLICATION_JSON)
+                accept = (MediaType.APPLICATION_JSON)
+            }
+
             if (authentication != null) {
                 header("Authentication", authentication)
             }
@@ -346,6 +361,30 @@ class UserTest(
         put(url, duplicateEmailBody, signinAndGetAuth(username2, password))
             .andExpect {
                 status { isBadRequest() }
+            }
+    }
+
+    @Test
+    @Transactional
+    fun `5_1_DELETE_USER_성공`() {
+        val url = "/users/me/"
+
+        // without login
+        delete(url, null, null)
+            .andExpect {
+                status { isUnauthorized() }
+            }
+
+        // with login
+        delete(url, null, signinAndGetAuth(username2, password))
+            .andExpect {
+                status { isNoContent() }
+            }
+
+        // login 시도
+        signin(username2, password)
+            .andExpect {
+                status { isUnauthorized() }
             }
     }
 }
