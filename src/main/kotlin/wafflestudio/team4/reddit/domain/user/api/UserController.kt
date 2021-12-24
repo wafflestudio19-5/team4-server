@@ -36,7 +36,7 @@ class UserController(
         @RequestParam(required = false, defaultValue = "10") size: Int,
     ): PageResponse<UserDto.Response> {
         // TODO order
-        // deleted users
+        // TODO deleted users
         val usersPage = userService.getUsersPage(lastUserId, size)
         val userLinks = buildPageLink(lastUserId, size)
         return PageResponse(usersPage.map { UserDto.Response(it) }, userLinks)
