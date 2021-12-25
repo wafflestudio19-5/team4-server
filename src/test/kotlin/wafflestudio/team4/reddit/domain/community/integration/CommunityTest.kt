@@ -2,11 +2,13 @@ package wafflestudio.team4.reddit.domain.community.integration
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.json.JSONArray
-import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.TestInstance
-import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.TestMethodOrder
+import org.junit.jupiter.api.MethodOrderer
 import org.junit.jupiter.api.Test
-import org.springframework.beans.factory.annotation.Autowired
+import org.junit.jupiter.api.Order
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.Assertions
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.mock.mockito.MockBean
@@ -15,8 +17,6 @@ import org.springframework.test.context.TestConstructor
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.ResultActionsDsl
 import org.springframework.test.web.servlet.post
-import org.springframework.transaction.annotation.Transactional
-import wafflestudio.team4.reddit.domain.community.service.CommunityService
 import wafflestudio.team4.reddit.domain.topic.model.Topic
 import wafflestudio.team4.reddit.domain.topic.repository.TopicRepository
 import wafflestudio.team4.reddit.domain.topic.service.TopicService
@@ -26,11 +26,10 @@ import wafflestudio.team4.reddit.global.util.TestHelper
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @SpringBootTest
+@TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 class CommunityTest(
     private val mockMvc: MockMvc,
-    private val objectMapper: ObjectMapper,
-    @Autowired
-    private val communityService: CommunityService
+    private val objectMapper: ObjectMapper
 ) {
     private val testHelper = TestHelper(objectMapper)
 
@@ -168,13 +167,13 @@ class CommunityTest(
     }
 
     @Test
-    @Transactional
+    @Order(1)
     fun `1_1_커뮤니티 생성_정상`() {
         // without login
-        createCommunity(null, createCommunityRequest(communityName1, description, listOf("topic1", "topic2")))
+        /*createCommunity(null, createCommunityRequest(communityName1, description, listOf("topic1", "topic2")))
             .andExpect {
                 status { isUnauthorized() }
-            }
+            }*/
 
         // with login
         val authentication1 = signinAndGetAuth(username1, password)
@@ -192,16 +191,16 @@ class CommunityTest(
     }
 
     @Test
-    @Transactional
+    @Order(2)
     fun `1_2_커뮤니티 생성_중복 이름`() {
-        val authentication1 = signinAndGetAuth(username1, password)
+        /*val authentication1 = signinAndGetAuth(username1, password)
         createCommunity(
             authentication1,
             createCommunityRequest(communityName1, description, listOf("topic1", "topic2"))
         )
             .andExpect {
                 status { isCreated() }
-            }
+            }*/
 
         val authentication2 = signinAndGetAuth(username2, password)
         createCommunity(
@@ -218,16 +217,16 @@ class CommunityTest(
     }
 
     @Test
-    @Transactional
+    @Order(3)
     fun `2_1_커뮤니티 구독_매니저_정상`() {
-        val authentication1 = signinAndGetAuth(username1, password)
+        /*val authentication1 = signinAndGetAuth(username1, password)
         createCommunity(
             authentication1,
             createCommunityRequest(communityName1, description, listOf("topic1", "topic2"))
         )
             .andExpect {
                 status { isCreated() }
-            }
+            }*/
 
         val authentication2 = signinAndGetAuth(username2, password)
         joinCommunity(authentication2, joinCommunityRequest("manager"), 1)
@@ -241,16 +240,16 @@ class CommunityTest(
     }
 
     @Test
-    @Transactional
+    @Order(4)
     fun `2_2_커뮤니티 구독_일반 회원_정상`() {
-        val authentication1 = signinAndGetAuth(username1, password)
+        /*val authentication1 = signinAndGetAuth(username1, password)
         createCommunity(
             authentication1,
             createCommunityRequest(communityName1, description, listOf("topic1", "topic2"))
         )
             .andExpect {
                 status { isCreated() }
-            }
+            }*/
 
         val authentication3 = signinAndGetAuth(username3, password)
         joinCommunity(authentication3, joinCommunityRequest("member"), 1)
@@ -264,10 +263,10 @@ class CommunityTest(
     }
 
     @Test
-    @Transactional
+    @Order(5)
     fun `2_3_커뮤니티 구독_해당 커뮤니티 없음`() {
         val authentication1 = signinAndGetAuth(username1, password)
-        joinCommunity(authentication1, joinCommunityRequest("member"), 1)
+        joinCommunity(authentication1, joinCommunityRequest("member"), 2)
             .andExpect {
                 status { isNotFound() }
             }
@@ -278,42 +277,43 @@ class CommunityTest(
     }
 
     @Test
-    @Transactional
+    @Order(6)
     fun `2_4_커뮤니티 구독_이미 구독`() {
-        val authentication1 = signinAndGetAuth(username1, password)
+        /*val authentication1 = signinAndGetAuth(username1, password)
         createCommunity(
             authentication1,
             createCommunityRequest(communityName1, description, listOf("topic1", "topic2"))
         )
             .andExpect {
                 status { isCreated() }
-            }
-        val authentication2 = signinAndGetAuth(username2, password)
+            }*/
+        /*val authentication2 = signinAndGetAuth(username2, password)
         joinCommunity(authentication2, joinCommunityRequest("member"), 1)
             .andExpect {
                 status { isCreated() }
-            }
-
+            }*/
+        val authentication2 = signinAndGetAuth(username2, password)
+        val authentication3 = signinAndGetAuth(username3, password)
         // manager attempts rejoin as manager
-        joinCommunity(authentication1, joinCommunityRequest("manager"), 1)
-            .andExpect {
-                status { isBadRequest() }
-            }
-
-        // manager attempts rejoin as member -> possible?
-        joinCommunity(authentication1, joinCommunityRequest("member"), 1)
-            .andExpect {
-                status { isBadRequest() }
-            }
-
-        // member attempts rejoin as manager -> possible??
         joinCommunity(authentication2, joinCommunityRequest("manager"), 1)
             .andExpect {
                 status { isBadRequest() }
             }
 
-        // member attempts rejoin as member
+        // manager attempts rejoin as member -> possible?
         joinCommunity(authentication2, joinCommunityRequest("member"), 1)
+            .andExpect {
+                status { isBadRequest() }
+            }
+
+        // member attempts rejoin as manager -> possible??
+        joinCommunity(authentication3, joinCommunityRequest("manager"), 1)
+            .andExpect {
+                status { isBadRequest() }
+            }
+
+        // member attempts rejoin as member
+        joinCommunity(authentication3, joinCommunityRequest("member"), 1)
             .andExpect {
                 status { isBadRequest() }
             }
@@ -323,20 +323,15 @@ class CommunityTest(
             }
     }
 
-    // login x needed?
-
     @Test
-    @Transactional
     fun `3_1_커뮤니티 탈퇴_정상`() {
     }
 
     @Test
-    @Transactional
     fun `3_2_커뮤니티 탈퇴_`() {
     }
 
     @Test
-    @Transactional
     fun `4_1_커뮤니티 정보 수정_정상`() {
     }
 }

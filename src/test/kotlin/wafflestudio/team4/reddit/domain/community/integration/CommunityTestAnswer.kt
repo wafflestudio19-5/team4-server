@@ -47,7 +47,7 @@ object CommunityTestAnswer {
             1,
             "communityName1",
             1,
-            1,
+            2,
             "description",
             false
         ),
