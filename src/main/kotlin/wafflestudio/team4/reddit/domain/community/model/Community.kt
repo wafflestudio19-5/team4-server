@@ -1,6 +1,7 @@
 package wafflestudio.team4.reddit.domain.community.model
 
 import wafflestudio.team4.reddit.domain.model.BaseTimeEntity
+import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.Table
 import javax.validation.constraints.NotBlank
@@ -10,6 +11,7 @@ import javax.validation.constraints.NotNull
 @Table(name = "reddit_community")
 class Community(
 
+    @Column(unique = true)
     @field:NotBlank
     var name: String,
 

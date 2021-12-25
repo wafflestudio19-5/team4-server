@@ -2,6 +2,9 @@ package wafflestudio.team4.reddit.domain.community.service
 
 import org.springframework.stereotype.Service
 import wafflestudio.team4.reddit.domain.community.dto.CommunityDto
+import wafflestudio.team4.reddit.domain.community.exception.AlreadyJoinedException
+import wafflestudio.team4.reddit.domain.community.exception.CommunityAlreadyExistsException
+import wafflestudio.team4.reddit.domain.community.exception.CommunityNotFoundException
 import wafflestudio.team4.reddit.domain.community.exception.NotCommunityManagerException
 import wafflestudio.team4.reddit.domain.community.model.Community
 import wafflestudio.team4.reddit.domain.community.model.CommunityTopic
@@ -23,16 +26,18 @@ class CommunityService(
     }
 
     fun getCommunityById(communityId: Long): Community {
-        // TODO exception: if community with id x exist
+        if (!communityRepository.existsById(communityId)) throw CommunityNotFoundException()
         return communityRepository.getById(communityId)
     }
 
     fun createCommunity(createRequest: CommunityDto.CreateRequest, user: User): Community {
+        if (communityRepository.existsByName(createRequest.name)) throw CommunityAlreadyExistsException()
         var community = Community(
             name = createRequest.name,
             num_members = 0, // managers not part of num_members
             num_managers = 1,
-            description = createRequest.description
+            description = createRequest.description,
+            deleted = false
         )
         community = communityRepository.save(community)
 
@@ -52,7 +57,7 @@ class CommunityService(
         communityTopicRepository.save(communityTopic)
 
         // add additional topics
-        if (topics.isNotEmpty()) {
+        if (topics.size > 1) {
             for (i in 1 until topics.size) {
                 val newCommunityTopic = CommunityTopic(
                     community = community,
@@ -66,14 +71,15 @@ class CommunityService(
     }
 
     fun joinCommunity(user: User, communityId: Long, role: String): Community {
-        // TODO exception: if already joined (member or manager)
-        // TODO exception: if community with id x exist
+        if (!communityRepository.existsById(communityId)) throw CommunityNotFoundException()
         var community = communityRepository.getById(communityId)
 
+        if (userCommunityRepository.existsByUserAndCommunity(user, community)) throw AlreadyJoinedException()
         val userCommunity = UserCommunity(
             user = user,
             community = community
         )
+
         if (role == "manager") {
             userCommunity.isManager = true
             community.num_managers += 1
@@ -87,7 +93,7 @@ class CommunityService(
 
     fun leaveCommunity(user: User, communityId: Long): Community {
         // TODO exception: if user not in community (already left or never joined)
-        // TODO exception: if community with id x exist
+        if (!communityRepository.existsById(communityId)) throw CommunityNotFoundException()
         var community = communityRepository.getById(communityId)
 
         val userCommunity = userCommunityRepository.getByUserAndCommunity(user, community)
@@ -102,7 +108,7 @@ class CommunityService(
     }
 
     fun modifyCommunity(user: User, modifyRequest: CommunityDto.ModifyRequest, communityId: Long): Community {
-        // TODO exception: if community with id x exist
+        if (!communityRepository.existsById(communityId)) throw CommunityNotFoundException()
 
         var community = communityRepository.getById(communityId)
 
@@ -125,7 +131,7 @@ class CommunityService(
     }
 
     fun deleteCommunity(user: User, communityId: Long) {
-        // TODO exception: if community with id x exist
+        if (!communityRepository.existsById(communityId)) throw CommunityNotFoundException()
         val community = communityRepository.getById(communityId)
         // check whether user is this community's manager
         val userCommunity = userCommunityRepository.getByUserAndCommunity(user, community)
