@@ -21,22 +21,21 @@ class Post(
 //    val community: Community, // community 도메인 import 필요
 
     @field:NotBlank
-    val title: String,
+    var title: String,
 
     @field:NotBlank
-    val content: String,
+    var content: String,
 
     @OneToMany(mappedBy = "post")
-    val images : List<PostImage> = listOf(),
+    var images : List<PostImage> = listOf(),
 
 //    @OneToMany(mappedBy = "post")
 //    val videos : List<PostVideo> = listOf(),
 
     @field:NotNull
-    val isDeleted: Boolean = false,
+    var isDeleted: Boolean = false,
 
-//    file? 은 필요가 있을지...
-//    numVote - 리스폰스로 보낼 시 Dto에서 처리
-//    numDownVote - 리스폰스로 보낼 시 Dto에서 처리
+    @OneToMany(mappedBy = "post")
+    val votes : List<PostVote> = listOf(),
 
 ) : BaseTimeEntity()
