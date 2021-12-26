@@ -59,7 +59,7 @@ class CommunityController(
     }
 
     // withdraw from community
-    @PostMapping("/{community_id}/user/") // change URL pattern
+    @DeleteMapping("/{community_id}/me/") // change URL pattern
     fun leaveCommunity(
         @CurrentUser user: User,
         @PathVariable("community_id") communityId: Long
@@ -87,6 +87,6 @@ class CommunityController(
         ResponseEntity<Any> {
         val community = communityService.deleteCommunity(user, communityId)
         // what to return?
-        return ResponseEntity.status(200).body(null)
+        return ResponseEntity.status(200).body(CommunityDto.Response(community))
     }
 }

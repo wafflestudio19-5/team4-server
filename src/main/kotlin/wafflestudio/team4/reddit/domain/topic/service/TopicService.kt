@@ -11,10 +11,18 @@ import wafflestudio.team4.reddit.domain.user.model.User
 class TopicService(
     private val topicRepository: TopicRepository
 ) {
+    fun getTopicByName(name: String): Topic {
+        return topicRepository.getByName(name)
+    }
+
     @Transactional
     fun createTopic(createRequest: TopicDto.CreateRequest, user: User): Topic {
         var topic = Topic(createRequest.name)
         topic = topicRepository.save(topic)
         return topic
+    }
+
+    fun checkTopicExistence(name: String): Boolean {
+        return topicRepository.existsByName(name)
     }
 }

@@ -21,5 +21,8 @@ class CommunityTopic(
     @field:NotNull
     @ManyToOne(fetch = FetchType.EAGER, cascade = [CascadeType.ALL])
     @JoinColumn(name = "topic_id")
-    val topic: Topic
+    val topic: Topic,
+
+    @field:NotNull
+    var deleted: Boolean = false
 ) : BaseTimeEntity()

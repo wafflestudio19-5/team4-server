@@ -49,6 +49,7 @@ class CommunityDto {
     // ModifyRequest
     data class ModifyRequest(
         val name: String,
-        val description: String
+        val description: String,
+        val topics: List<String>
     )
 }
