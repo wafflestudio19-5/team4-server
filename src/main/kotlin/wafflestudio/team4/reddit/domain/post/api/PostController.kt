@@ -19,9 +19,9 @@ class PostController(
 ) {
     @GetMapping("/")
     fun getPosts(
-//        @RequestParam(defaultValue = "new", name = "order") order: String,
-        @RequestParam(name = "lastPostId", required = true) lastPostId : Int, // 현재 페이지
-        @RequestParam(name = "size", required = true) size: Int, // 각 페이지 당 게시글 수
+//      @RequestParam(defaultValue = "new", name = "order") order: String,
+        @RequestParam(name = "lastPostId", defaultValue = Long.MAX_VALUE.toString()) lastPostId : Long, // 현재 페이지
+        @RequestParam(name = "size", defaultValue = "10") size: Int, // 각 페이지 당 게시글 수
     ): ListResponse<PostDto.Response> {
         val posts = postService.getPosts(lastPostId, size)
         return ListResponse(posts.map { PostDto.Response(it) } )

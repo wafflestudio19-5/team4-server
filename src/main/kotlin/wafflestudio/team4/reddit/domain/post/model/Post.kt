@@ -27,7 +27,7 @@ class Post(
     var content: String,
 
     @OneToMany(mappedBy = "post")
-    var images : List<PostImage> = listOf(),
+    var images : MutableList<PostImage> = mutableListOf(),
 
 //    @OneToMany(mappedBy = "post")
 //    val videos : List<PostVideo> = listOf(),

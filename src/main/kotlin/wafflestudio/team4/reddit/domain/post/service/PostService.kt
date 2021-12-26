@@ -1,6 +1,5 @@
 package wafflestudio.team4.reddit.domain.post.service
 
-import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -19,9 +18,9 @@ class PostService(
     private val postCommunityRepository: PostCommunityRepository,
     private val postVoteRepository: PostVoteRepository,
 ) {
-    fun getPosts(lasPostId: Int, size: Int): List<Post> {
-        val pageRequest : PageRequest = PageRequest.of(0,size);
-        return postRepository.findByIdLessThanAndOrderByIdDesc(lasPostId, pageRequest).content
+    fun getPosts(lasPostId: Long, size: Int): List<Post> {
+        val pageRequest : PageRequest = PageRequest.of(0,size)
+        return postRepository.findByIdLessThanOrderByIdDesc(lasPostId, pageRequest).content
     }
 
     fun getPostById(postId: Long): Post {
