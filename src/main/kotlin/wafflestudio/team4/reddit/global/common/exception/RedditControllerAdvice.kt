@@ -65,4 +65,6 @@ class RedditControllerAdvice {
         logger.error(ErrorType.VALIDATION_FAILED.name + " " + errorMessage)
         return ErrorResponse(ErrorType.VALIDATION_FAILED.code, ErrorType.VALIDATION_FAILED.name, errorMessage)
     }
+
+    // TODO jwt expiration
 }
