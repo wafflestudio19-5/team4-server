@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import org.springframework.test.web.servlet.MvcResult
 import wafflestudio.team4.reddit.domain.user.integration.UserTestAnswer
+import wafflestudio.team4.reddit.domain.community.integration.CommunityTestAnswer
 
 class TestHelper(
     private val objectMapper: ObjectMapper,
@@ -50,6 +51,21 @@ class TestHelper(
             return false
         }
         val ansString = dto2String(UserTestAnswer.ans[testNum - 1][subTestNum - 1])
+        val responseBody = mvcResult.response.contentAsString
+        return compare(responseBody, ansString)
+    }
+
+    fun compareCommunity(mvcResult: MvcResult, testNum: Int, subTestNum: Int): Boolean {
+        println("Compare called: $testNum $subTestNum")
+        if (testNum < 1 || testNum > CommunityTestAnswer.ans.size) {
+            println("Invalid test num")
+            return false
+        }
+        if (subTestNum < 1 || subTestNum > CommunityTestAnswer.ans[testNum - 1].size) {
+            println("Invalid sub test num")
+            return false
+        }
+        val ansString = dto2String(CommunityTestAnswer.ans[testNum - 1][subTestNum - 1])
         val responseBody = mvcResult.response.contentAsString
         return compare(responseBody, ansString)
     }
