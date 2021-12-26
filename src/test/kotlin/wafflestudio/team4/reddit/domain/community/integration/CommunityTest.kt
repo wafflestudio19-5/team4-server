@@ -210,7 +210,7 @@ class CommunityTest(
                 header { exists("Authentication") }
             }
 
-        signup(signupRequest(username1, password))
+        signup(signupRequest("username1", password))
             .andExpect {
                 status { isCreated() }
                 header { exists("Authentication") }
