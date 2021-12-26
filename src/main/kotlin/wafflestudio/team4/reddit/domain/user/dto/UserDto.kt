@@ -44,4 +44,14 @@ class UserDto {
         @field:NotBlank
         val password: String,
     )
+
+    data class UpdateRequest(
+        @field:UniqueEmail
+        @field:Email
+        val email: String?,
+
+        val username: String?,
+
+        val password: String?,
+    )
 }

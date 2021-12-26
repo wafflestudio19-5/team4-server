@@ -1,5 +1,7 @@
 package wafflestudio.team4.reddit.domain.user.service
 
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
@@ -18,6 +20,7 @@ class UserService(
     @Transactional
     fun signup(signupRequest: UserDto.SignupRequest): User {
         val encodedPassword = passwordEncoder.encode(signupRequest.password)
+        // TODO deleted된 user와의 email uniqueness는 어떻게??
 
         val newUser = User(
             email = signupRequest.email,
@@ -36,5 +39,22 @@ class UserService(
 
     fun getUserById(userId: Long): User {
         return userRepository.findByIdOrNull(userId) ?: throw UserNotFoundException()
+    }
+
+    fun getUsersPage(lastUserId: Long, size: Int): Page<User> {
+        val pageRequest = PageRequest.of(0, size)
+        return userRepository.findByIdLessThanOrderByIdDesc(lastUserId, pageRequest)
+    }
+
+    fun updateUser(user: User, updateRequest: UserDto.UpdateRequest): User {
+        val newEncodedPassword =
+            if (updateRequest.password != null) passwordEncoder.encode(updateRequest.password) else null
+        val updatedUser = user.updatedBy(updateRequest, newEncodedPassword)
+        return userRepository.save(updatedUser)
+    }
+
+    fun deleteUser(user: User) {
+        user.isDeleted = true
+        userRepository.save(user)
     }
 }
