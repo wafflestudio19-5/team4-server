@@ -31,9 +31,9 @@ class CommunityTest(
 ) {
     private val testHelper = TestHelper(objectMapper)
 
-    private val username1 = "username1"
-    private val username2 = "username2"
-    private val username3 = "username3"
+    private val usernameA = "usernameA"
+    private val usernameB = "usernameB"
+    private val usernameC = "usernameC"
     private val password = "password"
 
     // don't use mockBean (test Topic at same time)
@@ -210,19 +210,19 @@ class CommunityTest(
                 header { exists("Authentication") }
             }
 
-        signup(signupRequest("username1", password))
+        signup(signupRequest(usernameA, password))
             .andExpect {
                 status { isCreated() }
                 header { exists("Authentication") }
             }
 
-        signup(signupRequest(username2, password))
+        signup(signupRequest(usernameB, password))
             .andExpect {
                 status { isCreated() }
                 header { exists("Authentication") }
             }
 
-        signup(signupRequest(username3, password))
+        signup(signupRequest(usernameC, password))
             .andExpect {
                 status { isCreated() }
                 header { exists("Authentication") }
@@ -249,7 +249,7 @@ class CommunityTest(
                 status { isCreated() }
             }
 
-        val authentication1 = signinAndGetAuth(username1, password)
+        val authentication1 = signinAndGetAuth(usernameA, password)
         createCommunity(
             authentication1,
             createCommunityRequest(communityName1, description, listOf("topic1", "topic2"))
@@ -275,7 +275,7 @@ class CommunityTest(
                 status { isCreated() }
             }*/
 
-        val authentication2 = signinAndGetAuth(username2, password)
+        val authentication2 = signinAndGetAuth(usernameB, password)
         createCommunity(
             authentication2,
             createCommunityRequest(communityName1, description, listOf("topic1", "topic2"))
@@ -301,7 +301,7 @@ class CommunityTest(
                 status { isCreated() }
             }*/
 
-        val authentication2 = signinAndGetAuth(username2, password)
+        val authentication2 = signinAndGetAuth(usernameB, password)
         joinCommunity(authentication2, joinCommunityRequest("manager"), 1)
             .andExpect {
                 status { isCreated() }
@@ -324,7 +324,7 @@ class CommunityTest(
                 status { isCreated() }
             }*/
 
-        val authentication3 = signinAndGetAuth(username3, password)
+        val authentication3 = signinAndGetAuth(usernameC, password)
         joinCommunity(authentication3, joinCommunityRequest("member"), 1)
             .andExpect {
                 status { isCreated() }
@@ -338,7 +338,7 @@ class CommunityTest(
     @Test
     @Order(5)
     fun `2_3_커뮤니티 구독_해당 커뮤니티 없음`() {
-        val authentication1 = signinAndGetAuth(username1, password)
+        val authentication1 = signinAndGetAuth(usernameA, password)
         joinCommunity(authentication1, joinCommunityRequest("member"), 2)
             .andExpect {
                 status { isNotFound() }
@@ -365,8 +365,8 @@ class CommunityTest(
             .andExpect {
                 status { isCreated() }
             }*/
-        val authentication2 = signinAndGetAuth(username2, password)
-        val authentication3 = signinAndGetAuth(username3, password)
+        val authentication2 = signinAndGetAuth(usernameB, password)
+        val authentication3 = signinAndGetAuth(usernameC, password)
         // manager attempts rejoin as manager
         joinCommunity(authentication2, joinCommunityRequest("manager"), 1)
             .andExpect {
@@ -399,7 +399,7 @@ class CommunityTest(
     @Test
     @Order(7)
     fun `3_1_커뮤니티 탈퇴_매니저_정상`() {
-        val authentication2 = signinAndGetAuth(username2, password)
+        val authentication2 = signinAndGetAuth(usernameB, password)
         leaveCommunity(authentication2, 1)
             .andExpect {
                 status { isOk() }
@@ -413,7 +413,7 @@ class CommunityTest(
     @Test
     @Order(8)
     fun `3_2_커뮤니티 탈퇴_일반 회원_정상`() {
-        val authentication3 = signinAndGetAuth(username3, password)
+        val authentication3 = signinAndGetAuth(usernameC, password)
         leaveCommunity(authentication3, 1)
             .andExpect {
                 status { isOk() }
@@ -427,7 +427,7 @@ class CommunityTest(
     @Test
     @Order(9)
     fun `3_3_커뮤니티 탈퇴_해당 커뮤니티 없음`() {
-        val authentication1 = signinAndGetAuth(username1, password)
+        val authentication1 = signinAndGetAuth(usernameA, password)
         leaveCommunity(authentication1, 2)
             .andExpect {
                 status { isNotFound() }
@@ -460,7 +460,7 @@ class CommunityTest(
     @Test
     @Order(11)
     fun `3_5_커뮤니티 탈퇴_이미 탈퇴함`() {
-        val authentication2 = signinAndGetAuth(username2, password)
+        val authentication2 = signinAndGetAuth(usernameB, password)
         leaveCommunity(authentication2, 1)
             .andExpect {
                 status { isBadRequest() }
@@ -479,7 +479,7 @@ class CommunityTest(
         createTopic(authenticationAdmin, createTopicRequest("topic3"))
         createTopic(authenticationAdmin, createTopicRequest("topic4"))
 
-        val authentication1 = signinAndGetAuth(username1, password)
+        val authentication1 = signinAndGetAuth(usernameA, password)
 
         val body = modifyCommunityRequest(
             "changedName1",
@@ -500,7 +500,7 @@ class CommunityTest(
     @Test
     @Order(13)
     fun `4_2_커뮤니티 정보 수정_해당 커뮤니티 없음`() {
-        val authentication1 = signinAndGetAuth(username1, password)
+        val authentication1 = signinAndGetAuth(usernameA, password)
         val body = modifyCommunityRequest(
             "changedName2",
             "changedDescription",
@@ -520,7 +520,7 @@ class CommunityTest(
     @Order(14)
     fun `4_3_커뮤니티 정보 수정_매니저 아님`() {
         // 현재 구독 중 x
-        val authentication2 = signinAndGetAuth(username2, password)
+        val authentication2 = signinAndGetAuth(usernameB, password)
         val body = modifyCommunityRequest(
             "changedName2",
             "changedDescription2",
@@ -536,7 +536,7 @@ class CommunityTest(
             }
 
         // 일반 회원
-        val authentication3 = signinAndGetAuth(username3, password)
+        val authentication3 = signinAndGetAuth(usernameC, password)
         joinCommunity(authentication3, joinCommunityRequest("member"), 1)
         val body2 = modifyCommunityRequest(
             "changedName2",
@@ -556,7 +556,7 @@ class CommunityTest(
     @Test
     @Order(15)
     fun `4_4_커뮤니티 정보 수정_토픽 없음`() {
-        val authentication1 = signinAndGetAuth(username1, password)
+        val authentication1 = signinAndGetAuth(usernameA, password)
         val body = modifyCommunityRequest(
             "changedName2",
             "changedDescription2",
@@ -575,7 +575,7 @@ class CommunityTest(
     @Test
     @Order(18)
     fun `5_1_커뮤니티 삭제_정상`() {
-        val authentication1 = signinAndGetAuth(username1, password)
+        val authentication1 = signinAndGetAuth(usernameA, password)
         deleteCommunity(authentication1, 1)
             .andExpect {
                 status { isOk() }
@@ -589,7 +589,7 @@ class CommunityTest(
     @Test
     @Order(17)
     fun `5_2_커뮤니티 삭제_커뮤니티 없음`() {
-        val authentication1 = signinAndGetAuth(username1, password)
+        val authentication1 = signinAndGetAuth(usernameA, password)
         deleteCommunity(authentication1, 2)
             .andExpect {
                 status { isNotFound() }
@@ -604,7 +604,7 @@ class CommunityTest(
     @Order(16)
     fun `5_3_커뮤니티 삭제_매니저 아님`() {
 
-        val authentication2 = signinAndGetAuth(username2, password)
+        val authentication2 = signinAndGetAuth(usernameB, password)
         deleteCommunity(authentication2, 1)
             .andExpect {
                 status { isUnauthorized() }
