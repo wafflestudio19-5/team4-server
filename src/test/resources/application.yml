@@ -16,6 +16,9 @@ spring:
         url: jdbc:mysql://localhost:3306/reddit_test?serverTimezone=UTC
         username: waffle-team-4
         password: waffleteam4
+#        sql:
+#              init:
+#                mode: always
     jpa:
         generate-ddl: true
         hibernate:

@@ -8,6 +8,7 @@ object UserTestAnswer {
     private val username1 = "username1"
     private val username2 = "username2"
     private val username3 = "username3"
+    private val updateUsername = "updatename"
 
     private val ans1 = arrayOf(
         // 1 1
@@ -54,7 +55,48 @@ object UserTestAnswer {
         )
     )
 
-    val ans = arrayOf(ans1, ans2, ans3)
+    private val ans4 = arrayOf(
+        // 4 1
+        UserDto.Response(
+            2,
+            updateUsername,
+            "$updateUsername@snu.ac.kr",
+            null,
+        ),
+
+        // 4 2
+        UserDto.Response(
+            2,
+            updateUsername,
+            "$username2@snu.ac.kr",
+            null,
+        ),
+
+        // 4 3
+        UserDto.Response(
+            2,
+            username2,
+            "$updateUsername@snu.ac.kr",
+            null,
+        ),
+
+        // 4 4
+        UserDto.Response(
+            2,
+            updateUsername,
+            "$updateUsername@snu.ac.kr",
+            null,
+        ),
+
+        // 4 5
+        ErrorResponse(
+            ErrorType.USER_ALREADY_EXISTS.code,
+            ErrorType.USER_ALREADY_EXISTS.name,
+            "User already exists",
+        )
+    )
+
+    val ans = arrayOf(ans1, ans2, ans3, ans4)
 }
 
 object PostTestAnswer

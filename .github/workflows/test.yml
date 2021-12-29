@@ -20,7 +20,7 @@ jobs:
             - name: Set up MySQL
               uses: samin/mysql-action@v1
               with:
-                  charcter set server: 'utf8'
+                  character set server: 'utf8'
                   mysql database: 'reddit_test'
                   mysql user: 'waffle-team-4'
                   mysql password: 'waffleteam4'
@@ -30,7 +30,7 @@ jobs:
               with:
                   path: |
                       ~/.gradle/caches
-                      ~/.gralde/wrapper
+                      ~/.gradle/wrapper
                   key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
                   restore-keys: |
                       ${{ runner.os }}-gradle-

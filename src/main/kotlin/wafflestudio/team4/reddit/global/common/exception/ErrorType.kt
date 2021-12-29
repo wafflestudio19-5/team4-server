@@ -7,15 +7,18 @@ enum class ErrorType(
     // (status)|(case)
     // ex. default 404 : 4040
     //     404 for user: 4041
-    //     404 for post: 4042 ...
+    //     404 for post: 4042
+    //     404 for community: 4043 ...
 
     INVALID_REQUEST(4000),
     USER_ALREADY_EXISTS(4001),
     VALIDATION_FAILED(4002),
+    COMMUNITY_ALREADY_EXISTS(4003),
 
     UNAUTHORIZED(4010),
     USER_WRONG_EMAIL_PASSWORD(4011),
 
     NOT_FOUND(4040),
     USER_NOT_FOUND(4041),
+    COMMUNITY_NOT_FOUND(4043)
 }

@@ -24,7 +24,7 @@ import wafflestudio.team4.reddit.global.auth.model.UserPrincipalDetailService
 class SecurityConfig(
     private val jwtAuthenticationEntryPoint: JwtAuthenticationEntryPoint,
     private val jwtTokenProvider: JwtTokenProvider,
-    private val userPrincipalDetailService: UserPrincipalDetailService
+    private val userPrincipalDetailService: UserPrincipalDetailService,
 ) : WebSecurityConfigurerAdapter() {
     override fun configure(auth: AuthenticationManagerBuilder) {
         auth.authenticationProvider(daoAuthenticationProvider())
@@ -45,13 +45,17 @@ class SecurityConfig(
     }
 
     override fun configure(http: HttpSecurity) {
+//        userPrincipalDetailService.passwordEncoder = passwordEncoder()
         http
             .csrf().disable()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()
             .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint)
             .and()
-            .addFilter(SigninAuthenticationFilter(authenticationManager(), jwtTokenProvider))
+            .addFilter(
+                SigninAuthenticationFilter(authenticationManager(), jwtTokenProvider, userPrincipalDetailService)
+//                SigninAuthenticationFilter(authenticationManager(), jwtTokenProvider)
+            )
             .addFilter(JwtAuthenticationFilter(authenticationManager(), jwtTokenProvider))
             .authorizeRequests()
             .antMatchers("/api/v1/users/signin/").permitAll() // Auth entrypoint
