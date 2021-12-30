@@ -43,7 +43,7 @@ class CommunityDto {
     // JoinRequest
     data class JoinRequest(
         @field:NotBlank
-        val role: String
+        val role: String // TODO only role or manager allowed
     )
 
     // ModifyRequest
