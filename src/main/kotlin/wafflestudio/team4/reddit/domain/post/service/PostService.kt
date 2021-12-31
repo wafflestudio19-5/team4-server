@@ -2,8 +2,6 @@ package wafflestudio.team4.reddit.domain.post.service
 
 import com.amazonaws.HttpMethod
 import com.amazonaws.services.s3.AmazonS3
-import com.amazonaws.services.s3.Headers
-import com.amazonaws.services.s3.model.CannedAccessControlList
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
