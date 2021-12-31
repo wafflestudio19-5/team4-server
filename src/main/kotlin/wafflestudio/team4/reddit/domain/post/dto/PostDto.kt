@@ -11,9 +11,9 @@ class PostDto {
         val userId: Long,
         val title: String,
         val content: String,
-        val imageUriList: List<String>,
-//        val numUpVotes: Int,
-//        val numDownVotes: Int,
+        val imageUriList: List<String>, // S3 이미지 주소
+        // val numUpVotes: Int,
+        // val numDownVotes: Int,
     ) {
         constructor(post: Post) : this(
             id = post.id,
@@ -21,8 +21,8 @@ class PostDto {
             title = post.title,
             content = post.content,
             imageUriList = post.images.map { it.path }, // S3적용 후 변경
-//            numUpVotes = post.votes.count { it.isUp },
-//            numDownVotes = post.votes.count { !it.isUp },
+            //  numUpVotes = post.votes.count { it.isUp },
+            //  numDownVotes = post.votes.count { !it.isUp },
         )
     }
 
