@@ -40,18 +40,10 @@ class CommunityDto {
         // val topics: List<String> // at least one topic
     )
 
-    // JoinRequest
-    /*data class JoinRequest(
-        @field:NotBlank
-        val role: String
-    )*/
-
     // ModifyRequest
     data class ModifyRequest(
         // val name: String,
         val description: String,
         // val topics: List<String>,
-        // val addManagers: List<String>,
-        // val deleteManagers: List<String>
     )
 }
