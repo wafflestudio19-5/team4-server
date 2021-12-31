@@ -54,6 +54,9 @@ class CommunityController(
         return ResponseEntity.status(200).body(CommunityDto.Response(community))
     }
 
+    // TODO get community's managers (/about/moderators/)
+    // TODO get community's topics (/about/topics/)
+
     // create community
     // anyone allowed to make community
     @PostMapping("/")
@@ -68,10 +71,10 @@ class CommunityController(
     fun joinCommunity(
         @CurrentUser user: User,
         @PathVariable("community_id") communityId: Long,
-        @Valid @RequestBody joinRequest: CommunityDto.JoinRequest
+        // @Valid @RequestBody joinRequest: CommunityDto.JoinRequest
     ): ResponseEntity<CommunityDto.Response> {
-        val role = joinRequest.role // role: manager, member
-        val community = communityService.joinCommunity(user, communityId, role)
+        // val role = joinRequest.role // role: manager, member
+        val community = communityService.joinCommunity(user, communityId)
         return ResponseEntity.status(201).body(CommunityDto.Response(community))
     }
 
@@ -87,13 +90,46 @@ class CommunityController(
 
     // change already existing community info
     // only this community's managers allowed to change info
-    @PutMapping("/{community_id}/")
-    fun modifyCommunity(
+    // 1) change description
+    @PutMapping("/{community_id}/about/description/")
+    fun modifyCommunityDescription(
         @CurrentUser user: User,
         @PathVariable("community_id") communityId: Long,
         @Valid @RequestBody modifyRequest: CommunityDto.ModifyRequest
     ): ResponseEntity<CommunityDto.Response> {
-        val community = communityService.modifyCommunity(user, modifyRequest, communityId)
+        val community = communityService.modifyCommunityDescription(user, modifyRequest, communityId)
+        return ResponseEntity.status(200).body(CommunityDto.Response(community))
+    }
+
+    // 2) add, delete manager
+    @PutMapping("/{community_id}/about/moderators/{user_id}/add")
+    fun addCommunityManager(
+        @CurrentUser user: User,
+        @PathVariable("community_id") communityId: Long,
+        @PathVariable("user_id") userId: Long
+    ): ResponseEntity<CommunityDto.Response> {
+        val community = communityService.addCommunityManager(user, communityId, userId)
+        return ResponseEntity.status(200).body(CommunityDto.Response(community))
+    }
+
+    @PutMapping("/{community_id}/about/moderators/{user_id}/delete")
+    fun deleteCommunityManager(
+        @CurrentUser user: User,
+        @PathVariable("community_id") communityId: Long,
+        @PathVariable("user_id") userId: Long
+    ): ResponseEntity<CommunityDto.Response> {
+        val community = communityService.deleteCommunityManager(user, communityId, userId)
+        return ResponseEntity.status(200).body(CommunityDto.Response(community))
+    }
+
+    // 3) add, delete topic (toggle)
+    @PutMapping("/{community_id}/about/topics/{topic_id}/")
+    fun changeCommunityTopic(
+        @CurrentUser user: User,
+        @PathVariable("community_id") communityId: Long,
+        @PathVariable("topic_id") topicId: Long
+    ): ResponseEntity<CommunityDto.Response> {
+        val community = communityService.changeCommunityTopic(user, communityId, topicId)
         return ResponseEntity.status(200).body(CommunityDto.Response(community))
     }
 

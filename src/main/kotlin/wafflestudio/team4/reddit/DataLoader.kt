@@ -18,5 +18,6 @@ class DataLoader(
 //            val user = User("$username@snu.ac.kr", username, passwordEncoder.encode("somepassword"))
 //            userRepository.save(user)
 //        }
+//        // TODO add topics
     }
 }

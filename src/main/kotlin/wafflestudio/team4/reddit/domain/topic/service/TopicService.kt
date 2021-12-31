@@ -11,6 +11,10 @@ import wafflestudio.team4.reddit.domain.user.model.User
 class TopicService(
     private val topicRepository: TopicRepository
 ) {
+    fun getTopicById(id: Long): Topic {
+        return topicRepository.getById(id)
+    }
+
     fun getTopicByName(name: String): Topic {
         return topicRepository.getByName(name)
     }
@@ -25,4 +29,5 @@ class TopicService(
     fun checkTopicExistence(name: String): Boolean {
         return topicRepository.existsByName(name)
     }
+
 }

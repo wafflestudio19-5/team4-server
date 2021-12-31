@@ -34,22 +34,24 @@ class CommunityDto {
     data class CreateRequest(
         @field:NotBlank
         val name: String,
-        @field:NotBlank
-        val description: String,
-        @field:NotNull
-        val topics: List<String> // at least one topic
+        // @field:NotBlank
+        // val description: String,
+        // @field:NotNull
+        // val topics: List<String> // at least one topic
     )
 
     // JoinRequest
-    data class JoinRequest(
+    /*data class JoinRequest(
         @field:NotBlank
-        val role: String // TODO only role or manager allowed
-    )
+        val role: String
+    )*/
 
     // ModifyRequest
     data class ModifyRequest(
-        val name: String,
+        // val name: String,
         val description: String,
-        val topics: List<String>
+        // val topics: List<String>,
+        // val addManagers: List<String>,
+        // val deleteManagers: List<String>
     )
 }
