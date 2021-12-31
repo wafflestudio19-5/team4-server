@@ -10,6 +10,8 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import wafflestudio.team4.reddit.domain.community.repository.CommunityRepository
 import wafflestudio.team4.reddit.domain.post.dto.PostDto
+import wafflestudio.team4.reddit.domain.post.exception.NotPostOwnerException
+import wafflestudio.team4.reddit.domain.post.exception.PostNotFoundException
 import wafflestudio.team4.reddit.domain.post.model.Post
 import wafflestudio.team4.reddit.domain.post.model.PostCommunity
 import wafflestudio.team4.reddit.domain.post.model.PostImage
@@ -38,7 +40,7 @@ class PostService(
     }
 
     fun getPostById(postId: Long): Post {
-        return postRepository.findByIdOrNull(postId) ?: throw Exception() // TODO: 예외처리
+        return postRepository.findByIdOrNull(postId) ?: throw PostNotFoundException()
     }
 
     fun getPresignedUrl(fileName: String): String {
@@ -47,14 +49,14 @@ class PostService(
         expTimeMillis += (1000 * 60 * 60).toLong() // 1시간
         expiration.time = expTimeMillis
 
-        val request = GeneratePresignedUrlRequest("waffle-team-4-server-s3", "test/$fileName")
+        val request = GeneratePresignedUrlRequest("waffle-team-4-server-s3", "posts/$expiration/$fileName")
             .withMethod(HttpMethod.PUT)
             .withExpiration(expiration)
 
-        request.addRequestParameter(
-            Headers.S3_CANNED_ACL,
-            CannedAccessControlList.PublicRead.toString()
-        )
+//        request.addRequestParameter(
+//            Headers.S3_CANNED_ACL,
+//            CannedAccessControlList.PublicRead.toString()
+//        )
 
         return amazonS3.generatePresignedUrl(request).toString()
     }
@@ -83,11 +85,11 @@ class PostService(
     }
 
     fun deletePost(user: User, postId: Long): Post {
-        val post = postRepository.findByIdOrNull(postId) ?: throw Exception() // TODO: 예외처리
+        val post = postRepository.findByIdOrNull(postId) ?: throw PostNotFoundException()
 
         // 포스트 작성자 확인
         val postOwnerId = post.user.id
-        if (postOwnerId != user.id) throw Exception() // unauthorized
+        if (postOwnerId != user.id) throw NotPostOwnerException()
 
         post.deleted = true
         return postRepository.save(post)
@@ -106,7 +108,7 @@ class PostService(
 //    }
 
     fun vote(user: User, postId: Long, isUp: Int): Post {
-        val post = postRepository.findByIdOrNull(postId) ?: throw Exception()
+        val post = postRepository.findByIdOrNull(postId) ?: throw PostNotFoundException()
 
         // if vote history exists, change its isUp attribute
         if (postVoteRepository.existsByPostAndUser(post, user)) {
