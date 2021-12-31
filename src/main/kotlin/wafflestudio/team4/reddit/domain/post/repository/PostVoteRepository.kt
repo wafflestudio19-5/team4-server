@@ -6,6 +6,6 @@ import wafflestudio.team4.reddit.domain.post.model.PostVote
 import wafflestudio.team4.reddit.domain.user.model.User
 
 interface PostVoteRepository : JpaRepository<PostVote, Long?> {
-    fun existsByPostAndUser(post: Post, user: User):Boolean
-    fun findByPostAndUser(post: Post, user: User):PostVote
+    fun existsByPostAndUser(post: Post, user: User): Boolean
+    fun findByPostAndUser(post: Post, user: User): PostVote
 }

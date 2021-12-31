@@ -1,9 +1,7 @@
 package wafflestudio.team4.reddit.domain.post.dto
 
 import wafflestudio.team4.reddit.domain.post.model.Post
-import wafflestudio.team4.reddit.domain.user.model.User
 import javax.validation.constraints.NotBlank
-import javax.validation.constraints.NotNull
 
 class PostDto {
     data class Response(
@@ -49,5 +47,4 @@ class PostDto {
     data class UploadImageResponse(
         val url: String,
     )
-
 }

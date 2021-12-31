@@ -1,7 +1,10 @@
 package wafflestudio.team4.reddit.domain.post.model
 
 import wafflestudio.team4.reddit.domain.model.BaseTimeEntity
-import javax.persistence.*
+import javax.persistence.Entity
+import javax.persistence.JoinColumn
+import javax.persistence.ManyToOne
+import javax.persistence.Table
 import javax.validation.constraints.NotNull
 
 @Entity
@@ -15,7 +18,5 @@ class PostImage(
 
     @field:NotNull
     val url: String = "",
-
-
 
 ) : BaseTimeEntity()

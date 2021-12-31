@@ -1,7 +1,8 @@
 package wafflestudio.team4.reddit.domain.post.model
 
 import wafflestudio.team4.reddit.domain.model.BaseTimeEntity
-import javax.persistence.*
+import javax.persistence.Entity
+import javax.persistence.Table
 import javax.validation.constraints.NotBlank
 
 @Entity

@@ -19,7 +19,6 @@ import wafflestudio.team4.reddit.global.auth.JwtTokenProvider
 import wafflestudio.team4.reddit.global.common.dto.ListResponse
 import javax.validation.Valid
 
-
 @RestController
 @RequestMapping("/api/v1/posts")
 class PostController(
@@ -29,11 +28,11 @@ class PostController(
     @GetMapping("/")
     fun getPosts(
 //      @RequestParam(defaultValue = "new", name = "order") order: String,
-        @RequestParam(name = "lastPostId", defaultValue = Long.MAX_VALUE.toString()) lastPostId : Long, // 현재 페이지
+        @RequestParam(name = "lastPostId", defaultValue = Long.MAX_VALUE.toString()) lastPostId: Long, // 현재 페이지
         @RequestParam(name = "size", defaultValue = "10") size: Int, // 각 페이지 당 게시글 수
     ): ListResponse<PostDto.Response> {
         val posts = postService.getPosts(lastPostId, size)
-        return ListResponse(posts.map { PostDto.Response(it) } )
+        return ListResponse(posts.map { PostDto.Response(it) })
     }
 
     @GetMapping("/{post_id}/")
@@ -47,7 +46,7 @@ class PostController(
     @GetMapping("/image/")
     fun getImageUploadUrl(
         @Valid @RequestBody uploadImageRequest: PostDto.UploadImageRequest
-    ): PostDto.UploadImageResponse{
+    ): PostDto.UploadImageResponse {
         val url = postService.getPresignedUrl(uploadImageRequest.filename)
         return PostDto.UploadImageResponse(url)
     }
@@ -60,7 +59,6 @@ class PostController(
         val newPost = postService.createPost(user, createRequest)
         return ResponseEntity.status(201).body(PostDto.Response(newPost))
     }
-
 
     @DeleteMapping("/{post_id}/")
     fun deletePost(
@@ -89,7 +87,4 @@ class PostController(
     ): PostDto.Response {
         return PostDto.Response(postService.vote(user, id, isUp))
     }
-
-
-
 }

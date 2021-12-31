@@ -19,7 +19,7 @@ import wafflestudio.team4.reddit.domain.post.repository.PostImageRepository
 import wafflestudio.team4.reddit.domain.post.repository.PostRepository
 import wafflestudio.team4.reddit.domain.post.repository.PostVoteRepository
 import wafflestudio.team4.reddit.domain.user.model.User
-import java.util.*
+import java.util.Date
 
 @Service
 class PostService(
@@ -33,7 +33,7 @@ class PostService(
 ) {
 
     fun getPosts(lasPostId: Long, size: Int): List<Post> {
-        val pageRequest : PageRequest = PageRequest.of(0,size)
+        val pageRequest: PageRequest = PageRequest.of(0, size)
         return postRepository.findByIdLessThanAndDeletedIsFalseOrderByIdDesc(lasPostId, pageRequest).content
     }
 
@@ -41,24 +41,25 @@ class PostService(
         return postRepository.findByIdOrNull(postId) ?: throw Exception() // TODO: 예외처리
     }
 
-    fun getPresignedUrl(fileName: String) : String{
+    fun getPresignedUrl(fileName: String): String {
         val expiration: Date = Date()
         var expTimeMillis = expiration.time
         expTimeMillis += (1000 * 60 * 60).toLong() // 1시간
         expiration.time = expTimeMillis
 
-        val request = GeneratePresignedUrlRequest("waffle-team-4-server-s3","test/$fileName")
+        val request = GeneratePresignedUrlRequest("waffle-team-4-server-s3", "test/$fileName")
             .withMethod(HttpMethod.PUT)
             .withExpiration(expiration)
 
         request.addRequestParameter(
             Headers.S3_CANNED_ACL,
-            CannedAccessControlList.PublicRead.toString());
+            CannedAccessControlList.PublicRead.toString()
+        )
 
         return amazonS3.generatePresignedUrl(request).toString()
     }
 
-    fun createPost(user: User, request: PostDto.CreateRequest): Post{
+    fun createPost(user: User, request: PostDto.CreateRequest): Post {
         val community = communityRepository.findByName(request.community)
 
         val newPost = Post(
@@ -81,7 +82,7 @@ class PostService(
         return postRepository.save(newPost)
     }
 
-    fun deletePost(user: User, postId: Long): Post{
+    fun deletePost(user: User, postId: Long): Post {
         val post = postRepository.findByIdOrNull(postId) ?: throw Exception() // TODO: 예외처리
 
         // 포스트 작성자 확인
@@ -104,19 +105,19 @@ class PostService(
 //        return postRepository.save(post)
 //    }
 
-    fun vote(user: User, postId: Long, isUp: Int): Post{
+    fun vote(user: User, postId: Long, isUp: Int): Post {
         val post = postRepository.findByIdOrNull(postId) ?: throw Exception()
 
         // if vote history exists, change its isUp attribute
-        if(postVoteRepository.existsByPostAndUser(post,user)){
-            val voteHistory = postVoteRepository.findByPostAndUser(post,user)
-            if(voteHistory.isUp == isUp) voteHistory.isUp = 1
+        if (postVoteRepository.existsByPostAndUser(post, user)) {
+            val voteHistory = postVoteRepository.findByPostAndUser(post, user)
+            if (voteHistory.isUp == isUp) voteHistory.isUp = 1
             else voteHistory.isUp = isUp
             postVoteRepository.save(voteHistory)
             return post
         }
         // else create new vote
-        else{
+        else {
             val newVote = PostVote(
                 post = post,
                 user = user,
@@ -128,5 +129,4 @@ class PostService(
             return post
         }
     }
-
 }
