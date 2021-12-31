@@ -45,6 +45,7 @@ class PostDto {
     )
 
     data class UploadImageResponse(
-        val url: String,
+        val preSignedUrl: String,
+        val imageUrl: String,
     )
 }
