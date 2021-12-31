@@ -1,5 +1,6 @@
 package wafflestudio.team4.reddit.domain.post.model
 
+import wafflestudio.team4.reddit.domain.community.model.Community
 import wafflestudio.team4.reddit.domain.model.BaseTimeEntity
 import wafflestudio.team4.reddit.domain.user.model.User
 import javax.persistence.*
@@ -15,27 +16,26 @@ class Post(
     @JoinColumn(name="user_id")
     val user: User,
 
-//    @field:NotNull
-//    @ManyToOne
-//    @JoinColumn(name="community_id")
-//    val community: Community, // community 도메인 import 필요
+    @field:NotNull
+    @ManyToOne
+    @JoinColumn(name="community_id")
+    val community: Community,
 
     @field:NotBlank
     var title: String,
 
-    @field:NotBlank
-    var content: String,
+    var text: String? = "",
 
     @OneToMany(mappedBy = "post")
-    var images : MutableList<PostImage> = mutableListOf(),
+    var images : MutableList<PostImage>? = mutableListOf(),
 
 //    @OneToMany(mappedBy = "post")
 //    val videos : List<PostVideo> = listOf(),
 
     @field:NotNull
-    var isDeleted: Boolean = false,
+    var deleted: Boolean = false,
 
     @OneToMany(mappedBy = "post")
-    val votes : List<PostVote> = listOf(),
+    var votes : MutableList<PostVote> = mutableListOf(),
 
-) : BaseTimeEntity()
+    ) : BaseTimeEntity()

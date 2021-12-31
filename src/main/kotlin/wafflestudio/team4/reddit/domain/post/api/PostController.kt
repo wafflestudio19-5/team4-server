@@ -35,6 +35,14 @@ class PostController(
         return PostDto.Response(post)
     }
 
+    @GetMapping("/image/")
+    fun getImageUploadUrl(
+        @Valid @RequestBody uploadImageRequest: PostDto.UploadImageRequest
+    ): PostDto.UploadImageResponse{
+        val url = postService.getPresignedUrl(uploadImageRequest.filename)
+        return PostDto.UploadImageResponse(url)
+    }
+
     @PostMapping("/")
     fun createPost(
         @CurrentUser user: User,
@@ -54,21 +62,21 @@ class PostController(
         return PostDto.Response(deletedPost)
     }
 
-    @PutMapping("/{post_id}/")
-    fun modifyPost(
-        @CurrentUser user: User,
-        @PathVariable("post_id") id: Long,
-        @Valid @RequestBody modifyRequest: PostDto.CreateRequest
-    ): PostDto.Response {
-        val modifiedPost = postService.modifyPost(user, id, modifyRequest)
-        return PostDto.Response(modifiedPost)
-    }
+//    @PutMapping("/{post_id}/")
+//    fun modifyPost(
+//        @CurrentUser user: User,
+//        @PathVariable("post_id") id: Long,
+//        @Valid @RequestBody modifyRequest: PostDto.CreateRequest
+//    ): PostDto.Response {
+//        val modifiedPost = postService.modifyPost(user, id, modifyRequest)
+//        return PostDto.Response(modifiedPost)
+//    }
 
     @PutMapping("/{post_id}/vote/")
     fun votePost(
         @CurrentUser user: User,
         @PathVariable("post_id") id: Long,
-        @RequestParam(name = "isUp", required = true) isUp: Boolean,
+        @RequestParam(name = "isUp", required = true) isUp: Int,
     ): PostDto.Response {
         return PostDto.Response(postService.vote(user, id, isUp))
     }

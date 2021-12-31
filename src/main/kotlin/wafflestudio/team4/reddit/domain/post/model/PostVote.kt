@@ -15,10 +15,10 @@ class PostVote(
 
     @field:NotNull
     @ManyToOne
-    @JoinColumn(name = "voter_id")
-    val voter: User,
+    @JoinColumn(name = "user_id")
+    val user: User,
 
     @field:NotNull
-    val isUp: Boolean = true,
+    var isUp: Int = 0,
 
 ) : BaseTimeEntity()

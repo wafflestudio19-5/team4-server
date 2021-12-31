@@ -10,31 +10,44 @@ class PostDto {
         val id: Long,
         val userId: Long,
         val title: String,
-        val content: String,
-        val imageUriList: List<String>, // S3 이미지 주소
-        // val numUpVotes: Int,
-        // val numDownVotes: Int,
+        val text: String?,
+        val images: List<String>?, // S3 이미지 주소
+        val numUpVotes: Int,
+        val numDownVotes: Int,
+//        val isDeleted: Boolean,
     ) {
         constructor(post: Post) : this(
             id = post.id,
             userId = post.user.id,
             title = post.title,
-            content = post.content,
-            imageUriList = post.images.map { it.path }, // S3적용 후 변경
-            //  numUpVotes = post.votes.count { it.isUp },
-            //  numDownVotes = post.votes.count { !it.isUp },
+            text = post.text,
+            images = post.images?.map { it.url }, // S3적용 후 변경
+            numUpVotes = post.votes.count { it.isUp == 2 },
+            numDownVotes = post.votes.count { it.isUp == 0 },
+//            isDeleted = post.deleted
         )
     }
 
     data class CreateRequest(
         @field:NotBlank
-        val title: String,
+        val community: String,
 
         @field:NotBlank
-        val content: String,
+        val title: String,
 
-        // val images
+        val text: String? = "",
 
+        val images: List<String>? = null,
+
+    )
+
+    data class UploadImageRequest(
+        @field:NotBlank
+        val filename: String
+    )
+
+    data class UploadImageResponse(
+        val url: String,
     )
 
 }
