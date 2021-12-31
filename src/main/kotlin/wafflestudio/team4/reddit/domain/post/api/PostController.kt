@@ -2,6 +2,7 @@ package wafflestudio.team4.reddit.domain.post.api
 
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+
 import wafflestudio.team4.reddit.domain.post.dto.PostDto
 import wafflestudio.team4.reddit.domain.post.service.PostService
 import wafflestudio.team4.reddit.domain.user.model.User
