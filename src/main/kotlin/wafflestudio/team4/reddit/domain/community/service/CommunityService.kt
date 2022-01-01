@@ -38,7 +38,7 @@ class CommunityService(
     fun getCommunityById(communityId: Long): Community {
         if (!communityRepository.existsById(communityId)) throw CommunityNotFoundException()
         val community = communityRepository.getById(communityId)
-        if (community.deleted) throw CommunityDeletedException()
+        if (community.isDeleted) throw CommunityDeletedException()
         return community
     }
 
@@ -50,7 +50,7 @@ class CommunityService(
             num_members = 0, // managers not part of num_members
             num_managers = 1,
             description = createRequest.description,
-            deleted = false
+            isDeleted = false
         )
         community = communityRepository.save(community)
 
@@ -92,7 +92,7 @@ class CommunityService(
     fun joinCommunity(user: User, communityId: Long, role: String): Community {
         if (!communityRepository.existsById(communityId)) throw CommunityNotFoundException()
         var community = communityRepository.getById(communityId)
-        if (community.deleted) throw CommunityDeletedException()
+        if (community.isDeleted) throw CommunityDeletedException()
 
         var userCommunity = UserCommunity(
             user = user,
@@ -118,7 +118,7 @@ class CommunityService(
     fun leaveCommunity(user: User, communityId: Long): Community {
         if (!communityRepository.existsById(communityId)) throw CommunityNotFoundException()
         var community = communityRepository.getById(communityId)
-        if (community.deleted) throw CommunityDeletedException()
+        if (community.isDeleted) throw CommunityDeletedException()
 
         if (!userCommunityRepository.existsByUserAndCommunity(user, community)) throw NotCurrentlyJoinedException()
         val userCommunity = userCommunityRepository.getByUserAndCommunity(user, community)
@@ -137,7 +137,7 @@ class CommunityService(
     fun modifyCommunity(user: User, modifyRequest: CommunityDto.ModifyRequest, communityId: Long): Community {
         if (!communityRepository.existsById(communityId)) throw CommunityNotFoundException()
         var community = communityRepository.getById(communityId)
-        if (community.deleted) throw CommunityDeletedException()
+        if (community.isDeleted) throw CommunityDeletedException()
 
         // check if user is this community's manager
         if (!userCommunityRepository.existsByUserAndCommunity(user, community)) throw NotCommunityManagerException()
@@ -184,7 +184,7 @@ class CommunityService(
     fun deleteCommunity(user: User, communityId: Long): Community {
         if (!communityRepository.existsById(communityId)) throw CommunityNotFoundException()
         var community = communityRepository.getById(communityId)
-        if (community.deleted) throw CommunityDeletedException()
+        if (community.isDeleted) throw CommunityDeletedException()
 
         // check whether user is this community's manager
         if (!userCommunityRepository.existsByUserAndCommunity(user, community)) throw NotCommunityManagerException()
@@ -192,7 +192,7 @@ class CommunityService(
         if (!userCommunity.joined) throw NotCommunityManagerException()
         if (!userCommunity.isManager) throw NotCommunityManagerException()
 
-        community.deleted = true
+        community.isDeleted = true
         community = communityRepository.save(community)
         // what to return?
         return community

@@ -29,5 +29,5 @@ class Community(
     var description: String,
 
     @field:NotNull
-    var deleted: Boolean = false
+    var isDeleted: Boolean = false
 ) : BaseTimeEntity()

@@ -17,7 +17,7 @@ class CommunityDto {
         @field:NotBlank
         val description: String,
         @field:NotNull
-        val deleted: Boolean
+        val isDeleted: Boolean
     ) {
         constructor(community: Community) : this(
             id = community.id,
@@ -26,7 +26,7 @@ class CommunityDto {
             num_members = community.num_members,
             num_managers = community.num_managers,
             description = community.description,
-            deleted = community.deleted
+            isDeleted = community.isDeleted
         )
     }
 
