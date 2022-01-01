@@ -1,5 +1,8 @@
 spring:
   profiles:
+    include:
+        - aws
+        - credentials
     active: local
 app:
     jwt:
@@ -26,15 +29,6 @@ spring:
       ddl-auto: create
     show-sql: true
 
-cloud:
-    aws:
-        s3:
-            bucket: waffle-team-4-server-s3
-        region:
-            static: ap-northeast-2
-        credentials:
-            accessKey: gitignored
-            secretKey: gitignored
 ---
 
 spring:
@@ -55,14 +49,3 @@ spring:
       ddl-auto: update
 server:
     port: 8081
-
-cloud:
-    aws:
-        s3:
-            bucket: waffle-team-4-server-s3
-        region:
-            static: ap-northeast-2
-        stack:
-            auto: false
-        credentials:
-            instanceProfile: true
