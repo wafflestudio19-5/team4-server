@@ -14,7 +14,7 @@ class CommunityDto {
         val num_members: Int,
         @field:NotNull
         val num_managers: Int,
-        @field:NotBlank
+        // @field:NotBlank
         val description: String,
         @field:NotNull
         val deleted: Boolean
@@ -26,7 +26,7 @@ class CommunityDto {
             num_members = community.num_members,
             num_managers = community.num_managers,
             description = community.description,
-            deleted = community.deleted
+            deleted = community.isDeleted
         )
     }
 
@@ -41,7 +41,7 @@ class CommunityDto {
     )
 
     // ModifyRequest
-    data class ModifyRequest(
+    data class ModifyDescriptionRequest(
         // val name: String,
         val description: String,
         // val topics: List<String>,

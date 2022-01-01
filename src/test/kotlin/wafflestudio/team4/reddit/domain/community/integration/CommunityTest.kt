@@ -1,7 +1,7 @@
 package wafflestudio.team4.reddit.domain.community.integration
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import org.json.JSONArray
+// import org.json.JSONArray
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.TestMethodOrder
 import org.junit.jupiter.api.MethodOrderer
@@ -12,12 +12,18 @@ import org.junit.jupiter.api.Assertions
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
+// import org.springframework.http.ResponseEntity
 import org.springframework.test.context.TestConstructor
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.ResultActionsDsl
 import org.springframework.test.web.servlet.post
 import org.springframework.test.web.servlet.delete
 import org.springframework.test.web.servlet.put
+// import org.springframework.web.bind.annotation.PathVariable
+// import org.springframework.web.bind.annotation.PutMapping
+// import wafflestudio.team4.reddit.domain.community.dto.CommunityDto
+// import wafflestudio.team4.reddit.domain.user.model.User
+// import wafflestudio.team4.reddit.global.auth.CurrentUser
 import wafflestudio.team4.reddit.global.util.TestHelper
 
 @AutoConfigureMockMvc
@@ -36,13 +42,7 @@ class CommunityTest(
     private val usernameC = "usernameC"
     private val password = "password"
 
-    // don't use mockBean (test Topic at same time)
-    private val topicName1 = "topic1"
-    private val topicName2 = "topic2"
-
     private val communityName1 = "communityName1"
-    private val communityName2 = "communityName2"
-    private val description = "description"
 
     // dependencies (mock bean)
 
@@ -133,35 +133,33 @@ class CommunityTest(
         }
     }
 
-    private fun createCommunityRequest(name: String, description: String, topics: List<String>): String {
-        val topic_array = JSONArray(topics)
+    private fun createCommunityRequest(name: String/*, description: String, topics: List<String>*/): String {
+        // val topic_array = JSONArray(topics)
         return """
             {
-                "name": "$name",
-                "description": "$description",
-                "topics": $topic_array
+                "name": "$name"
             }
         """.trimIndent()
     }
 
-    private fun joinCommunity(authentication: String?, body: String, communityId: Long): ResultActionsDsl {
+    private fun joinCommunity(authentication: String?, /*body: String, */communityId: Long): ResultActionsDsl {
         return mockMvc.post("/api/v1/communities/$communityId/me/") {
             if (authentication != null) {
                 header("Authentication", authentication)
             }
-            content = (body)
+            // content = (body)
             contentType = (MediaType.APPLICATION_JSON)
             accept = (MediaType.APPLICATION_JSON)
         }
     }
 
-    private fun joinCommunityRequest(role: String): String {
+    /*private fun joinCommunityRequest(role: String): String {
         return """
             {
                 "role": "$role"
             }
         """.trimIndent()
-    }
+    }*/
 
     private fun leaveCommunity(authentication: String?, communityId: Long): ResultActionsDsl {
         return mockMvc.delete("/api/v1/communities/$communityId/me/") {
@@ -171,8 +169,8 @@ class CommunityTest(
         }
     }
 
-    private fun modifyCommunity(authentication: String?, communityId: Long, body: String): ResultActionsDsl {
-        return mockMvc.put("/api/v1/communities/$communityId/") {
+    private fun modifyCommunityDescription(authentication: String?, communityId: Long, body: String): ResultActionsDsl {
+        return mockMvc.put("/api/v1/communities/$communityId/about/description/") {
             if (authentication != null) {
                 header("Authentication", authentication)
             }
@@ -182,15 +180,37 @@ class CommunityTest(
         }
     }
 
-    private fun modifyCommunityRequest(name: String, description: String, topics: List<String>): String {
-        val topic_array = JSONArray(topics)
+    private fun modifyCommunityDescriptionRequest(description: String): String {
+        // val topic_array = JSONArray(topics)
         return """
             {
-                "name": "$name",
-                "topics": $topic_array,
                 "description": "$description"
             }
         """.trimIndent()
+    }
+
+    private fun addCommunityManager(authentication: String?, communityId: Long, userId: Long): ResultActionsDsl {
+        return mockMvc.put("/api/v1/communities/$communityId/about/moderators/$userId/add/") {
+            if (authentication != null) {
+                header("Authentication", authentication)
+            }
+        }
+    }
+
+    private fun deleteCommunityManager(authentication: String?, communityId: Long, userId: Long): ResultActionsDsl {
+        return mockMvc.put("/api/v1/communities/$communityId/about/moderators/$userId/delete/") {
+            if (authentication != null) {
+                header("Authentication", authentication)
+            }
+        }
+    }
+
+    private fun changeCommunityTopic(authentication: String?, communityId: Long, topicId: Long): ResultActionsDsl {
+        return mockMvc.put("/api/v1/communities/$communityId/about/topics/$topicId/") {
+            if (authentication != null) {
+                header("Authentication", authentication)
+            }
+        }
     }
 
     private fun deleteCommunity(authentication: String?, communityId: Long): ResultActionsDsl {
@@ -204,25 +224,25 @@ class CommunityTest(
     // setup
     @BeforeAll
     fun createUsers() {
-        signup(signupRequest("admin", password))
+        signup(signupRequest("admin", password)) // id 3
             .andExpect {
                 status { isCreated() }
                 header { exists("Authentication") }
             }
 
-        signup(signupRequest(usernameA, password))
+        signup(signupRequest(usernameA, password)) // id 4
             .andExpect {
                 status { isCreated() }
                 header { exists("Authentication") }
             }
 
-        signup(signupRequest(usernameB, password))
+        signup(signupRequest(usernameB, password)) // id 5
             .andExpect {
                 status { isCreated() }
                 header { exists("Authentication") }
             }
 
-        signup(signupRequest(usernameC, password))
+        signup(signupRequest(usernameC, password)) // id 6
             .andExpect {
                 status { isCreated() }
                 header { exists("Authentication") }
@@ -233,26 +253,15 @@ class CommunityTest(
     @Order(1)
     fun `1_1_커뮤니티 생성_정상`() {
         // without login
-        createCommunity(null, createCommunityRequest(communityName1, description, listOf("topic1", "topic2")))
+        createCommunity(null, createCommunityRequest(communityName1))
             .andExpect {
                 status { isUnauthorized() }
-            }
-
-        // with login
-        val authenticationAdmin = signinAndGetAuth("admin", password)
-        createTopic(authenticationAdmin, createTopicRequest("topic1"))
-            .andExpect {
-                status { isCreated() }
-            }
-        createTopic(authenticationAdmin, createTopicRequest("topic2"))
-            .andExpect {
-                status { isCreated() }
             }
 
         val authentication1 = signinAndGetAuth(usernameA, password)
         createCommunity(
             authentication1,
-            createCommunityRequest(communityName1, description, listOf("topic1", "topic2"))
+            createCommunityRequest(communityName1)
         )
             .andExpect {
                 status { isCreated() }
@@ -278,7 +287,7 @@ class CommunityTest(
         val authentication2 = signinAndGetAuth(usernameB, password)
         createCommunity(
             authentication2,
-            createCommunityRequest(communityName1, description, listOf("topic1", "topic2"))
+            createCommunityRequest(communityName1)
         )
             .andExpect {
                 status { isBadRequest() }
@@ -289,7 +298,7 @@ class CommunityTest(
             }
     }
 
-    @Test
+    /*@Test
     @Order(3)
     fun `2_1_커뮤니티 구독_매니저_정상`() {
         /*val authentication1 = signinAndGetAuth(username1, password)
@@ -302,7 +311,31 @@ class CommunityTest(
             }*/
 
         val authentication2 = signinAndGetAuth(usernameB, password)
-        joinCommunity(authentication2, joinCommunityRequest("manager"), 1)
+        joinCommunity(authentication2, 1)
+            .andExpect {
+                status { isCreated() }
+            }
+            .andReturn()
+            .let { mvcResult ->
+                Assertions.assertTrue(testHelper.compareCommunity(mvcResult, 2, 1))
+            }
+    }
+    */
+
+    @Test
+    @Order(3)
+    fun `2_1_커뮤니티 구독_정상`() {
+        /*val authentication1 = signinAndGetAuth(username1, password)
+        createCommunity(
+            authentication1,
+            createCommunityRequest(communityName1, description, listOf("topic1", "topic2"))
+        )
+            .andExpect {
+                status { isCreated() }
+            }*/
+
+        val authentication3 = signinAndGetAuth(usernameC, password)
+        joinCommunity(authentication3, 1)
             .andExpect {
                 status { isCreated() }
             }
@@ -314,20 +347,11 @@ class CommunityTest(
 
     @Test
     @Order(4)
-    fun `2_2_커뮤니티 구독_일반 회원_정상`() {
-        /*val authentication1 = signinAndGetAuth(username1, password)
-        createCommunity(
-            authentication1,
-            createCommunityRequest(communityName1, description, listOf("topic1", "topic2"))
-        )
+    fun `2_2_커뮤니티 구독_해당 커뮤니티 없음`() {
+        val authentication1 = signinAndGetAuth(usernameA, password)
+        joinCommunity(authentication1, 2)
             .andExpect {
-                status { isCreated() }
-            }*/
-
-        val authentication3 = signinAndGetAuth(usernameC, password)
-        joinCommunity(authentication3, joinCommunityRequest("member"), 1)
-            .andExpect {
-                status { isCreated() }
+                status { isNotFound() }
             }
             .andReturn()
             .let { mvcResult ->
@@ -337,21 +361,7 @@ class CommunityTest(
 
     @Test
     @Order(5)
-    fun `2_3_커뮤니티 구독_해당 커뮤니티 없음`() {
-        val authentication1 = signinAndGetAuth(usernameA, password)
-        joinCommunity(authentication1, joinCommunityRequest("member"), 2)
-            .andExpect {
-                status { isNotFound() }
-            }
-            .andReturn()
-            .let { mvcResult ->
-                Assertions.assertTrue(testHelper.compareCommunity(mvcResult, 2, 3))
-            }
-    }
-
-    @Test
-    @Order(6)
-    fun `2_4_커뮤니티 구독_이미 구독`() {
+    fun `2_3_커뮤니티 구독_이미 구독`() {
         /*val authentication1 = signinAndGetAuth(username1, password)
         createCommunity(
             authentication1,
@@ -365,42 +375,48 @@ class CommunityTest(
             .andExpect {
                 status { isCreated() }
             }*/
-        val authentication2 = signinAndGetAuth(usernameB, password)
+        val authentication1 = signinAndGetAuth(usernameA, password)
         val authentication3 = signinAndGetAuth(usernameC, password)
         // manager attempts rejoin as manager
-        joinCommunity(authentication2, joinCommunityRequest("manager"), 1)
+        /*joinCommunity(authentication2, 1)
             .andExpect {
                 status { isBadRequest() }
-            }
+            }*/
 
-        // manager attempts rejoin as member -> possible?
-        joinCommunity(authentication2, joinCommunityRequest("member"), 1)
+        // manager attempts rejoin as member
+        joinCommunity(authentication1, 1)
             .andExpect {
                 status { isBadRequest() }
             }
 
         // member attempts rejoin as manager -> possible??
-        joinCommunity(authentication3, joinCommunityRequest("manager"), 1)
+        /*joinCommunity(authentication3, 1)
             .andExpect {
                 status { isBadRequest() }
-            }
+            }*/
 
         // member attempts rejoin as member
-        joinCommunity(authentication3, joinCommunityRequest("member"), 1)
+        joinCommunity(authentication3, 1)
             .andExpect {
                 status { isBadRequest() }
             }
             .andReturn()
             .let { mvcResult ->
-                Assertions.assertTrue(testHelper.compareCommunity(mvcResult, 2, 4))
+                Assertions.assertTrue(testHelper.compareCommunity(mvcResult, 2, 3))
             }
     }
 
     @Test
-    @Order(7)
-    fun `3_1_커뮤니티 탈퇴_매니저_정상`() {
-        val authentication2 = signinAndGetAuth(usernameB, password)
-        leaveCommunity(authentication2, 1)
+    @Order(6)
+    fun `3_1_커뮤니티 설명글 수정_정상`() {
+
+        val authentication1 = signinAndGetAuth(usernameA, password)
+
+        val body = modifyCommunityDescriptionRequest(
+            "description"
+        )
+
+        modifyCommunityDescription(authentication1, 1, body)
             .andExpect {
                 status { isOk() }
             }
@@ -411,10 +427,10 @@ class CommunityTest(
     }
 
     @Test
-    @Order(8)
-    fun `3_2_커뮤니티 탈퇴_일반 회원_정상`() {
-        val authentication3 = signinAndGetAuth(usernameC, password)
-        leaveCommunity(authentication3, 1)
+    @Order(7)
+    fun `3_2_커뮤니티 매니저 추가_정상`() {
+        val authentication1 = signinAndGetAuth(usernameA, password)
+        addCommunityManager(authentication1, 1, 3)
             .andExpect {
                 status { isOk() }
             }
@@ -425,12 +441,14 @@ class CommunityTest(
     }
 
     @Test
-    @Order(9)
-    fun `3_3_커뮤니티 탈퇴_해당 커뮤니티 없음`() {
+    @Order(8)
+    fun `3_3_커뮤니티 매니저 삭제_정상`() {
+        // 현재 구독 중 x
         val authentication1 = signinAndGetAuth(usernameA, password)
-        leaveCommunity(authentication1, 2)
+
+        deleteCommunityManager(authentication1, 1, 5)
             .andExpect {
-                status { isNotFound() }
+                status { isOk() }
             }
             .andReturn()
             .let { mvcResult ->
@@ -439,17 +457,23 @@ class CommunityTest(
     }
 
     @Test
-    @Order(10)
-    fun `3_4_커뮤니티 탈퇴_가입한 적 없음`() {
-        signup(signupRequest("username4", password))
+    @Order(9)
+    fun `3_4_커뮤니티 토픽 추가_정상`() {
+        // with login
+        val authenticationAdmin = signinAndGetAuth("admin", password)
+        createTopic(authenticationAdmin, createTopicRequest("topic1"))
             .andExpect {
                 status { isCreated() }
-                header { exists("Authentication") }
             }
-        val authentication4 = signinAndGetAuth("username4", password)
-        leaveCommunity(authentication4, 1)
+        createTopic(authenticationAdmin, createTopicRequest("topic2"))
             .andExpect {
-                status { isBadRequest() }
+                status { isCreated() }
+            }
+
+        val authentication1 = signinAndGetAuth(usernameA, password)
+        changeCommunityTopic(authentication1, 1, 19)
+            .andExpect {
+                status { isOk() }
             }
             .andReturn()
             .let { mvcResult ->
@@ -457,103 +481,7 @@ class CommunityTest(
             }
     }
 
-    @Test
-    @Order(11)
-    fun `3_5_커뮤니티 탈퇴_이미 탈퇴함`() {
-        val authentication2 = signinAndGetAuth(usernameB, password)
-        leaveCommunity(authentication2, 1)
-            .andExpect {
-                status { isBadRequest() }
-            }
-            .andReturn()
-            .let { mvcResult ->
-                Assertions.assertTrue(testHelper.compareCommunity(mvcResult, 3, 5))
-            }
-    }
-
-    @Test
-    @Order(12)
-    fun `4_1_커뮤니티 정보 수정_정상`() {
-
-        val authenticationAdmin = signinAndGetAuth("admin", password)
-        createTopic(authenticationAdmin, createTopicRequest("topic3"))
-        createTopic(authenticationAdmin, createTopicRequest("topic4"))
-
-        val authentication1 = signinAndGetAuth(usernameA, password)
-
-        val body = modifyCommunityRequest(
-            "changedName1",
-            "changedDescription",
-            listOf("topic1", "topic3", "topic4")
-        )
-
-        modifyCommunity(authentication1, 1, body)
-            .andExpect {
-                status { isOk() }
-            }
-            .andReturn()
-            .let { mvcResult ->
-                Assertions.assertTrue(testHelper.compareCommunity(mvcResult, 4, 1))
-            }
-    }
-
-    @Test
-    @Order(13)
-    fun `4_2_커뮤니티 정보 수정_해당 커뮤니티 없음`() {
-        val authentication1 = signinAndGetAuth(usernameA, password)
-        val body = modifyCommunityRequest(
-            "changedName2",
-            "changedDescription",
-            listOf("topic1")
-        )
-        modifyCommunity(authentication1, 2, body)
-            .andExpect {
-                status { isNotFound() }
-            }
-            .andReturn()
-            .let { mvcResult ->
-                Assertions.assertTrue(testHelper.compareCommunity(mvcResult, 4, 2))
-            }
-    }
-
-    @Test
-    @Order(14)
-    fun `4_3_커뮤니티 정보 수정_매니저 아님`() {
-        // 현재 구독 중 x
-        val authentication2 = signinAndGetAuth(usernameB, password)
-        val body = modifyCommunityRequest(
-            "changedName2",
-            "changedDescription2",
-            listOf("topic1")
-        )
-        modifyCommunity(authentication2, 1, body)
-            .andExpect {
-                status { isUnauthorized() }
-            }
-            .andReturn()
-            .let { mvcResult ->
-                Assertions.assertTrue(testHelper.compareCommunity(mvcResult, 4, 3))
-            }
-
-        // 일반 회원
-        val authentication3 = signinAndGetAuth(usernameC, password)
-        joinCommunity(authentication3, joinCommunityRequest("member"), 1)
-        val body2 = modifyCommunityRequest(
-            "changedName2",
-            "changedDescription2",
-            listOf("topic1")
-        )
-        modifyCommunity(authentication3, 1, body2)
-            .andExpect {
-                status { isUnauthorized() }
-            }
-            .andReturn()
-            .let { mvcResult ->
-                Assertions.assertTrue(testHelper.compareCommunity(mvcResult, 4, 3))
-            }
-    }
-
-    @Test
+    /*@Test
     @Order(15)
     fun `4_4_커뮤니티 정보 수정_토픽 없음`() {
         val authentication1 = signinAndGetAuth(usernameA, password)
@@ -570,10 +498,71 @@ class CommunityTest(
             .let { mvcResult ->
                 Assertions.assertTrue(testHelper.compareCommunity(mvcResult, 4, 4))
             }
+    }*/
+
+    @Test
+    @Order(10)
+    fun `4_1_커뮤니티 탈퇴_일반 회원_정상`() {
+        val authentication3 = signinAndGetAuth(usernameC, password)
+        leaveCommunity(authentication3, 1)
+            .andExpect {
+                status { isOk() }
+            }
+            .andReturn()
+            .let { mvcResult ->
+                Assertions.assertTrue(testHelper.compareCommunity(mvcResult, 4, 1))
+            }
     }
 
     @Test
-    @Order(18)
+    @Order(11)
+    fun `4_2_커뮤니티 탈퇴_해당 커뮤니티 없음`() {
+        val authentication1 = signinAndGetAuth(usernameA, password)
+        leaveCommunity(authentication1, 2)
+            .andExpect {
+                status { isNotFound() }
+            }
+            .andReturn()
+            .let { mvcResult ->
+                Assertions.assertTrue(testHelper.compareCommunity(mvcResult, 4, 2))
+            }
+    }
+
+    @Test
+    @Order(12)
+    fun `4_3_커뮤니티 탈퇴_가입한 적 없음`() {
+        signup(signupRequest("username4", password))
+            .andExpect {
+                status { isCreated() }
+                header { exists("Authentication") }
+            }
+        val authentication4 = signinAndGetAuth("username4", password)
+        leaveCommunity(authentication4, 1)
+            .andExpect {
+                status { isBadRequest() }
+            }
+            .andReturn()
+            .let { mvcResult ->
+                Assertions.assertTrue(testHelper.compareCommunity(mvcResult, 4, 3))
+            }
+    }
+
+    @Test
+    @Order(13)
+    fun `4_4_커뮤니티 탈퇴_이미 탈퇴함`() {
+        val authentication3 = signinAndGetAuth(usernameC, password)
+        leaveCommunity(authentication3, 1)
+            .andExpect {
+                status { isBadRequest() }
+            }
+            .andReturn()
+            .let { mvcResult ->
+                Assertions.assertTrue(testHelper.compareCommunity(mvcResult, 4, 4))
+            }
+    }
+
+    @Test
+    @Order(14)
     fun `5_1_커뮤니티 삭제_정상`() {
         val authentication1 = signinAndGetAuth(usernameA, password)
         deleteCommunity(authentication1, 1)
@@ -587,7 +576,7 @@ class CommunityTest(
     }
 
     @Test
-    @Order(17)
+    @Order(15)
     fun `5_2_커뮤니티 삭제_커뮤니티 없음`() {
         val authentication1 = signinAndGetAuth(usernameA, password)
         deleteCommunity(authentication1, 2)

@@ -19,7 +19,7 @@ object CommunityTestAnswer {
             "communityName1",
             0,
             1,
-            "description",
+            "",
             false
         ),
 
@@ -37,27 +37,18 @@ object CommunityTestAnswer {
         CommunityDto.Response(
             1,
             "communityName1",
-            0,
-            2,
-            "description",
+            1,
+            1,
+            "",
             false
         ),
         // 2 2
-        CommunityDto.Response(
-            1,
-            "communityName1",
-            1,
-            2,
-            "description",
-            false
-        ),
-        // 2 3
         ErrorResponse(
             ErrorType.COMMUNITY_NOT_FOUND.code,
             ErrorType.COMMUNITY_NOT_FOUND.name,
             "Community Not Found",
         ),
-        // 2 4
+        // 2 3
         ErrorResponse(
             ErrorType.INVALID_REQUEST.code,
             ErrorType.INVALID_REQUEST.name,
@@ -79,40 +70,39 @@ object CommunityTestAnswer {
         CommunityDto.Response(
             1,
             "communityName1",
-            0,
             1,
+            2,
             "description",
             false
         ),
         // 3 3
-        ErrorResponse(
-            ErrorType.COMMUNITY_NOT_FOUND.code,
-            ErrorType.COMMUNITY_NOT_FOUND.name,
-            "Community Not Found",
+        CommunityDto.Response(
+            1,
+            "communityName1",
+            1,
+            1,
+            "description",
+            false
         ),
         // 3 4
-        ErrorResponse(
-            ErrorType.INVALID_REQUEST.code,
-            ErrorType.INVALID_REQUEST.name,
-            "Not Currently Joined"
+        CommunityDto.Response(
+            1,
+            "communityName1",
+            1,
+            1,
+            "description",
+            false
         ),
-        // 3 5
-        ErrorResponse(
-            ErrorType.INVALID_REQUEST.code,
-            ErrorType.INVALID_REQUEST.name,
-            "Not Currently Joined"
-        )
-
     )
 
     private val ans4 = arrayOf(
         // 4 1
         CommunityDto.Response(
             1,
-            "changedName1",
+            "communityName1",
             0,
             1,
-            "changedDescription",
+            "description",
             false
         ),
         // 4 2
@@ -123,26 +113,27 @@ object CommunityTestAnswer {
         ),
         // 4 3
         ErrorResponse(
-            ErrorType.UNAUTHORIZED.code,
-            ErrorType.UNAUTHORIZED.name,
-            "Not Community Manager"
+            ErrorType.INVALID_REQUEST.code,
+            ErrorType.INVALID_REQUEST.name,
+            "Not Currently Joined"
         ),
         // 4 4
         ErrorResponse(
-            ErrorType.NOT_FOUND.code,
-            ErrorType.NOT_FOUND.name,
-            "Topic Not Found"
+            ErrorType.INVALID_REQUEST.code,
+            ErrorType.INVALID_REQUEST.name,
+            "Not Currently Joined"
         )
+
     )
 
     private val ans5 = arrayOf(
         // 5 1
         CommunityDto.Response(
             1,
-            "changedName1",
+            "communityName1",
+            0,
             1,
-            1,
-            "changedDescription",
+            "description",
             true
         ),
         // 5 2

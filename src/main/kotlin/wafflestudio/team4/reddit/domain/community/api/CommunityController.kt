@@ -95,14 +95,14 @@ class CommunityController(
     fun modifyCommunityDescription(
         @CurrentUser user: User,
         @PathVariable("community_id") communityId: Long,
-        @Valid @RequestBody modifyRequest: CommunityDto.ModifyRequest
+        @Valid @RequestBody modifyRequest: CommunityDto.ModifyDescriptionRequest
     ): ResponseEntity<CommunityDto.Response> {
         val community = communityService.modifyCommunityDescription(user, modifyRequest, communityId)
         return ResponseEntity.status(200).body(CommunityDto.Response(community))
     }
 
     // 2) add, delete manager
-    @PutMapping("/{community_id}/about/moderators/{user_id}/add")
+    @PutMapping("/{community_id}/about/moderators/{user_id}/add/")
     fun addCommunityManager(
         @CurrentUser user: User,
         @PathVariable("community_id") communityId: Long,
@@ -112,7 +112,7 @@ class CommunityController(
         return ResponseEntity.status(200).body(CommunityDto.Response(community))
     }
 
-    @PutMapping("/{community_id}/about/moderators/{user_id}/delete")
+    @PutMapping("/{community_id}/about/moderators/{user_id}/delete/")
     fun deleteCommunityManager(
         @CurrentUser user: User,
         @PathVariable("community_id") communityId: Long,

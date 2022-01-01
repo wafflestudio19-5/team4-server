@@ -46,7 +46,7 @@ class CommunityService(
     fun getCommunityById(communityId: Long): Community {
         if (!communityRepository.existsById(communityId)) throw CommunityNotFoundException()
         val community = communityRepository.getById(communityId)
-        if (community.deleted) throw CommunityDeletedException()
+        if (community.isDeleted) throw CommunityDeletedException()
         return community
     }
 
@@ -56,11 +56,11 @@ class CommunityService(
             num_members = 0, // managers not part of num_members
             num_managers = 1,
             description = "", // createRequest.description,
-            deleted = false
+            isDeleted = false
         )
         if (communityRepository.existsByName(createRequest.name)) {
             var oldCommunity = communityRepository.getByName(createRequest.name)
-            if (!oldCommunity.deleted) throw CommunityAlreadyExistsException()
+            if (!oldCommunity.isDeleted) throw CommunityAlreadyExistsException()
             else {
                 oldCommunity = community
                 community = communityRepository.save(oldCommunity)
@@ -157,7 +157,7 @@ class CommunityService(
         return community
     }
 
-    fun modifyCommunityDescription(user: User, modifyRequest: CommunityDto.ModifyRequest, communityId: Long):
+    fun modifyCommunityDescription(user: User, modifyRequest: CommunityDto.ModifyDescriptionRequest, communityId: Long):
         Community {
         // check community existence
         var community = getCommunityById(communityId)
@@ -256,7 +256,7 @@ class CommunityService(
         // check whether user is this community's manager
         checkManagerStatus(user, community)
 
-        community.deleted = true
+        community.isDeleted = true
         community = communityRepository.save(community)
         // what to return?
         return community

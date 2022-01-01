@@ -24,8 +24,8 @@ class Community(
     var num_managers: Int = 0,
 
     // @field:NotBlank
-    var description: String,
+    var description: String = "",
 
     @field:NotNull
-    var deleted: Boolean = false
+    var isDeleted: Boolean = false
 ) : BaseTimeEntity()
