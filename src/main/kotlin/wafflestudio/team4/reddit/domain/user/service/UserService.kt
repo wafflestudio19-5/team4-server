@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import wafflestudio.team4.reddit.domain.user.dto.UserDto
 import wafflestudio.team4.reddit.domain.user.exception.UnauthorizedSigninException
+import wafflestudio.team4.reddit.domain.user.exception.UserDeletedException
 import wafflestudio.team4.reddit.domain.user.exception.UserNotFoundException
 import wafflestudio.team4.reddit.domain.user.model.User
 import wafflestudio.team4.reddit.domain.user.repository.UserRepository
@@ -38,7 +39,9 @@ class UserService(
     }
 
     fun getUserById(userId: Long): User {
-        return userRepository.findByIdOrNull(userId) ?: throw UserNotFoundException()
+        val user = userRepository.findByIdOrNull(userId) ?: throw UserNotFoundException()
+        if (user.isDeleted) throw UserDeletedException()
+        return user
     }
 
     fun getUsersPage(lastUserId: Long, size: Int): Page<User> {
