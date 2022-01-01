@@ -40,9 +40,7 @@ class DataLoader(
             "Programming",
             "Politics",
             "Technology",
-            "World News",
-            "topic1",
-            "topic2"
+            "World News"
         )
         for (topicName in topicList) {
             val topic = Topic(topicName)
