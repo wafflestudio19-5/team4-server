@@ -1,5 +1,7 @@
 package wafflestudio.team4.reddit.domain.community.service
 
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import wafflestudio.team4.reddit.domain.community.dto.CommunityDto
 import wafflestudio.team4.reddit.domain.community.exception.CommunityNotFoundException
@@ -26,13 +28,18 @@ class CommunityService(
     private val communityTopicRepository: CommunityTopicRepository,
     private val topicService: TopicService
 ) {
-    fun getAllCommunities(): List<Community> {
-        return communityRepository.findAll()
+
+    // used in search query
+    fun getCommunitiesPage(lastCommunityId: Long, size: Int): Page<Community> {
+        val pageRequest = PageRequest.of(0, size)
+        return communityRepository.findByIdLessThanOrderByIdDesc(lastCommunityId, pageRequest)
     }
 
     fun getCommunityById(communityId: Long): Community {
         if (!communityRepository.existsById(communityId)) throw CommunityNotFoundException()
-        return communityRepository.getById(communityId)
+        val community = communityRepository.getById(communityId)
+        if (community.deleted) throw CommunityDeletedException()
+        return community
     }
 
     fun createCommunity(createRequest: CommunityDto.CreateRequest, user: User): Community {
