@@ -4,13 +4,15 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import wafflestudio.team4.reddit.domain.comment.dto.CommentDto
+import wafflestudio.team4.reddit.domain.comment.exception.CommentNotFoundException
+import wafflestudio.team4.reddit.domain.comment.exception.NotCommentOwnerException
 import wafflestudio.team4.reddit.domain.comment.model.Comment
 import wafflestudio.team4.reddit.domain.comment.model.CommentVote
 import wafflestudio.team4.reddit.domain.comment.repository.CommentRepository
 import wafflestudio.team4.reddit.domain.comment.repository.CommentVoteRepository
+import wafflestudio.team4.reddit.domain.post.exception.PostNotFoundException
 import wafflestudio.team4.reddit.domain.post.repository.PostRepository
 import wafflestudio.team4.reddit.domain.user.model.User
-import java.lang.Exception
 
 @Service
 class CommentService(
@@ -19,7 +21,7 @@ class CommentService(
     private val postRepository: PostRepository,
 ) {
     fun getComments(lastCommentId: Long, size: Int, postId: Long): List<Comment> {
-        val post = postRepository.findByIdOrNull(postId) ?: throw Exception()
+        val post = postRepository.findByIdOrNull(postId) ?: throw PostNotFoundException()
         val pageRequest: PageRequest = PageRequest.of(0, size)
         return commentRepository.findByPostIsAndIdLessThanAndDeletedIsNotOrderByIdDesc(
             post,
@@ -30,8 +32,8 @@ class CommentService(
     }
 
     fun createComment(user: User, postId: Long, request: CommentDto.CreateRequest): Comment {
-        val post = postRepository.findByIdOrNull(postId) ?: throw Exception()
-        val parentComment = commentRepository.findByIdOrNull(request.parentId) ?: throw Exception()
+        val post = postRepository.findByIdOrNull(postId) ?: throw PostNotFoundException()
+        val parentComment = commentRepository.findByIdOrNull(request.parentId) ?: throw CommentNotFoundException()
 
         val newComment = Comment(
             user = user,
@@ -45,11 +47,11 @@ class CommentService(
     }
 
     fun deleteComment(user: User, commentId: Long): Comment {
-        val comment = commentRepository.findByIdOrNull(commentId) ?: throw Exception()
+        val comment = commentRepository.findByIdOrNull(commentId) ?: throw CommentNotFoundException()
 
         // 코멘트 작성자 확인
         val commentOwnerId = comment.user.id
-        if (commentOwnerId != user.id) throw Exception()
+        if (commentOwnerId != user.id) throw NotCommentOwnerException()
 
         // 코멘트 children 유무
         if (commentRepository.existsByParentIs(comment)) {
@@ -62,11 +64,11 @@ class CommentService(
     }
 
     fun modifyComment(user: User, commentId: Long, request: CommentDto.ModifyRequest): Comment {
-        val comment = commentRepository.findByIdOrNull(commentId) ?: throw Exception()
+        val comment = commentRepository.findByIdOrNull(commentId) ?: throw CommentNotFoundException()
 
         // 코멘트 작성자 확인
         val commentOwnerId = comment.user.id
-        if (commentOwnerId != user.id) throw Exception()
+        if (commentOwnerId != user.id) throw NotCommentOwnerException()
 
         comment.text = request.text
 
@@ -74,7 +76,7 @@ class CommentService(
     }
 
     fun voteComment(user: User, commentId: Long, isUp: Int): Comment {
-        val comment = commentRepository.findByIdOrNull(commentId) ?: throw Exception()
+        val comment = commentRepository.findByIdOrNull(commentId) ?: throw CommentNotFoundException()
         if (commentVoteRepository.existsByCommentAndUser(comment, user)) {
             val voteHistory = commentVoteRepository.findByCommentAndUser(comment, user)
             if (voteHistory.isUp == isUp) voteHistory.isUp = 1
