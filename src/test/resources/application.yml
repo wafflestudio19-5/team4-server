@@ -24,3 +24,13 @@ spring:
         hibernate:
             ddl-auto: create
         show-sql: true
+
+cloud:
+    aws:
+        s3:
+            bucket: waffle-team-4-server-s3
+        region:
+            static: ap-northeast-2
+        credentials:
+            accessKey: gitignored
+            secretKey: gitignored

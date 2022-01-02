@@ -7,4 +7,5 @@ interface CommunityRepository : JpaRepository<Community, Long?> {
     override fun getById(id: Long): Community
     override fun findAll(): List<Community>
     fun existsByName(name: String): Boolean
+    fun findByName(name: String): Community
 }
