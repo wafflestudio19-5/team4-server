@@ -10,4 +10,5 @@ interface CommunityRepository : JpaRepository<Community, Long?> {
     override fun findAll(): List<Community>
     fun existsByName(name: String): Boolean
     fun findByIdLessThanOrderByIdDesc(lastCommunityId: Long, pageRequest: PageRequest): Page<Community>
+    fun findByName(name: String): Community
 }
