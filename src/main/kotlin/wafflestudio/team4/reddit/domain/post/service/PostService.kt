@@ -41,20 +41,15 @@ class PostService(
         return postRepository.findByIdOrNull(postId) ?: throw PostNotFoundException()
     }
 
-    fun getPresignedUrl(fileName: String): String {
+    fun getPresignedUrl(user: User, fileName: String): String {
         val expiration: Date = Date()
         var expTimeMillis = expiration.time
         expTimeMillis += (1000 * 60 * 60).toLong() // 1시간
         expiration.time = expTimeMillis
 
-        val request = GeneratePresignedUrlRequest("waffle-team-4-server-s3", "posts/$expiration/$fileName")
+        val request = GeneratePresignedUrlRequest("waffle-team-4-server-s3", "posts/${user.id}/$fileName")
             .withMethod(HttpMethod.PUT)
             .withExpiration(expiration)
-
-//        request.addRequestParameter(
-//            Headers.S3_CANNED_ACL,
-//            CannedAccessControlList.PublicRead.toString()
-//        )
 
         return amazonS3.generatePresignedUrl(request).toString()
     }
