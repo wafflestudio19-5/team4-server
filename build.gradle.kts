@@ -42,6 +42,8 @@ dependencies {
     testImplementation("org.springframework.security:spring-security-test")
 
     implementation("org.hibernate.validator:hibernate-validator")
+    implementation("com.amazonaws:aws-java-sdk-bom:1.12.52")
+    implementation("com.amazonaws:aws-java-sdk-s3:1.12.52")
 }
 
 tasks.withType<KotlinCompile> {
