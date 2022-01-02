@@ -23,13 +23,11 @@ class CommentDto {
             parentId = comment.parent.id,
             numUpVotes = comment.votes.count { it.isUp == 2 },
             numDownVotes = comment.votes.count { it.isUp == 0 },
-            deleted = comment.deleted
+            deleted = comment.deleted == 1
         )
     }
 
     data class CreateRequest(
-        @field:NotNull
-        val postId: Long,
 
         @field:NotBlank
         val text: String,

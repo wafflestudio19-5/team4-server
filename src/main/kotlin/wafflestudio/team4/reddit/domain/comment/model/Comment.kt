@@ -26,7 +26,7 @@ class Comment(
     val post: Post,
 
     @field:NotNull
-    val text: String,
+    var text: String,
 
     @field:NotNull
     val depth: Int,
@@ -39,6 +39,9 @@ class Comment(
     var votes: MutableList<CommentVote> = mutableListOf(),
 
     @NotNull
-    var deleted: Boolean = false
+    // 0: exist 1: deleted, but has children comments (will not be filtered and be included in response)
+    // 2: deleted (will be filtered with jpa query)
+    // 항상 같은 수의 댓글을 넘겨주기 위해 이렇게 설정했습니다...
+    var deleted: Int = 0
 
 ) : BaseTimeEntity()
