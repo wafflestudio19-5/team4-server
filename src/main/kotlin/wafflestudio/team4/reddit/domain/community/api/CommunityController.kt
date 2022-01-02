@@ -17,7 +17,6 @@ import wafflestudio.team4.reddit.domain.user.model.User
 import wafflestudio.team4.reddit.global.auth.CurrentUser
 import wafflestudio.team4.reddit.global.common.dto.PageLinkDto
 import wafflestudio.team4.reddit.global.common.dto.PageResponse
-
 // import wafflestudio.team4.reddit.global.common.dto.ListResponse
 
 @RestController
