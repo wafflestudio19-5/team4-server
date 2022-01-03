@@ -25,6 +25,6 @@ class UserPrincipalDetailService(
             userRepository.findByEmail(
                 loginRequest.email,
             ) ?: throw UnexpectedUserNotFoundException()
-        return user.isDeleted
+        return user.deleted
     }
 }
