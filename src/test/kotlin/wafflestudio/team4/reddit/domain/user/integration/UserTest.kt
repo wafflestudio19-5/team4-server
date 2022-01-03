@@ -27,27 +27,16 @@ class UserTest(
 
     private val testHelper = TestHelper(mockMvc, objectMapper)
 
-    private fun signupRequest(username: String, password: String): String {
-        return """
-            {
-                "email": "$username@snu.ac.kr",
-                "username": "$username",
-                "password": "$password"
-            }
-        """.trimIndent()
-    }
-
     // set up
-
     @BeforeAll
     fun createUsers() {
-        testHelper.signup(signupRequest(username1, password))
+        testHelper.signup(username1, password)
             .andExpect {
                 status { isCreated() }
                 header { exists("Authentication") }
             }
 
-        testHelper.signup(signupRequest(username2, password))
+        testHelper.signup(username2, password)
             .andExpect {
                 status { isCreated() }
                 header { exists("Authentication") }
@@ -57,7 +46,7 @@ class UserTest(
     @Test
     @Transactional
     fun `1_1_회원 가입_정상`() {
-        testHelper.signup(signupRequest("username3", password))
+        testHelper.signup("username3", password)
             .andExpect {
                 status { isCreated() }
                 header { exists("Authentication") }
@@ -71,7 +60,7 @@ class UserTest(
     @Test
     @Transactional
     fun `1_2_회원 가입_중복 이메일`() {
-        testHelper.signup(signupRequest(username1, password))
+        testHelper.signup(username1, password)
             .andExpect {
                 status { isBadRequest() }
             }

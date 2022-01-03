@@ -39,6 +39,20 @@ class TestHelper(
         }
     }
 
+    fun signup(username: String, password: String): ResultActionsDsl {
+        return signup(signupRequest(username, password))
+    }
+
+    fun signupRequest(username: String, password: String): String {
+        return """
+            {
+                "email": "$username@snu.ac.kr",
+                "username": "$username",
+                "password": "$password"
+            }
+        """.trimIndent()
+    }
+
     fun signinAndGetAuth(username: String, password: String): String {
         return signin(username, password)
             .andReturn()
