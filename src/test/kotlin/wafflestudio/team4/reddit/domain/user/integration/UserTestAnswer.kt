@@ -98,5 +98,3 @@ object UserTestAnswer {
 
     val ans = arrayOf(ans1, ans2, ans3, ans4)
 }
-
-object PostTestAnswer

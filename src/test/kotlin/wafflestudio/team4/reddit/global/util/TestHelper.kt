@@ -2,13 +2,97 @@ package wafflestudio.team4.reddit.global.util
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
+import org.springframework.http.MediaType
+import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.MvcResult
+import org.springframework.test.web.servlet.ResultActionsDsl
+import org.springframework.test.web.servlet.delete
+import org.springframework.test.web.servlet.get
+import org.springframework.test.web.servlet.post
+import org.springframework.test.web.servlet.put
 import wafflestudio.team4.reddit.domain.user.integration.UserTestAnswer
 import wafflestudio.team4.reddit.domain.community.integration.CommunityTestAnswer
 
 class TestHelper(
+    private val mockMvc: MockMvc,
     private val objectMapper: ObjectMapper,
 ) {
+    fun signin(username: String, password: String): ResultActionsDsl {
+        return mockMvc.post("/api/v1/users/signin/") {
+            contentType = MediaType.APPLICATION_JSON
+            accept = MediaType.APPLICATION_JSON
+            content =
+                """
+                    {
+                        "email": "${toEmail(username)}",
+                        "password": "$password"
+                    }
+                """.trimIndent()
+        }
+    }
+
+    fun signup(body: String): ResultActionsDsl {
+        return mockMvc.post("/api/v1/users/") {
+            content = (body)
+            contentType = (MediaType.APPLICATION_JSON)
+            accept = (MediaType.APPLICATION_JSON)
+        }
+    }
+
+    fun signinAndGetAuth(username: String, password: String): String {
+        return signin(username, password)
+            .andReturn()
+            .response
+            .getHeader("Authentication")!!
+    }
+
+    fun get(url: String, authentication: String?): ResultActionsDsl {
+        val targetUrl = if (url.startsWith("/")) url else "/$url"
+        return mockMvc.get("/api/v1$targetUrl") {
+            if (authentication != null) {
+                header("Authentication", authentication)
+            }
+        }
+    }
+
+    fun post(url: String, body: String, authentication: String?): ResultActionsDsl {
+        val targetUrl = if (url.startsWith("/")) url else "/$url"
+        return mockMvc.post("/api/v1$targetUrl") {
+            content = (body)
+            contentType = (MediaType.APPLICATION_JSON)
+            accept = (MediaType.APPLICATION_JSON)
+            if (authentication != null) {
+                header("Authentication", authentication)
+            }
+        }
+    }
+
+    fun put(url: String, body: String, authentication: String?): ResultActionsDsl {
+        val targetUrl = if (url.startsWith("/")) url else "/$url"
+        return mockMvc.put("/api/v1$targetUrl") {
+            content = (body)
+            contentType = (MediaType.APPLICATION_JSON)
+            accept = (MediaType.APPLICATION_JSON)
+            if (authentication != null) {
+                header("Authentication", authentication)
+            }
+        }
+    }
+
+    fun delete(url: String, body: String?, authentication: String?): ResultActionsDsl {
+        val targetUrl = if (url.startsWith("/")) url else "/$url"
+        return mockMvc.delete("/api/v1$targetUrl") {
+            if (body != null) {
+                content = (body)
+                contentType = (MediaType.APPLICATION_JSON)
+                accept = (MediaType.APPLICATION_JSON)
+            }
+
+            if (authentication != null) {
+                header("Authentication", authentication)
+            }
+        }
+    }
 
     fun toEmail(name: String): String {
         return "$name@snu.ac.kr"
