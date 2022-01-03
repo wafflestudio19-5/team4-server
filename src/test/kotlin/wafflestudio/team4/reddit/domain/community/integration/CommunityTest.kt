@@ -29,7 +29,7 @@ class CommunityTest(
     private val mockMvc: MockMvc,
     private val objectMapper: ObjectMapper
 ) {
-    private val testHelper = TestHelper(objectMapper)
+    private val testHelper = TestHelper(mockMvc, objectMapper)
 
     private val usernameA = "usernameA"
     private val usernameB = "usernameB"
