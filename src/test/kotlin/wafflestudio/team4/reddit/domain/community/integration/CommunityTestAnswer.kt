@@ -3,8 +3,9 @@ package wafflestudio.team4.reddit.domain.community.integration
 import wafflestudio.team4.reddit.domain.community.dto.CommunityDto
 import wafflestudio.team4.reddit.global.common.exception.ErrorResponse
 import wafflestudio.team4.reddit.global.common.exception.ErrorType
+import wafflestudio.team4.reddit.global.util.TestAnswer
 
-object CommunityTestAnswer {
+object CommunityTestAnswer : TestAnswer {
     private val username1 = "username1"
     private val username2 = "username2"
     private val username3 = "username3"
@@ -159,5 +160,5 @@ object CommunityTestAnswer {
         ),
     )
 
-    val ans = arrayOf(ans1, ans2, ans3, ans4, ans5)
+    override val ans = arrayOf(ans1, ans2, ans3, ans4, ans5)
 }

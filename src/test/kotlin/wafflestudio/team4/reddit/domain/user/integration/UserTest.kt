@@ -9,6 +9,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.TestConstructor
 import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.MvcResult
 import org.springframework.transaction.annotation.Transactional
 import wafflestudio.team4.reddit.global.util.TestHelper
 
@@ -26,6 +27,10 @@ class UserTest(
     private val password = "somepassword"
 
     private val testHelper = TestHelper(mockMvc, objectMapper)
+
+    private fun compare(mvcResult: MvcResult, testNum: Int, subTestNum: Int): Boolean {
+        return testHelper.compare(UserTestAnswer, mvcResult, testNum, subTestNum)
+    }
 
     // set up
     @BeforeAll
@@ -53,7 +58,7 @@ class UserTest(
             }
             .andReturn()
             .let { mvcResult ->
-                assertTrue(testHelper.compare(mvcResult, 1, 1))
+                assertTrue(compare(mvcResult, 1, 1))
             }
     }
 
@@ -65,7 +70,7 @@ class UserTest(
                 status { isBadRequest() }
             }
             .andReturn()
-            .let { assertTrue(testHelper.compare(it, 1, 2)) }
+            .let { assertTrue(compare(it, 1, 2)) }
     }
 
     @Test
@@ -113,7 +118,7 @@ class UserTest(
                 status { isOk() }
             }
             .andReturn()
-            .let { assertTrue(testHelper.compare(it, 3, 1)) }
+            .let { assertTrue(compare(it, 3, 1)) }
     }
 
     @Test
@@ -133,7 +138,7 @@ class UserTest(
                 status { isOk() }
             }
             .andReturn()
-            .let { assertTrue(testHelper.compare(it, 3, 2)) }
+            .let { assertTrue(compare(it, 3, 2)) }
     }
 
     @Test
@@ -144,7 +149,7 @@ class UserTest(
                 status { isNotFound() }
             }
             .andReturn()
-            .let { assertTrue(testHelper.compare(it, 3, 3)) }
+            .let { assertTrue(compare(it, 3, 3)) }
     }
 
     @Test
@@ -172,7 +177,7 @@ class UserTest(
                 status { isOk() }
             }
             .andReturn()
-            .let { assertTrue(testHelper.compare(it, 4, 1)) }
+            .let { assertTrue(compare(it, 4, 1)) }
 
         // password check
         testHelper.signin("updatename", "update_password")
@@ -198,7 +203,7 @@ class UserTest(
                 status { isOk() }
             }
             .andReturn()
-            .let { assertTrue(testHelper.compare(it, 4, 2)) }
+            .let { assertTrue(compare(it, 4, 2)) }
 
         // password check
         testHelper.signin(username2, "update_password")
@@ -224,7 +229,7 @@ class UserTest(
                 status { isOk() }
             }
             .andReturn()
-            .let { assertTrue(testHelper.compare(it, 4, 3)) }
+            .let { assertTrue(compare(it, 4, 3)) }
 
         // password check
         testHelper.signin("updatename", "update_password")
@@ -250,7 +255,7 @@ class UserTest(
                 status { isOk() }
             }
             .andReturn()
-            .let { assertTrue(testHelper.compare(it, 4, 4)) }
+            .let { assertTrue(compare(it, 4, 4)) }
     }
 
     @Test
