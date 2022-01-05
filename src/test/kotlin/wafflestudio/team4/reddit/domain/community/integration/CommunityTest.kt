@@ -382,6 +382,7 @@ class CommunityTest(
     @Order(12)
     fun `4_1_커뮤니티 정보 수정_정상`() {
         // TODO partial update
+        // TODO Response
 
         val authenticationAdmin = testHelper.signinAndGetAuth("admin", password)
         createTopic(createTopicRequest("topic3"), authenticationAdmin)

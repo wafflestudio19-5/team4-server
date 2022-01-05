@@ -40,7 +40,7 @@ class UserService(
 
     fun getUserById(userId: Long): User {
         val user = userRepository.findByIdOrNull(userId) ?: throw UserNotFoundException()
-        if (user.isDeleted) throw UserDeletedException()
+        if (user.deleted) throw UserDeletedException()
         return user
     }
 
