@@ -10,9 +10,10 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.DeleteMapping
 import wafflestudio.team4.reddit.domain.follow.dto.FollowDto
 import wafflestudio.team4.reddit.domain.follow.service.FollowService
+import wafflestudio.team4.reddit.domain.user.dto.UserDto
 import wafflestudio.team4.reddit.domain.user.model.User
 import wafflestudio.team4.reddit.global.auth.CurrentUser
-import wafflestudio.team4.reddit.global.common.dto.PageLinkDto
+// import wafflestudio.team4.reddit.global.common.dto.PageLinkDto
 import wafflestudio.team4.reddit.global.common.dto.PageResponse
 
 @RestController
@@ -23,18 +24,18 @@ class FollowController(
 
     // get following?
 
-    @GetMapping("/{fromUser_id}")
+    @GetMapping("/{toUser_id}")
     fun getFollowersPage(
-        @PathVariable("fromUser_id") fromUserId: Long,
+        @PathVariable("toUser_id") toUserId: Long,
         @RequestParam(required = false, defaultValue = Long.MAX_VALUE.toString()) lastFollowId: Long,
         @RequestParam(required = false, defaultValue = "10") size: Int,
-    ): PageResponse<FollowDto.Response> {
-        val followPage = followService.getFollowersPage(fromUserId, lastFollowId, size)
-        val followLinks = buildPageLink(lastFollowId, size)
-        return PageResponse(followPage.map { FollowDto.Response(it) }, followLinks)
+    ): PageResponse<UserDto.Response> {
+        val followPage = followService.getFollowersPage(toUserId, lastFollowId, size)
+        // val followLinks = buildPageLink(lastFollowId, size)
+        return PageResponse(followPage.map { UserDto.Response(it.fromUser) })
     }
 
-    private fun buildPageLink(lastFollowId: Long, size: Int): PageLinkDto {
+    /*private fun buildPageLink(lastFollowId: Long, size: Int): PageLinkDto {
         val first = "size=$size"
         val self = "lastFollowId=$lastFollowId&size=$size"
         val last = "lastFollowId=${size + 1}&size=$size"
@@ -45,7 +46,7 @@ class FollowController(
                 Long.MAX_VALUE else lastFollowId + size}&size=$size"
 
         return PageLinkDto(first, prev, self, next, last)
-    }
+    }*/
 
     @PostMapping("/{toUser_id}/")
     fun follow(@CurrentUser fromUser: User, @PathVariable("toUser_id") toUserId: Long):

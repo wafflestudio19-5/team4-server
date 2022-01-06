@@ -15,9 +15,10 @@ class FollowService(
     private val followRepository: FollowRepository,
     private val userService: UserService
 ) {
-    fun getFollowersPage(fromUserId: Long, lastFollowId: Long, size: Int): Page<Follow> {
+    fun getFollowersPage(toUserId: Long, lastFollowId: Long, size: Int): Page<Follow> {
         val pageRequest = PageRequest.of(0, size)
-        return followRepository.findByFromUserIdLessThanOrderByIdDesc(fromUserId, lastFollowId, pageRequest)
+        // equals toUserId, followId less than, pageRequest
+        return followRepository.findByToUserIdEqualsAndIdLessThanOrderByIdDesc(toUserId, lastFollowId, pageRequest)
     }
 
     fun follow(fromUser: User, toUserId: Long): Follow {
