@@ -11,4 +11,5 @@ interface CommunityRepository : JpaRepository<Community, Long?> {
     fun existsByName(name: String): Boolean
     fun findByIdLessThanOrderByIdDesc(id: Long, pageable: Pageable): Page<Community>
     fun getByName(name: String): Community
+    fun findByName(name: String): Community
 }
