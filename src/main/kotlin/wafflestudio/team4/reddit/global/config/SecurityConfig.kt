@@ -12,11 +12,11 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
-import wafflestudio.team4.reddit.global.auth.JwtAuthenticationEntryPoint
-import wafflestudio.team4.reddit.global.auth.JwtAuthenticationFilter
-import wafflestudio.team4.reddit.global.auth.JwtTokenProvider
-import wafflestudio.team4.reddit.global.auth.SigninAuthenticationFilter
-import wafflestudio.team4.reddit.global.auth.model.UserPrincipalDetailService
+import wafflestudio.team4.reddit.global.auth.jwt.JwtAuthenticationEntryPoint
+import wafflestudio.team4.reddit.global.auth.filter.JwtAuthenticationFilter
+import wafflestudio.team4.reddit.global.auth.jwt.JwtTokenProvider
+import wafflestudio.team4.reddit.global.auth.filter.SigninAuthenticationFilter
+import wafflestudio.team4.reddit.global.auth.service.UserPrincipalDetailService
 
 @Configuration
 @EnableGlobalMethodSecurity(prePostEnabled = true)

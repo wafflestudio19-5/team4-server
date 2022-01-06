@@ -1,4 +1,4 @@
-package wafflestudio.team4.reddit.global.auth
+package wafflestudio.team4.reddit.global.auth.annotation
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 

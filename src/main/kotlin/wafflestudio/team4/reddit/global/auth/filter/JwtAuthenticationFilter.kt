@@ -1,8 +1,9 @@
-package wafflestudio.team4.reddit.global.auth
+package wafflestudio.team4.reddit.global.auth.filter
 
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter
+import wafflestudio.team4.reddit.global.auth.jwt.JwtTokenProvider
 import javax.servlet.FilterChain
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse

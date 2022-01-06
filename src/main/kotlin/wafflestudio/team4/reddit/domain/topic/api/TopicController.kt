@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.DeleteMapping
 import wafflestudio.team4.reddit.domain.topic.dto.TopicDto
 import wafflestudio.team4.reddit.domain.topic.service.TopicService
 import wafflestudio.team4.reddit.domain.user.model.User
-import wafflestudio.team4.reddit.global.auth.CurrentUser
+import wafflestudio.team4.reddit.global.auth.annotation.CurrentUser
 import javax.validation.Valid
 
 @RestController

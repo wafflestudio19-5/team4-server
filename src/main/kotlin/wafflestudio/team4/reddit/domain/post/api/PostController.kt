@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.PutMapping
 import wafflestudio.team4.reddit.domain.post.dto.PostDto
 import wafflestudio.team4.reddit.domain.post.service.PostService
 import wafflestudio.team4.reddit.domain.user.model.User
-import wafflestudio.team4.reddit.global.auth.CurrentUser
-import wafflestudio.team4.reddit.global.auth.JwtTokenProvider
+import wafflestudio.team4.reddit.global.auth.annotation.CurrentUser
+import wafflestudio.team4.reddit.global.auth.jwt.JwtTokenProvider
 import wafflestudio.team4.reddit.global.common.dto.ListResponse
 import javax.validation.Valid
 
