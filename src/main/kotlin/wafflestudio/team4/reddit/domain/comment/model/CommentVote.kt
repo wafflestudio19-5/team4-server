@@ -22,6 +22,7 @@ class CommentVote(
     @JoinColumn(name = "user_id")
     val user: User,
 
+    // 2 - up vote, 0  - down vote, 1 - cancelled vote
     @field:NotNull
     var isUp: Int = 0,
 

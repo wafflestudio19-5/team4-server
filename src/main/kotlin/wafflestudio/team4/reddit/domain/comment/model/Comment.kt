@@ -32,13 +32,17 @@ class Comment(
     val depth: Int,
 
     @OneToOne
-    @JoinColumn(name = "comment_id")
-    val parent: Comment,
+    @JoinColumn(name = "parent_comment_id")
+    var parent: Comment? = null,
+
+    @OneToOne
+    @JoinColumn(name = "group_comment_id")
+    var group: Comment? = null,
 
     @OneToMany(mappedBy = "comment")
     var votes: MutableList<CommentVote> = mutableListOf(),
 
-    @NotNull
+    @field:NotNull
     // 0: exist 1: deleted, but has children comments (will not be filtered and be included in response)
     // 2: deleted (will be filtered with jpa query)
     // 항상 같은 수의 댓글을 넘겨주기 위해 이렇게 설정했습니다...

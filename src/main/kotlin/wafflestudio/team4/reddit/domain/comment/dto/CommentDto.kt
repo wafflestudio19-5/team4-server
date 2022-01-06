@@ -10,7 +10,8 @@ class CommentDto {
         val userId: Long,
         val text: String,
         val depth: Int,
-        val parentId: Long,
+        val parentId: Long?,
+        val groupId: Long?,
         val numUpVotes: Int,
         val numDownVotes: Int,
         val deleted: Boolean,
@@ -20,10 +21,11 @@ class CommentDto {
             userId = comment.user.id,
             text = comment.text,
             depth = comment.depth,
-            parentId = comment.parent.id,
+            parentId = comment.parent?.id,
+            groupId = comment.group?.id,
             numUpVotes = comment.votes.count { it.isUp == 2 },
             numDownVotes = comment.votes.count { it.isUp == 0 },
-            deleted = comment.deleted == 1
+            deleted = comment.deleted == 1 || comment.deleted == 2
         )
     }
 
@@ -36,7 +38,10 @@ class CommentDto {
         val depth: Int,
 
         @field:NotNull
-        val parentId: Long
+        val parentId: Long = 0L,
+
+        @field:NotNull
+        val groupId: Long = 0L,
     )
 
     data class ModifyRequest(
