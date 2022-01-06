@@ -20,5 +20,6 @@ enum class ErrorType(
 
     NOT_FOUND(4040),
     USER_NOT_FOUND(4041),
+    POST_NOT_FOUND(4042),
     COMMUNITY_NOT_FOUND(4043)
 }

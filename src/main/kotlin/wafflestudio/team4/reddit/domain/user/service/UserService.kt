@@ -54,7 +54,7 @@ class UserService(
     }
 
     fun deleteUser(user: User) {
-        user.isDeleted = true
+        user.deleted = true
         userRepository.save(user)
     }
 }
