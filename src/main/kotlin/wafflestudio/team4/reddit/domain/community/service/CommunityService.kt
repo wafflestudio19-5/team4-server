@@ -10,15 +10,13 @@ import wafflestudio.team4.reddit.domain.community.exception.AlreadyJoinedExcepti
 import wafflestudio.team4.reddit.domain.community.exception.CommunityAlreadyExistsException
 import wafflestudio.team4.reddit.domain.community.exception.NotCurrentlyJoinedException
 import wafflestudio.team4.reddit.domain.community.exception.NotCommunityManagerException
-import wafflestudio.team4.reddit.domain.community.exception.AlreadyManagerException
 import wafflestudio.team4.reddit.domain.community.model.Community
 import wafflestudio.team4.reddit.domain.community.model.CommunityTopic
-import wafflestudio.team4.reddit.domain.community.model.ManagerCommunity
 import wafflestudio.team4.reddit.domain.community.model.UserCommunity
 import wafflestudio.team4.reddit.domain.community.repository.CommunityRepository
 import wafflestudio.team4.reddit.domain.community.repository.CommunityTopicRepository
-import wafflestudio.team4.reddit.domain.community.repository.ManagerCommunityRepository
 import wafflestudio.team4.reddit.domain.community.repository.UserCommunityRepository
+import wafflestudio.team4.reddit.domain.topic.exceptions.TopicNotFoundException
 import wafflestudio.team4.reddit.domain.topic.model.Topic
 import wafflestudio.team4.reddit.domain.topic.service.TopicService
 import wafflestudio.team4.reddit.domain.user.model.User
@@ -28,7 +26,6 @@ import wafflestudio.team4.reddit.domain.user.service.UserService
 class CommunityService(
     private val communityRepository: CommunityRepository,
     private val userCommunityRepository: UserCommunityRepository,
-    private val managerCommunityRepository: ManagerCommunityRepository,
     private val communityTopicRepository: CommunityTopicRepository,
     private val topicService: TopicService,
     private val userService: UserService
@@ -46,7 +43,7 @@ class CommunityService(
     fun getCommunityById(communityId: Long): Community {
         if (!communityRepository.existsById(communityId)) throw CommunityNotFoundException()
         val community = communityRepository.getById(communityId)
-        if (community.isDeleted) throw CommunityDeletedException()
+        if (community.deleted) throw CommunityDeletedException()
         return community
     }
 
@@ -55,12 +52,12 @@ class CommunityService(
             name = createRequest.name,
             num_members = 0, // managers not part of num_members
             num_managers = 1,
-            description = "", // createRequest.description,
-            isDeleted = false
+            description = createRequest.description,
+            deleted = false
         )
         if (communityRepository.existsByName(createRequest.name)) {
             var oldCommunity = communityRepository.getByName(createRequest.name)
-            if (!oldCommunity.isDeleted) throw CommunityAlreadyExistsException()
+            if (!oldCommunity.deleted) throw CommunityAlreadyExistsException()
             else {
                 oldCommunity = community
                 community = communityRepository.save(oldCommunity)
@@ -75,20 +72,19 @@ class CommunityService(
         )
         userCommunityRepository.save(userCommunity)
 
-        val managerCommunity = ManagerCommunity(
+        /*val managerCommunity = ManagerCommunity(
             manager = user,
             community = community
         )
-        managerCommunityRepository.save(managerCommunity)
+        managerCommunityRepository.save(managerCommunity)*/
 
-        // topics not added at first
-        /*val topics = mutableListOf<Topic>()
+        val topics = mutableListOf<Topic>()
         for (topicName in createRequest.topics) {
             if (!topicService.checkTopicExistence(topicName)) throw TopicNotFoundException()
             val topic = topicService.getTopicByName(topicName)
             topics.add(topic)
         }
-        // val topics = createRequest.topics.map { Topic(name = it) }
+
         val communityTopic = CommunityTopic(
             community = community,
             topic = topics[0] // at least one topic, first topic
@@ -105,7 +101,7 @@ class CommunityService(
                 communityTopicRepository.save(newCommunityTopic)
             }
         }
-        */
+
         return community
     }
 
@@ -145,9 +141,10 @@ class CommunityService(
 
         if (userCommunity.isManager) {
             community.num_managers -= 1
-            val managerCommunity = managerCommunityRepository.getByManagerAndCommunity(user, community)
-            managerCommunity.joined = false
-            managerCommunityRepository.save(managerCommunity)
+            userCommunity.isManager = false
+            // val managerCommunity = managerCommunityRepository.getByManagerAndCommunity(user, community)
+            // managerCommunity.joined = false
+            // managerCommunityRepository.save(managerCommunity)
         } else community.num_members -= 1
         userCommunity.joined = false
 
@@ -195,8 +192,7 @@ class CommunityService(
         }*/
 
         // change description
-        if (modifyRequest.description != "") community.description = modifyRequest.description
-
+        community.description = modifyRequest.description
         community = communityRepository.save(community)
 
         return community
@@ -211,7 +207,6 @@ class CommunityService(
 
         val manager = userService.getUserById(userId)
         community = addManager(community, manager)
-        communityRepository.save(community)
         return community
     }
 
@@ -224,7 +219,6 @@ class CommunityService(
 
         val manager = userService.getUserById(userId)
         community = deleteManager(community, manager)
-        communityRepository.save(community)
         return community
     }
 
@@ -237,7 +231,7 @@ class CommunityService(
 
         val topic = topicService.getTopicById(topicId)
 
-        // topic already added -> toggle to delete, not added -> toggle to add
+        // topic already added -> toggle to delete / not added -> toggle to add
         if (communityTopicRepository.existsByCommunityAndTopic(community, topic)) {
             val communityTopic = communityTopicRepository.getByCommunityAndTopic(community, topic)
             communityTopic.deleted = !communityTopic.deleted
@@ -256,16 +250,16 @@ class CommunityService(
         // check whether user is this community's manager
         checkManagerStatus(user, community)
 
-        community.isDeleted = true
+        community.deleted = true
         community = communityRepository.save(community)
         // what to return?
         return community
     }
 
     // helper functions
-    fun addManager(community: Community, manager: User): Community { // don't have to accept invitation
-        if (managerCommunityRepository.existsByManagerAndCommunity(manager, community)) {
-            val managerCommunity = managerCommunityRepository.getByManagerAndCommunity(manager, community)
+    fun addManager(community: Community, manager: User): Community {
+        /*if (managerCommunityRepository.existsByUserAndCommunity(manager, community)) {
+            val managerCommunity = userCommunityRepository.getByManagerAndCommunity(manager, community)
             if (managerCommunity.joined) throw AlreadyManagerException()
             managerCommunity.joined = true // reassign
             managerCommunityRepository.save(managerCommunity)
@@ -275,7 +269,8 @@ class CommunityService(
                 community = community
             )
             managerCommunityRepository.save(managerCommunity)
-        }
+        }*/
+
         // if not user, add as user
         if (!userCommunityRepository.existsByUserAndCommunity(manager, community)) { // first join
             val userCommunity = UserCommunity(
@@ -288,12 +283,14 @@ class CommunityService(
             val userCommunity = userCommunityRepository.getByUserAndCommunity(manager, community)
             if (!userCommunity.joined) { // rejoin
                 userCommunity.joined = true
-                userCommunity.isManager = true
-                userCommunityRepository.save(userCommunity)
             }
+            if (userCommunity.joined && !userCommunity.isManager) community.num_members -= 1
+            userCommunity.isManager = true
+            userCommunityRepository.save(userCommunity)
         }
 
         community.num_managers += 1
+        communityRepository.save(community)
         return community
     }
 
@@ -302,16 +299,15 @@ class CommunityService(
         val managerCommunity = checkManagerStatus(manager, community)
 
         managerCommunity.joined = false
-        managerCommunityRepository.save(managerCommunity)
-        val userCommunity = userCommunityRepository.getByUserAndCommunity(manager, community)
-        userCommunity.isManager = false
-        userCommunityRepository.save(userCommunity)
+        managerCommunity.isManager = false
+        userCommunityRepository.save(managerCommunity)
 
         community.num_managers -= 1
+        communityRepository.save(community)
         return community
     }
 
-    fun changeTopics(community: Community, topics: List<Topic>) {
+    /*fun changeTopics(community: Community, topics: List<Topic>) {
         // delete newly deleted topics
         // if no already assigned topics, skip this block
         val oldTopics = if (communityTopicRepository.existsByCommunity(community))
@@ -338,19 +334,14 @@ class CommunityService(
                 }
             }
         }
-    }
+    }*/
 
-    fun checkManagerStatus(user: User, community: Community): ManagerCommunity {
-        /*if (!userCommunityRepository.existsByUserAndCommunity(user, community))
-        throw NotCommunityManagerException()
+    fun checkManagerStatus(user: User, community: Community): UserCommunity {
+        if (!userCommunityRepository.existsByUserAndCommunity(user, community))
+            throw NotCommunityManagerException()
         val userCommunity = userCommunityRepository.getByUserAndCommunity(user, community)
         if (!userCommunity.joined) throw NotCommunityManagerException()
         if (!userCommunity.isManager) throw NotCommunityManagerException()
-        */
-        if (!managerCommunityRepository.existsByManagerAndCommunity(user, community))
-            throw NotCommunityManagerException()
-        val managerCommunity = managerCommunityRepository.getByManagerAndCommunity(user, community)
-        if (!managerCommunity.joined) throw NotCommunityManagerException()
-        return managerCommunity
+        return userCommunity
     }
 }

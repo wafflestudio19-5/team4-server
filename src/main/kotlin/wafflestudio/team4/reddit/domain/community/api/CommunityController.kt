@@ -56,6 +56,7 @@ class CommunityController(
 
     // TODO get community's managers (/about/moderators/)
     // TODO get community's topics (/about/topics/)
+    // TODO redirect to about page (/about/)
 
     // create community
     // anyone allowed to make community
@@ -75,11 +76,11 @@ class CommunityController(
     ): ResponseEntity<CommunityDto.Response> {
         // val role = joinRequest.role // role: manager, member
         val community = communityService.joinCommunity(user, communityId)
-        return ResponseEntity.status(201).body(CommunityDto.Response(community))
+        return ResponseEntity.status(200).body(CommunityDto.Response(community))
     }
 
     // withdraw from community
-    @DeleteMapping("/{community_id}/me/") // change URL pattern
+    @DeleteMapping("/{community_id}/me/")
     fun leaveCommunity(
         @CurrentUser user: User,
         @PathVariable("community_id") communityId: Long
@@ -88,7 +89,7 @@ class CommunityController(
         return ResponseEntity.status(200).body(CommunityDto.Response(community))
     }
 
-    // change already existing community info
+    // change community info
     // only this community's managers allowed to change info
     // 1) change description
     @PutMapping("/{community_id}/about/description/")

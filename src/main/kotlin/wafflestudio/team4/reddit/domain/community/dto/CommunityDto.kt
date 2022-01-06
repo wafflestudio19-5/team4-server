@@ -22,11 +22,10 @@ class CommunityDto {
         constructor(community: Community) : this(
             id = community.id,
             name = community.name,
-            // managers = community.managers.map{},
             num_members = community.num_members,
             num_managers = community.num_managers,
             description = community.description,
-            deleted = community.isDeleted
+            deleted = community.deleted
         )
     }
 
@@ -34,10 +33,10 @@ class CommunityDto {
     data class CreateRequest(
         @field:NotBlank
         val name: String,
-        // @field:NotBlank
-        // val description: String,
-        // @field:NotNull
-        // val topics: List<String> // at least one topic
+        @field:NotBlank
+        val description: String,
+        @field:NotNull
+        val topics: List<String> // at least one topic
     )
 
     // ModifyRequest
