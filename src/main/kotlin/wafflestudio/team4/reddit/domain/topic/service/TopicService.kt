@@ -29,5 +29,4 @@ class TopicService(
     fun checkTopicExistence(name: String): Boolean {
         return topicRepository.existsByName(name)
     }
-
 }
