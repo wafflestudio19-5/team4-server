@@ -1,5 +1,7 @@
 package wafflestudio.team4.reddit.domain.follow.service
 
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import wafflestudio.team4.reddit.domain.follow.exception.AlreadyFollowingException
 import wafflestudio.team4.reddit.domain.follow.exception.NotFollowingException
@@ -13,7 +15,10 @@ class FollowService(
     private val followRepository: FollowRepository,
     private val userService: UserService
 ) {
-    // TODO GET
+    fun getFollowersPage(fromUserId: Long, lastFollowId: Long, size: Int): Page<Follow> {
+        val pageRequest = PageRequest.of(0, size)
+        return followRepository.findByFromUserIdLessThanOrderByIdDesc(fromUserId, lastFollowId, pageRequest)
+    }
 
     fun follow(fromUser: User, toUserId: Long): Follow {
         val toUser = userService.getUserById(toUserId)
