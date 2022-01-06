@@ -27,7 +27,7 @@ class User(
     var online: Boolean = false,
 
     @field:NotNull
-    var isDeleted: Boolean = false,
+    var deleted: Boolean = false,
 
     @field:NotNull
     var roles: String = "",
