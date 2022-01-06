@@ -14,12 +14,12 @@ import javax.validation.constraints.NotNull
 @Table(name = "reddit_follow")
 class Follow(
     @field:NotNull
-    @ManyToOne(fetch = FetchType.EAGER, cascade = [CascadeType.ALL])
+    @ManyToOne(fetch = FetchType.EAGER, cascade = [CascadeType.MERGE])
     @JoinColumn(name = "from_user_id")
     val fromUser: User,
 
     @field:NotNull
-    @ManyToOne(fetch = FetchType.EAGER, cascade = [CascadeType.ALL])
+    @ManyToOne(fetch = FetchType.EAGER, cascade = [CascadeType.MERGE])
     @JoinColumn(name = "to_user_id")
     val toUser: User,
 

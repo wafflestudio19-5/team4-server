@@ -24,15 +24,15 @@ class FollowController(
 
     // get following?
 
-    @GetMapping("/{toUser_id}")
+    @GetMapping("/{toUser_id}/followers/")
     fun getFollowersPage(
         @PathVariable("toUser_id") toUserId: Long,
         @RequestParam(required = false, defaultValue = Long.MAX_VALUE.toString()) lastFollowId: Long,
         @RequestParam(required = false, defaultValue = "10") size: Int,
-    ): PageResponse<UserDto.Response> {
+    ): PageResponse<FollowDto.FollowerResponse> {
         val followPage = followService.getFollowersPage(toUserId, lastFollowId, size)
         // val followLinks = buildPageLink(lastFollowId, size)
-        return PageResponse(followPage.map { UserDto.Response(it.fromUser) })
+        return PageResponse(followPage.map { FollowDto.FollowerResponse(it.fromUser) })
     }
 
     /*private fun buildPageLink(lastFollowId: Long, size: Int): PageLinkDto {
