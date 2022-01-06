@@ -3,8 +3,9 @@ package wafflestudio.team4.reddit.domain.user.integration
 import wafflestudio.team4.reddit.domain.user.dto.UserDto
 import wafflestudio.team4.reddit.global.common.exception.ErrorResponse
 import wafflestudio.team4.reddit.global.common.exception.ErrorType
+import wafflestudio.team4.reddit.global.util.TestAnswer
 
-object UserTestAnswer {
+object UserTestAnswer : TestAnswer {
     private val username1 = "username1"
     private val username2 = "username2"
     private val username3 = "username3"
@@ -28,7 +29,7 @@ object UserTestAnswer {
     )
 
     // test 2: body non-required
-    private val ans2 = arrayOf("")
+    private val ans2: Array<Any> = arrayOf("")
 
     private val ans3 = arrayOf(
         // 3 1
@@ -96,7 +97,5 @@ object UserTestAnswer {
         )
     )
 
-    val ans = arrayOf(ans1, ans2, ans3, ans4)
+    override val ans = arrayOf(ans1, ans2, ans3, ans4)
 }
-
-object PostTestAnswer
