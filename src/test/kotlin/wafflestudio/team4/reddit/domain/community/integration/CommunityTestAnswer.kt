@@ -44,7 +44,7 @@ object CommunityTestAnswer {
         CommunityDto.Response(
             1,
             communityName1,
-            2,
+            1,
             1,
             description,
             false

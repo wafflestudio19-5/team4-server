@@ -233,31 +233,31 @@ class CommunityTest(
     // setup
     @BeforeAll
     fun createUsers() {
-        signup(signupRequest(admin, password)) // id 3
+        signup(signupRequest(admin, password)) // id 1
             .andExpect {
                 status { isCreated() }
                 header { exists("Authentication") }
             }
 
-        signup(signupRequest(usernameA, password)) // id 4
+        signup(signupRequest(usernameA, password)) // id 2
             .andExpect {
                 status { isCreated() }
                 header { exists("Authentication") }
             }
 
-        signup(signupRequest(usernameB, password)) // id 5
+        signup(signupRequest(usernameB, password)) // id 3
             .andExpect {
                 status { isCreated() }
                 header { exists("Authentication") }
             }
 
-        signup(signupRequest(usernameC, password)) // id 6
+        signup(signupRequest(usernameC, password)) // id 4
             .andExpect {
                 status { isCreated() }
                 header { exists("Authentication") }
             }
 
-        signup(signupRequest(usernameD, password)) // id 7
+        signup(signupRequest(usernameD, password)) // id 5
             .andExpect {
                 status { isCreated() }
                 header { exists("Authentication") }
@@ -267,12 +267,10 @@ class CommunityTest(
         createTopic(authentication, createTopicRequest(topicName1))
             .andExpect {
                 status { isCreated() }
-                header { exists("Authentication") }
             }
         createTopic(authentication, createTopicRequest(topicName2))
             .andExpect {
                 status { isCreated() }
-                header { exists("Authentication") }
             }
     }
 
@@ -455,12 +453,12 @@ class CommunityTest(
     fun `3_2_커뮤니티 매니저 추가_정상`() {
         val authentication1 = signinAndGetAuth(usernameA, password)
 
-        addCommunityManager(authentication1, 1, 6) // C originally just member
+        addCommunityManager(authentication1, 1, 4) // C originally just member
             .andExpect {
                 status { isOk() }
             }
 
-        addCommunityManager(authentication1, 1, 7) // D
+        addCommunityManager(authentication1, 1, 5) // D
             .andExpect {
                 status { isOk() }
             }
@@ -477,7 +475,7 @@ class CommunityTest(
         val authentication3 = signinAndGetAuth(usernameC, password)
         // TODO block deleting oneself
 
-        deleteCommunityManager(authentication3, 1, 3)
+        deleteCommunityManager(authentication3, 1, 2)
             .andExpect {
                 status { isOk() }
             }
@@ -603,7 +601,7 @@ class CommunityTest(
     }
 
     @Test
-    @Order(14)
+    @Order(16)
     fun `5_1_커뮤니티 삭제_정상`() {
         val authentication3 = signinAndGetAuth(usernameC, password)
         deleteCommunity(authentication3, 1)
@@ -631,7 +629,7 @@ class CommunityTest(
     }
 
     @Test
-    @Order(16)
+    @Order(14)
     fun `5_3_커뮤니티 삭제_매니저 아님`() {
 
         val authentication2 = signinAndGetAuth(usernameB, password)
