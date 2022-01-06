@@ -16,6 +16,7 @@ import wafflestudio.team4.reddit.global.auth.jwt.JwtAuthenticationEntryPoint
 import wafflestudio.team4.reddit.global.auth.filter.JwtAuthenticationFilter
 import wafflestudio.team4.reddit.global.auth.jwt.JwtTokenProvider
 import wafflestudio.team4.reddit.global.auth.filter.SigninAuthenticationFilter
+import wafflestudio.team4.reddit.global.oauth.service.OAuthUserService
 import wafflestudio.team4.reddit.global.auth.service.UserPrincipalDetailService
 
 @Configuration
@@ -25,6 +26,7 @@ class SecurityConfig(
     private val jwtAuthenticationEntryPoint: JwtAuthenticationEntryPoint,
     private val jwtTokenProvider: JwtTokenProvider,
     private val userPrincipalDetailService: UserPrincipalDetailService,
+    private val oAuthUserService: OAuthUserService,
 ) : WebSecurityConfigurerAdapter() {
     override fun configure(auth: AuthenticationManagerBuilder) {
         auth.authenticationProvider(daoAuthenticationProvider())
@@ -63,5 +65,9 @@ class SecurityConfig(
             .antMatchers("/api/v1/ping/").permitAll() // .antMatchers(HttpMethod.POST, "/api/v1/seminars/").hasRole("INSTRUCTOR")
             .antMatchers("/profile").permitAll()
             .anyRequest().authenticated()
+            .and()
+            .oauth2Login()
+            .userInfoEndpoint()
+            .userService(oAuthUserService)
     }
 }

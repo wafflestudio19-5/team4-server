@@ -2,8 +2,10 @@ package wafflestudio.team4.reddit.domain.user.model
 
 import wafflestudio.team4.reddit.domain.model.BaseTimeEntity
 import wafflestudio.team4.reddit.domain.user.dto.UserDto
+import javax.persistence.CascadeType
 import javax.persistence.Column
 import javax.persistence.Entity
+import javax.persistence.OneToOne
 import javax.persistence.Table
 import javax.validation.constraints.Email
 import javax.validation.constraints.NotBlank
@@ -32,7 +34,9 @@ class User(
     @field:NotNull
     var roles: String = "",
 
-    // TODO cascade
+    @field:NotNull
+    @OneToOne(mappedBy = "user", cascade = [CascadeType.ALL])
+    val userProfile: UserProfile,
 ) : BaseTimeEntity() {
     fun updatedBy(updateRequest: UserDto.UpdateRequest, encodedPassword: String?): User {
         this.email = updateRequest.email ?: this.email
