@@ -30,9 +30,6 @@ class CommunityService(
     private val topicService: TopicService,
     private val userService: UserService
 ) {
-    fun getAllCommunities(): List<Community> {
-        return communityRepository.findAll()
-    }
 
     // used in search query
     fun getCommunitiesPage(lastCommunityId: Long, size: Int): Page<Community> {
