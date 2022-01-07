@@ -64,6 +64,7 @@ class SecurityConfig(
             .antMatchers(HttpMethod.POST, "/api/v1/users/").anonymous() // SignUp user
             .antMatchers("/api/v1/ping/").permitAll()
             .antMatchers("/profile").permitAll()
+//            .antMatchers("/").permitAll()
             .anyRequest().authenticated()
             .and()
             .oauth2Login()
