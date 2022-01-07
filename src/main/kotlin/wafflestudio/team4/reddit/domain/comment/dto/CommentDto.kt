@@ -8,6 +8,8 @@ class CommentDto {
     data class Response(
         val id: Long,
         val userId: Long,
+        val userName: String,
+        val userImageUrl: String?,
         val text: String,
         val depth: Int,
         val parentId: Long?,
@@ -19,6 +21,8 @@ class CommentDto {
         constructor(comment: Comment) : this(
             id = comment.id,
             userId = comment.user.id,
+            userName = comment.user.username,
+            userImageUrl = comment.user.userProfile!!.userImage?.url,
             text = comment.text,
             depth = comment.depth,
             parentId = comment.parent?.id,
