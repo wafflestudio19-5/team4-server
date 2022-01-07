@@ -11,6 +11,8 @@ import wafflestudio.team4.reddit.domain.user.exception.UnauthorizedSigninExcepti
 import wafflestudio.team4.reddit.domain.user.exception.UserDeletedException
 import wafflestudio.team4.reddit.domain.user.exception.UserNotFoundException
 import wafflestudio.team4.reddit.domain.user.model.User
+import wafflestudio.team4.reddit.domain.user.model.UserImage
+import wafflestudio.team4.reddit.domain.user.model.UserProfile
 import wafflestudio.team4.reddit.domain.user.repository.UserRepository
 
 @Service
@@ -28,6 +30,14 @@ class UserService(
             username = signupRequest.username,
             password = encodedPassword,
         )
+        val newUserProfile = UserProfile(
+            newUser,
+        )
+        val newUserImage = UserImage(
+            newUserProfile,
+        )
+        newUserProfile.userImage = newUserImage
+        newUser.userProfile = newUserProfile
         return userRepository.save(newUser)
     }
 
