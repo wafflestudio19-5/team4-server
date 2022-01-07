@@ -35,7 +35,6 @@ class User(
     @field:NotNull
     var roles: String = "",
 
-    @field:NotNull
     @OneToOne(mappedBy = "user", cascade = [CascadeType.ALL])
     var userProfile: UserProfile? = null,
 ) : BaseTimeEntity() {
