@@ -64,19 +64,17 @@ class FollowTest(
             .andExpect {
                 status { isCreated() }
                 header { exists("Authentication") }
-            }
-
+            } // in github workflows, id 6 vs in local, id 1
         testHelper.signup(usernameY, password)
             .andExpect {
                 status { isCreated() }
                 header { exists("Authentication") }
-            }
-
+            } // in github workflows, id 7 vs in local, id 2
         testHelper.signup(usernameZ, password)
             .andExpect {
                 status { isCreated() }
                 header { exists("Authentication") }
-            }
+            } // in github, workflows, id 8 vs in local, id 3
     }
 
     @Test
@@ -84,21 +82,21 @@ class FollowTest(
     fun `1_1_팔로우_정상`() {
         // 1 -> 2
         val authentication1 = testHelper.signinAndGetAuth(usernameX, password)
-        follow(2, authentication1)
+        follow(7, authentication1) // in local, id 2
             .andExpect {
                 status { isCreated() }
             }
 
         // 3 -> 2
         val authentication3 = testHelper.signinAndGetAuth(usernameZ, password)
-        follow(2, authentication3)
+        follow(7, authentication3) // in local, id 2
             .andExpect {
                 status { isCreated() }
             }
 
         // 2 -> 3
         val authentication2 = testHelper.signinAndGetAuth(usernameY, password)
-        follow(3, authentication2)
+        follow(8, authentication2) // in local, id 3
             .andExpect {
                 status { isCreated() }
             }
@@ -113,7 +111,7 @@ class FollowTest(
     fun `2_1_언팔_정상`() {
         // 2 -> 3
         val authentication2 = testHelper.signinAndGetAuth(usernameY, password)
-        unfollow(3, authentication2)
+        unfollow(8, authentication2) // in local, id 3
             .andExpect {
                 status { isOk() }
             }
@@ -128,7 +126,7 @@ class FollowTest(
     fun `3_1_GET_FOLLOWERS_정상`() {
         // 2
         val authentication3 = testHelper.signinAndGetAuth(usernameZ, password)
-        getFollowersPage(2, 100, 10, authentication3)
+        getFollowersPage(7, 100, 10, authentication3) // in local, id 2
             .andExpect {
                 status { isOk() }
             }

@@ -1,9 +1,7 @@
 package wafflestudio.team4.reddit.domain.follow.dto
 
-import com.fasterxml.jackson.annotation.JsonProperty
 import wafflestudio.team4.reddit.domain.follow.model.Follow
 import wafflestudio.team4.reddit.domain.user.model.User
-import java.time.LocalDateTime
 import javax.validation.constraints.NotBlank
 import javax.validation.constraints.NotNull
 
