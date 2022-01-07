@@ -1,7 +1,7 @@
 package wafflestudio.team4.reddit.domain.community.service
 
 import org.springframework.data.domain.Page
-import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import wafflestudio.team4.reddit.domain.community.dto.CommunityDto
 import wafflestudio.team4.reddit.domain.community.exception.CommunityNotFoundException
@@ -31,7 +31,7 @@ class CommunityService(
 
     // used in search query
     fun getCommunitiesPage(lastCommunityId: Long, size: Int): Page<Community> {
-        val pageRequest = PageRequest.of(0, size)
+        val pageRequest = Pageable.ofSize(size)
         return communityRepository.findByIdLessThanOrderByIdDesc(lastCommunityId, pageRequest)
     }
 
