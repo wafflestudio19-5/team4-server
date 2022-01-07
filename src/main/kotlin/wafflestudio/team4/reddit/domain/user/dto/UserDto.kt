@@ -2,6 +2,7 @@ package wafflestudio.team4.reddit.domain.user.dto
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import wafflestudio.team4.reddit.domain.user.model.User
+import wafflestudio.team4.reddit.domain.user.model.UserProfile
 import wafflestudio.team4.reddit.global.validation.constraints.UniqueEmail
 import java.time.LocalDateTime
 import javax.validation.constraints.Email
@@ -54,4 +55,35 @@ class UserDto {
 
         val password: String?,
     )
+
+    data class UploadImageRequest(
+        @field:NotBlank
+        val filename: String
+    )
+
+    data class UploadImageResponse(
+        val preSignedUrl: String,
+        val imageUrl: String,
+    )
+
+    data class UpdateProfileRequest(
+        val name: String,
+        val description: String,
+    )
+
+    data class ProfileResponse(
+        val userId: Long,
+        val name: String,
+        val imageUrl: String?,
+        val description: String,
+        val followers: Int,
+    ) {
+        constructor(userProfile: UserProfile, followersNum: Int) : this(
+            userId = userProfile.user.id,
+            name = userProfile.name,
+            imageUrl = userProfile.userImage?.url,
+            description = userProfile.description,
+            followers = followersNum // followRepository.findByToUser(toUser:user)
+        )
+    }
 }

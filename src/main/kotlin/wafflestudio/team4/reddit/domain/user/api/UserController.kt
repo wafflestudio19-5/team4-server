@@ -96,4 +96,39 @@ class UserController(
         userService.deleteUser(user)
         return ResponseEntity.noContent().build()
     }
+
+    @GetMapping("/profile/{user_id}/")
+    fun getProfile(@PathVariable("user_id") id: Long): UserDto.ProfileResponse {
+        val profile = userService.getProfileById(id)
+        val followNum = userService.getFollowNumById(id)
+        return UserDto.ProfileResponse(profile, followNum)
+    }
+
+    @GetMapping("/profile/me/")
+    fun getCurrentProfile(@CurrentUser user: User): UserDto.ProfileResponse {
+        val profile = userService.getProfileById(user.id)
+        val followNum = userService.getFollowNumById(user.id)
+        return UserDto.ProfileResponse(profile, followNum)
+    }
+
+    @GetMapping("/profile/image/")
+    fun getProfileImageS3Url(
+        @CurrentUser user: User,
+        @Valid @RequestBody uploadImageRequest: UserDto.UploadImageRequest
+    ): UserDto.UploadImageResponse {
+        val preSignedUrl = userService.getPresignedUrlAndSaveImage(user, uploadImageRequest.filename)
+        val imageUrl = "https://waffle-team-4-server-s3.s3.ap-northeast-2.amazonaws.com/profiles/" +
+            "${user.id}/${uploadImageRequest.filename}"
+        return UserDto.UploadImageResponse(preSignedUrl, imageUrl)
+    }
+
+    @PutMapping("/profile/me/")
+    fun updateProfile(
+        @CurrentUser user: User,
+        @Valid @RequestBody updateProfileRequest: UserDto.UpdateProfileRequest
+    ): UserDto.ProfileResponse {
+        val updatedProfile = userService.updateProfile(user, updateProfileRequest)
+        val followNum = userService.getFollowNumById(user.id)
+        return UserDto.ProfileResponse(updatedProfile, followNum)
+    }
 }

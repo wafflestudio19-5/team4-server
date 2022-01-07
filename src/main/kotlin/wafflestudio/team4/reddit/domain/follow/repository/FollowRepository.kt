@@ -14,4 +14,5 @@ interface FollowRepository : JpaRepository<Follow, Long?> {
         lastFollowId: Long,
         pageRequest: Pageable
     ): Page<Follow>
+    fun findByToUser(toUser: User): List<Follow>
 }
