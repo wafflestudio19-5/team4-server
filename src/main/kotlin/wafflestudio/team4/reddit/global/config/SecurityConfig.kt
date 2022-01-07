@@ -61,7 +61,8 @@ class SecurityConfig(
             .authorizeRequests()
             .antMatchers("/api/v1/users/signin/").permitAll() // Auth entrypoint
             .antMatchers(HttpMethod.POST, "/api/v1/users/").anonymous() // SignUp user
-            .antMatchers("/signin/oauth/**").permitAll() // social login
+            // .antMatchers("/signin/oauth/**").permitAll() // social login
+            .antMatchers("/api/v1/social_login/**/").permitAll()
             .antMatchers("/api/v1/ping/").permitAll()
             .antMatchers("/profile").permitAll()
 //            .antMatchers("/").permitAll()
