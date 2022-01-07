@@ -113,9 +113,22 @@ class UserService(
     }
 
     fun updateProfile(user: User, updateRequest: UserDto.UpdateProfileRequest): UserProfile {
-        var profile = user.userProfile!!
-        profile.name = updateRequest.name
-        profile.description = updateRequest.description
-        return userProfileRepository.save(profile)
+        if (user.userProfile == null) {
+            // old user
+            val newUserProfile = UserProfile(
+                user,
+            )
+            val newUserImage = UserImage(
+                newUserProfile,
+            )
+            newUserProfile.userImage = newUserImage
+            user.userProfile = newUserProfile
+            return userRepository.save(user).userProfile!!
+        } else {
+            var profile = user.userProfile!!
+            profile.name = updateRequest.name
+            profile.description = updateRequest.description
+            return userProfileRepository.save(profile)
+        }
     }
 }
