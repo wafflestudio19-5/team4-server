@@ -67,7 +67,7 @@ class TestHelper(
         }
     }
 
-    fun post(url: String, body: String, authentication: String?): ResultActionsDsl {
+    fun post(url: String, body: String?, authentication: String?): ResultActionsDsl {
         val targetUrl = if (url.startsWith("/")) url else "/$url"
         return mockMvc.post("/api/v1$targetUrl") {
             content = (body)
@@ -79,7 +79,7 @@ class TestHelper(
         }
     }
 
-    fun put(url: String, body: String, authentication: String?): ResultActionsDsl {
+    fun put(url: String, body: String?, authentication: String?): ResultActionsDsl {
         val targetUrl = if (url.startsWith("/")) url else "/$url"
         return mockMvc.put("/api/v1$targetUrl") {
             content = (body)
