@@ -82,13 +82,6 @@ class UserController(
         headers.set("Authentication", jwtTokenProvider.generateToken(user.email))
         return ResponseEntity<UserDto.Response>(UserDto.Response(user), headers, HttpStatus.OK)
     }
-
-    @DeleteMapping("/me/")
-    fun deleteUser(@CurrentUser user: User): ResponseEntity<String> {
-        userService.deleteUser(user)
-        return ResponseEntity.noContent().build()
-    }
-
     @PutMapping("/me/")
     fun updateUser(
         @Valid @RequestBody updateRequest: UserDto.UpdateRequest,
@@ -96,5 +89,11 @@ class UserController(
     ): UserDto.Response {
         val updatedUser = userService.updateUser(user, updateRequest)
         return UserDto.Response(updatedUser)
+    }
+
+    @DeleteMapping("/me/")
+    fun deleteUser(@CurrentUser user: User): ResponseEntity<String> {
+        userService.deleteUser(user)
+        return ResponseEntity.noContent().build()
     }
 }
