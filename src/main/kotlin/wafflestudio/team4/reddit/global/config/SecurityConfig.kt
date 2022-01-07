@@ -56,13 +56,13 @@ class SecurityConfig(
             .and()
             .addFilter(
                 SigninAuthenticationFilter(authenticationManager(), jwtTokenProvider, userPrincipalDetailService)
-//                SigninAuthenticationFilter(authenticationManager(), jwtTokenProvider)
+//              SigninAuthenticationFilter(authenticationManager(), jwtTokenProvider)
             )
             .addFilter(JwtAuthenticationFilter(authenticationManager(), jwtTokenProvider))
             .authorizeRequests()
             .antMatchers("/api/v1/users/signin/").permitAll() // Auth entrypoint
             .antMatchers(HttpMethod.POST, "/api/v1/users/").anonymous() // SignUp user
-            .antMatchers("/api/v1/ping/").permitAll() // .antMatchers(HttpMethod.POST, "/api/v1/seminars/").hasRole("INSTRUCTOR")
+            .antMatchers("/api/v1/ping/").permitAll()
             .antMatchers("/profile").permitAll()
             .anyRequest().authenticated()
             .and()

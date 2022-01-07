@@ -5,11 +5,8 @@ import wafflestudio.team4.reddit.domain.user.model.User
 abstract class OAuth2UserInfo(
     protected val attributes: Map<String, Any>
 ) {
-    abstract fun getId(): String
-    abstract fun getName(): String
-    abstract fun getEmail(): String
-    abstract fun getImageUrl(): String
-
-    fun asUser(): User {
-    }
+    abstract val id: String
+    abstract val name: String
+    abstract val email: String
+    abstract val imageUrl: String
 }

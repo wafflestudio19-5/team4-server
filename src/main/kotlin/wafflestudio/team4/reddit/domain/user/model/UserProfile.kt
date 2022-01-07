@@ -18,12 +18,11 @@ class UserProfile(
     val user: User,
 
     @Column(unique = true)
-    val oAuthId: String?,
+    val oauthId: String?,
 
-    @field:NotNull
     @OneToOne(mappedBy = "userProfile", cascade = [CascadeType.ALL])
-    val userImage: UserImage,
+    var userImage: UserImage? = null,
 
     @field:NotNull
-    val description: String = "",
+    var description: String = "",
 ) : BaseTimeEntity()

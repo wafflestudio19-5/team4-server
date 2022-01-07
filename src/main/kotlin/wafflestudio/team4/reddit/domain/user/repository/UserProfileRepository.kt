@@ -4,5 +4,5 @@ import org.springframework.data.jpa.repository.JpaRepository
 import wafflestudio.team4.reddit.domain.user.model.UserProfile
 
 interface UserProfileRepository : JpaRepository<UserProfile, Long?> {
-    fun findByOAuthId(OAuthId: String): UserProfile?
+    fun findByOauthId(OAuthId: String): UserProfile?
 }

@@ -16,5 +16,5 @@ class UserImage(
     val userProfile: UserProfile,
 
     @field:NotNull
-    val url: String = "",
+    var url: String = "",
 ) : BaseTimeEntity()
