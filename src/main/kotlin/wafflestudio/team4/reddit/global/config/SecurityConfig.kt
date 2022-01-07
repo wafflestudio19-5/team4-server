@@ -12,11 +12,11 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
-import wafflestudio.team4.reddit.global.auth.JwtAuthenticationEntryPoint
-import wafflestudio.team4.reddit.global.auth.JwtAuthenticationFilter
-import wafflestudio.team4.reddit.global.auth.JwtTokenProvider
-import wafflestudio.team4.reddit.global.auth.SigninAuthenticationFilter
-import wafflestudio.team4.reddit.global.auth.model.UserPrincipalDetailService
+import wafflestudio.team4.reddit.global.auth.jwt.JwtAuthenticationEntryPoint
+import wafflestudio.team4.reddit.global.auth.filter.JwtAuthenticationFilter
+import wafflestudio.team4.reddit.global.auth.jwt.JwtTokenProvider
+import wafflestudio.team4.reddit.global.auth.filter.SigninAuthenticationFilter
+import wafflestudio.team4.reddit.global.auth.service.UserPrincipalDetailService
 
 @Configuration
 @EnableGlobalMethodSecurity(prePostEnabled = true)
@@ -25,6 +25,7 @@ class SecurityConfig(
     private val jwtAuthenticationEntryPoint: JwtAuthenticationEntryPoint,
     private val jwtTokenProvider: JwtTokenProvider,
     private val userPrincipalDetailService: UserPrincipalDetailService,
+//    private val oAuthUserService: OAuthUserService,
 ) : WebSecurityConfigurerAdapter() {
     override fun configure(auth: AuthenticationManagerBuilder) {
         auth.authenticationProvider(daoAuthenticationProvider())
@@ -54,14 +55,21 @@ class SecurityConfig(
             .and()
             .addFilter(
                 SigninAuthenticationFilter(authenticationManager(), jwtTokenProvider, userPrincipalDetailService)
-//                SigninAuthenticationFilter(authenticationManager(), jwtTokenProvider)
+//              SigninAuthenticationFilter(authenticationManager(), jwtTokenProvider)
             )
             .addFilter(JwtAuthenticationFilter(authenticationManager(), jwtTokenProvider))
             .authorizeRequests()
             .antMatchers("/api/v1/users/signin/").permitAll() // Auth entrypoint
             .antMatchers(HttpMethod.POST, "/api/v1/users/").anonymous() // SignUp user
-            .antMatchers("/api/v1/ping/").permitAll() // .antMatchers(HttpMethod.POST, "/api/v1/seminars/").hasRole("INSTRUCTOR")
+            // .antMatchers("/signin/oauth/**").permitAll() // social login
+            .antMatchers("/api/v1/social_login/**/").permitAll()
+            .antMatchers("/api/v1/ping/").permitAll()
             .antMatchers("/profile").permitAll()
+//            .antMatchers("/").permitAll()
             .anyRequest().authenticated()
+            .and()
+//            .oauth2Login()
+//            .userInfoEndpoint()
+//            .userService(oAuthUserService)
     }
 }
