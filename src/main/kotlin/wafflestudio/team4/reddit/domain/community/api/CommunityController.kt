@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.DeleteMapping
 import wafflestudio.team4.reddit.domain.community.dto.CommunityDto
@@ -14,7 +15,9 @@ import javax.validation.Valid
 import wafflestudio.team4.reddit.domain.community.service.CommunityService
 import wafflestudio.team4.reddit.domain.user.model.User
 import wafflestudio.team4.reddit.global.auth.annotation.CurrentUser
-import wafflestudio.team4.reddit.global.common.dto.ListResponse
+import wafflestudio.team4.reddit.global.common.dto.PageLinkDto
+import wafflestudio.team4.reddit.global.common.dto.PageResponse
+// import wafflestudio.team4.reddit.global.common.dto.ListResponse
 
 @RestController
 @RequestMapping("/api/v1/communities")
@@ -23,11 +26,26 @@ class CommunityController(
 ) {
     // get community list
     @GetMapping("/")
-    fun getCommunities(): ResponseEntity<ListResponse<CommunityDto.Response>> { // TODO pagination needed
-        val communities = communityService.getAllCommunities()
-        // specify when request community list
-        val response = ListResponse(communities.map { CommunityDto.Response(it) })
-        return ResponseEntity.status(200).body(response)
+    fun getCommunitiesPage(
+        @RequestParam(required = false, defaultValue = Long.MAX_VALUE.toString()) lastCommunityId: Long,
+        @RequestParam(required = false, defaultValue = "10") size: Int,
+    ): PageResponse<CommunityDto.Response> {
+        val communitiesPage = communityService.getCommunitiesPage(lastCommunityId, size)
+        val communityLinks = buildPageLink(lastCommunityId, size)
+        return PageResponse(communitiesPage.map { CommunityDto.Response(it) }, communityLinks)
+    }
+
+    private fun buildPageLink(lastCommunityId: Long, size: Int): PageLinkDto {
+        val first = "size=$size"
+        val self = "lastCommunityId=$lastCommunityId&size=$size"
+        val last = "lastCommunityId=${size + 1}&size=$size"
+
+        val next = "lastCommunityId=${java.lang.Long.max(0, lastCommunityId - size)}&size=$size"
+        val prev = "lastCommunityId=" +
+            "${if ((lastCommunityId - Long.MAX_VALUE) + size > 0)
+                Long.MAX_VALUE else lastCommunityId + size}&size=$size"
+
+        return PageLinkDto(first, prev, self, next, last)
     }
 
     // get community by id

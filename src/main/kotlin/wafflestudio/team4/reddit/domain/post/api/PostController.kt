@@ -15,7 +15,6 @@ import wafflestudio.team4.reddit.domain.post.dto.PostDto
 import wafflestudio.team4.reddit.domain.post.service.PostService
 import wafflestudio.team4.reddit.domain.user.model.User
 import wafflestudio.team4.reddit.global.auth.annotation.CurrentUser
-import wafflestudio.team4.reddit.global.auth.jwt.JwtTokenProvider
 import wafflestudio.team4.reddit.global.common.dto.ListResponse
 import javax.validation.Valid
 
@@ -23,7 +22,6 @@ import javax.validation.Valid
 @RequestMapping("/api/v1/posts")
 class PostController(
     private val postService: PostService,
-    private val jwtTokenProvider: JwtTokenProvider,
 ) {
     @GetMapping("/")
     fun getPosts(
@@ -67,9 +65,9 @@ class PostController(
     fun deletePost(
         @CurrentUser user: User,
         @PathVariable("post_id") id: Long
-    ): PostDto.Response {
-        val deletedPost = postService.deletePost(user, id)
-        return PostDto.Response(deletedPost)
+    ): ResponseEntity<String> {
+        postService.deletePost(user, id)
+        return ResponseEntity.noContent().build()
     }
 
 //    @PutMapping("/{post_id}/")
