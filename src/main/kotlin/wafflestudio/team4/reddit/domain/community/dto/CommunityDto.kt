@@ -5,7 +5,6 @@ import javax.validation.constraints.NotBlank
 import javax.validation.constraints.NotNull
 
 class CommunityDto {
-    // Response
     data class Response(
         val id: Long,
         @field:NotBlank
