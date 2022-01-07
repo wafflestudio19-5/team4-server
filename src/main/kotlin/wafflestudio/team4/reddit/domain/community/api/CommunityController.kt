@@ -62,8 +62,8 @@ class CommunityController(
         return ListResponse(managers)
     }
 
-    @GetMapping("/{community_id}/about/moderators/")
-    fun getTopics(@PathVariable("community_id") communityId: Long): ListResponse<Topic> {
+    @GetMapping("/{community_id}/about/topics/")
+    fun getCommunityTopics(@PathVariable("community_id") communityId: Long): ListResponse<Topic> {
         val topics = communityService.getTopics(communityId)
         return ListResponse(topics)
     }
