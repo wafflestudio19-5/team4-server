@@ -41,6 +41,14 @@ class UserService(
             username = signupRequest.username,
             password = encodedPassword,
         )
+        val newUserProfile = UserProfile(
+            newUser,
+        )
+        val newUserImage = UserImage(
+            newUserProfile,
+        )
+        newUserProfile.userImage = newUserImage
+        newUser.userProfile = newUserProfile
         return userRepository.save(newUser)
     }
 
