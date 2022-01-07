@@ -15,6 +15,7 @@ import org.springframework.test.context.TestConstructor
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.MvcResult
 import org.springframework.test.web.servlet.ResultActionsDsl
+import wafflestudio.team4.reddit.domain.user.repository.UserRepository
 import wafflestudio.team4.reddit.global.util.TestHelper
 
 // @Transactional
@@ -24,6 +25,7 @@ import wafflestudio.team4.reddit.global.util.TestHelper
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 class FollowTest(
+    private val userRepository: UserRepository,
     private val mockMvc: MockMvc,
     private val objectMapper: ObjectMapper
 ) {
@@ -33,6 +35,11 @@ class FollowTest(
     private val usernameY = "usernameY"
     private val usernameZ = "usernameZ"
     private val password = "password"
+
+    private fun getUserIdByEmail(email: String): Long {
+        val user = userRepository.findByEmail(email)
+        return if (user == null) -1 else user.id
+    }
 
     private fun follow(toUserId: Long, authentication: String?): ResultActionsDsl {
         return testHelper.post("/follow/$toUserId/", null, authentication)
@@ -64,17 +71,17 @@ class FollowTest(
             .andExpect {
                 status { isCreated() }
                 header { exists("Authentication") }
-            } // in github workflows, id 6 vs in local, id 1
+            }
         testHelper.signup(usernameY, password)
             .andExpect {
                 status { isCreated() }
                 header { exists("Authentication") }
-            } // in github workflows, id 7 vs in local, id 2
+            }
         testHelper.signup(usernameZ, password)
             .andExpect {
                 status { isCreated() }
                 header { exists("Authentication") }
-            } // in github, workflows, id 8 vs in local, id 3
+            }
     }
 
     @Test
@@ -82,21 +89,23 @@ class FollowTest(
     fun `1_1_팔로우_정상`() {
         // 1 -> 2
         val authentication1 = testHelper.signinAndGetAuth(usernameX, password)
-        follow(7, authentication1) // in local, id 2
+        val yId = getUserIdByEmail(testHelper.toEmail(usernameY))
+        follow(yId, authentication1)
             .andExpect {
                 status { isCreated() }
             }
 
         // 3 -> 2
         val authentication3 = testHelper.signinAndGetAuth(usernameZ, password)
-        follow(7, authentication3) // in local, id 2
+        follow(yId, authentication3)
             .andExpect {
                 status { isCreated() }
             }
 
         // 2 -> 3
         val authentication2 = testHelper.signinAndGetAuth(usernameY, password)
-        follow(8, authentication2) // in local, id 3
+        val zId = getUserIdByEmail(testHelper.toEmail(usernameZ))
+        follow(zId, authentication2)
             .andExpect {
                 status { isCreated() }
             }
@@ -111,7 +120,8 @@ class FollowTest(
     fun `2_1_언팔_정상`() {
         // 2 -> 3
         val authentication2 = testHelper.signinAndGetAuth(usernameY, password)
-        unfollow(8, authentication2) // in local, id 3
+        val zId = getUserIdByEmail(testHelper.toEmail(usernameZ))
+        unfollow(zId, authentication2)
             .andExpect {
                 status { isOk() }
             }
@@ -126,7 +136,8 @@ class FollowTest(
     fun `3_1_GET_FOLLOWERS_정상`() {
         // 2
         val authentication3 = testHelper.signinAndGetAuth(usernameZ, password)
-        getFollowersPage(7, 100, 10, authentication3) // in local, id 2
+        val yId = getUserIdByEmail(testHelper.toEmail(usernameY))
+        getFollowersPage(yId, 100, 10, authentication3)
             .andExpect {
                 status { isOk() }
             }
