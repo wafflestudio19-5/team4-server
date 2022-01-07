@@ -22,7 +22,7 @@ class CommentDto {
             id = comment.id,
             userId = comment.user.id,
             userName = comment.user.username,
-            userImageUrl = comment.user.userProfile!!.userImage?.url,
+            userImageUrl = comment.user.userProfile?.userImage?.url,
             text = comment.text,
             depth = comment.depth,
             parentId = comment.parent?.id,
