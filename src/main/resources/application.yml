@@ -3,6 +3,7 @@ spring:
     include:
         - aws
         - credentials
+        - oauth
     active: local
 app:
     jwt:
@@ -48,4 +49,4 @@ spring:
     hibernate:
       ddl-auto: update
 server:
-    port: 8081
+    port: 8080

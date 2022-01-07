@@ -13,7 +13,7 @@ import javax.validation.constraints.NotNull
 @Table(name = "reddit_post_community")
 class PostCommunity(
     @field:NotNull
-    @ManyToOne
+    @ManyToOne // TODO onetoone?
     @JoinColumn(name = "post_id")
     val post: Post,
 

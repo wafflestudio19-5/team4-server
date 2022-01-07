@@ -17,8 +17,8 @@ import org.springframework.web.bind.annotation.RestController
 import wafflestudio.team4.reddit.domain.user.dto.UserDto
 import wafflestudio.team4.reddit.domain.user.model.User
 import wafflestudio.team4.reddit.domain.user.service.UserService
-import wafflestudio.team4.reddit.global.auth.CurrentUser
-import wafflestudio.team4.reddit.global.auth.JwtTokenProvider
+import wafflestudio.team4.reddit.global.auth.annotation.CurrentUser
+import wafflestudio.team4.reddit.global.auth.jwt.JwtTokenProvider
 import wafflestudio.team4.reddit.global.common.dto.PageLinkDto
 import wafflestudio.team4.reddit.global.common.dto.PageResponse
 import java.lang.Long.max

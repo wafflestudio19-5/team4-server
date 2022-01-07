@@ -30,6 +30,13 @@ jobs:
       run: |
         chmod +x gradlew
 
+    - name: Inject application-oauth.ym
+      env:
+          OAUTH_CLIENT_ID: ${{ secrets.OAUTH_CLIENT_ID }}
+          OAUTH_CLIENT_SECRET: ${{ secrets.OAUTH_CLIENT_SECRET }}
+      run: |
+          echo -e "oauth2:\n    user:\n        google:\n            client-id: $OAUTH_CLIENT_ID\n            client-secret: $OAUTH_CLIENT_SECRET\n            redirect-uri: http://localhost:8080/redirect/oauth\n    provider:\n        google:\n            token-uri: https://www.googleapis.com/oauth2/v4/token\n            user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo\n" > ./src/main/resources/application-oauth.yml
+
     - name: Export JAR with Gradle
       run: |
         ./gradlew bootJar --no-daemon
