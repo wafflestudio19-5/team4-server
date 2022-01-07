@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.DeleteMapping
 import wafflestudio.team4.reddit.domain.follow.dto.FollowDto
 import wafflestudio.team4.reddit.domain.follow.service.FollowService
 import wafflestudio.team4.reddit.domain.user.model.User
-import wafflestudio.team4.reddit.global.auth.CurrentUser
+import wafflestudio.team4.reddit.global.auth.annotation.CurrentUser
 import wafflestudio.team4.reddit.global.common.dto.PageResponse
 
 @RestController
