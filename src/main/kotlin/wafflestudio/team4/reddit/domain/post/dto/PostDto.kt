@@ -7,6 +7,7 @@ class PostDto {
     data class Response(
         val id: Long,
         val userId: Long,
+        val community: String,
         val title: String,
         val text: String?,
         val images: List<String>?, // S3 이미지 주소
@@ -17,6 +18,7 @@ class PostDto {
         constructor(post: Post) : this(
             id = post.id,
             userId = post.user.id,
+            community = post.community.name,
             title = post.title,
             text = post.text,
             images = post.images?.map { it.url }, // S3적용 후 변경
