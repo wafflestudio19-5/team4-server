@@ -1,4 +1,4 @@
-package wafflestudio.team4.reddit.global.auth.model
+package wafflestudio.team4.reddit.global.auth.service
 
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service
 import wafflestudio.team4.reddit.domain.user.repository.UserRepository
 import wafflestudio.team4.reddit.global.auth.dto.LoginRequest
 import wafflestudio.team4.reddit.global.auth.exception.UnexpectedUserNotFoundException
+import wafflestudio.team4.reddit.global.auth.model.UserPrincipal
 
 @Service
 class UserPrincipalDetailService(
