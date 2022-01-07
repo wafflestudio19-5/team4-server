@@ -21,7 +21,6 @@ import wafflestudio.team4.reddit.domain.user.model.UserProfile
 import wafflestudio.team4.reddit.domain.user.repository.UserImageRepository
 import wafflestudio.team4.reddit.domain.user.repository.UserProfileRepository
 import wafflestudio.team4.reddit.domain.user.repository.UserRepository
-import java.lang.Exception
 import java.util.Date
 
 @Service
@@ -104,7 +103,8 @@ class UserService(
             .withMethod(HttpMethod.PUT)
             .withExpiration(expiration)
 
-        val userImage = userImageRepository.findByUserProfile(user.userProfile!!) ?: throw Exception()
+        val userImage = userImageRepository.findByUserProfile(user.userProfile!!)
+            ?: throw UserProfileNotFoundException()
         userImage.url = "https://waffle-team-4-server-s3.s3.ap-northeast-2.amazonaws.com/profiles/" +
             "${user.id}/$fileName"
         userImageRepository.save(userImage)
