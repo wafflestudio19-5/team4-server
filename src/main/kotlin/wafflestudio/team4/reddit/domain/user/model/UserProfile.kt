@@ -18,7 +18,7 @@ class UserProfile(
     val user: User,
 
     @Column(unique = true)
-    val oauthId: String?,
+    val oauthId: String? = null,
 
     @OneToOne(mappedBy = "userProfile", cascade = [CascadeType.ALL])
     var userImage: UserImage? = null,
