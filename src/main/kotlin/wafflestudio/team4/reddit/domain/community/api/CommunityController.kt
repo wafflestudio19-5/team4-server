@@ -13,8 +13,10 @@ import org.springframework.web.bind.annotation.DeleteMapping
 import wafflestudio.team4.reddit.domain.community.dto.CommunityDto
 import javax.validation.Valid
 import wafflestudio.team4.reddit.domain.community.service.CommunityService
+import wafflestudio.team4.reddit.domain.topic.model.Topic
 import wafflestudio.team4.reddit.domain.user.model.User
 import wafflestudio.team4.reddit.global.auth.CurrentUser
+import wafflestudio.team4.reddit.global.common.dto.ListResponse
 import wafflestudio.team4.reddit.global.common.dto.PageLinkDto
 import wafflestudio.team4.reddit.global.common.dto.PageResponse
 
@@ -54,8 +56,18 @@ class CommunityController(
         return ResponseEntity.status(200).body(CommunityDto.Response(community))
     }
 
-    // TODO get community's managers (/about/moderators/)
-    // TODO get community's topics (/about/topics/)
+    @GetMapping("/{community_id}/about/moderators/")
+    fun getManagers(@PathVariable("community_id") communityId: Long): ListResponse<User> {
+        val managers = communityService.getManagers(communityId)
+        return ListResponse(managers)
+    }
+
+    @GetMapping("/{community_id}/about/moderators/")
+    fun getTopics(@PathVariable("community_id") communityId: Long): ListResponse<Topic> {
+        val topics = communityService.getTopics(communityId)
+        return ListResponse(topics)
+    }
+
     // TODO redirect to about page (/about/)
 
     // create community

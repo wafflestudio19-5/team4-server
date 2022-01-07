@@ -12,6 +12,10 @@ import wafflestudio.team4.reddit.domain.user.model.User
 class TopicService(
     private val topicRepository: TopicRepository
 ) {
+    fun getAllTopics(): List<Topic> {
+        return topicRepository.findAll()
+    }
+
     fun getTopicById(id: Long): Topic {
         return topicRepository.getById(id)
     }

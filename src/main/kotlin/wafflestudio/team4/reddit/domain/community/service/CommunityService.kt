@@ -44,6 +44,28 @@ class CommunityService(
         return community
     }
 
+    fun getManagers(communityId: Long): List<User> {
+        val community = getCommunityById(communityId)
+        val userCommunityList = userCommunityRepository.findAllByCommunity(community)
+        val managerCommunityList = mutableListOf<UserCommunity>()
+        for (userCommunity in userCommunityList) {
+            if (userCommunity.isManager && userCommunity.joined) managerCommunityList.add(userCommunity)
+        }
+        val managers = managerCommunityList.map { it.user }
+        return managers
+    }
+
+    fun getTopics(communityId: Long): List<Topic> {
+        val community = getCommunityById(communityId)
+        val communityTopicList = communityTopicRepository.getAllByCommunity(community)
+        val currentCommunityTopicList = mutableListOf<CommunityTopic>()
+        for (communityTopic in communityTopicList) {
+            if (!communityTopic.deleted) currentCommunityTopicList.add(communityTopic)
+        }
+        val topics = currentCommunityTopicList.map { it.topic }
+        return topics
+    }
+
     fun createCommunity(createRequest: CommunityDto.CreateRequest, user: User): Community {
         var community = Community(
             name = createRequest.name,
