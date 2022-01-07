@@ -22,4 +22,9 @@ class ProfileController(
             .findAny()
             .orElse(defaultProfile)
     }
+
+    @GetMapping("")
+    fun landing(): String {
+        return "hi"
+    }
 }

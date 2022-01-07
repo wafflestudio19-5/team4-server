@@ -1,4 +1,4 @@
-package wafflestudio.team4.reddit.global.auth
+package wafflestudio.team4.reddit.global.auth.jwt
 
 import io.jsonwebtoken.ExpiredJwtException
 import org.slf4j.LoggerFactory

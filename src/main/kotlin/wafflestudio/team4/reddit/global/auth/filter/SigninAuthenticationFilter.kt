@@ -1,4 +1,4 @@
-package wafflestudio.team4.reddit.global.auth
+package wafflestudio.team4.reddit.global.auth.filter
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.security.authentication.AuthenticationManager
@@ -8,7 +8,8 @@ import org.springframework.security.core.AuthenticationException
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher
 import wafflestudio.team4.reddit.global.auth.dto.LoginRequest
-import wafflestudio.team4.reddit.global.auth.model.UserPrincipalDetailService
+import wafflestudio.team4.reddit.global.auth.jwt.JwtTokenProvider
+import wafflestudio.team4.reddit.global.auth.service.UserPrincipalDetailService
 import java.io.BufferedReader
 import javax.servlet.FilterChain
 import javax.servlet.http.HttpServletRequest

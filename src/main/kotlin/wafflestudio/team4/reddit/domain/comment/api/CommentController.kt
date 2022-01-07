@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import wafflestudio.team4.reddit.domain.comment.dto.CommentDto
 import wafflestudio.team4.reddit.domain.comment.service.CommentService
 import wafflestudio.team4.reddit.domain.user.model.User
-import wafflestudio.team4.reddit.global.auth.CurrentUser
+import wafflestudio.team4.reddit.global.auth.annotation.CurrentUser
 import wafflestudio.team4.reddit.global.common.dto.ListResponse
 import javax.validation.Valid
 
