@@ -1,6 +1,7 @@
 package wafflestudio.team4.reddit.global.oauth.service
 
 import org.springframework.core.ParameterizedTypeReference
+import org.springframework.http.HttpStatus
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.util.LinkedMultiValueMap
@@ -12,6 +13,7 @@ import wafflestudio.team4.reddit.domain.user.model.UserProfile
 import wafflestudio.team4.reddit.domain.user.repository.UserProfileRepository
 import wafflestudio.team4.reddit.domain.user.repository.UserRepository
 import wafflestudio.team4.reddit.global.oauth.exception.InvalidOAuthProviderException
+import wafflestudio.team4.reddit.global.oauth.exception.InvalidTokenAccessException
 import wafflestudio.team4.reddit.global.oauth.exception.InvalidUserInfoAccessException
 import wafflestudio.team4.reddit.global.oauth.info.OAuth2UserInfo
 import wafflestudio.team4.reddit.global.oauth.info.OAuth2UserInfoFactory
@@ -110,6 +112,9 @@ class OAuthService(
             .uri(provider.userInfoUri)
             .headers { header -> header.setBearerAuth(accessToken) }
             .retrieve()
+            .onStatus(HttpStatus::is4xxClientError) {
+                throw InvalidTokenAccessException("Access Token Expired: ${it.statusCode()}")
+            }
             .bodyToMono(object : ParameterizedTypeReference<Map<String, Any>>() {})
             .block() ?: throw InvalidUserInfoAccessException()
     }
