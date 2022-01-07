@@ -15,6 +15,7 @@ import javax.validation.constraints.NotNull
 class PostCommunity(
     @field:NotNull
     @OneToOne
+    @JoinColumn(name = "post_id")
     val post: Post,
 
     @field:NotNull
