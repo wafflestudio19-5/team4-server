@@ -1,12 +1,12 @@
 package wafflestudio.team4.reddit.domain.user.model
 
 import wafflestudio.team4.reddit.domain.model.BaseTimeEntity
-import javax.persistence.CascadeType
-import javax.persistence.Column
 import javax.persistence.Entity
-import javax.persistence.JoinColumn
-import javax.persistence.OneToOne
 import javax.persistence.Table
+import javax.persistence.OneToOne
+import javax.persistence.JoinColumn
+import javax.persistence.Column
+import javax.persistence.CascadeType
 import javax.validation.constraints.NotNull
 
 @Entity
@@ -18,11 +18,14 @@ class UserProfile(
     val user: User,
 
     @Column(unique = true)
-    val oauthId: String?,
+    val oauthId: String? = null,
 
     @OneToOne(mappedBy = "userProfile", cascade = [CascadeType.ALL])
     var userImage: UserImage? = null,
 
     @field:NotNull
     var description: String = "",
+
+    @field:NotNull
+    var name: String = user.username,
 ) : BaseTimeEntity()
