@@ -114,11 +114,11 @@ class UserController(
     @GetMapping("/profile/image/")
     fun getProfileImageS3Url(
         @CurrentUser user: User,
-        @Valid @RequestBody uploadImageRequest: UserDto.UploadImageRequest
+        @Valid @RequestParam(required = true) filename: String
     ): UserDto.UploadImageResponse {
-        val preSignedUrl = userService.getPresignedUrlAndSaveImage(user, uploadImageRequest.filename)
+        val preSignedUrl = userService.getPresignedUrlAndSaveImage(user, filename)
         val imageUrl = "https://waffle-team-4-server-s3.s3.ap-northeast-2.amazonaws.com/profiles/" +
-            "${user.id}/${uploadImageRequest.filename}"
+            "${user.id}/$filename"
         return UserDto.UploadImageResponse(preSignedUrl, imageUrl)
     }
 
