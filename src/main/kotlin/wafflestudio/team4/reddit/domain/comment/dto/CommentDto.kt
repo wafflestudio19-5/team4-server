@@ -1,6 +1,7 @@
 package wafflestudio.team4.reddit.domain.comment.dto
 
 import wafflestudio.team4.reddit.domain.comment.model.Comment
+import java.time.LocalDateTime
 import javax.validation.constraints.NotBlank
 import javax.validation.constraints.NotNull
 
@@ -17,6 +18,7 @@ class CommentDto {
         val numUpVotes: Int,
         val numDownVotes: Int,
         val deleted: Boolean,
+        val createdAt: LocalDateTime?
     ) {
         constructor(comment: Comment) : this(
             id = comment.id,
@@ -29,7 +31,8 @@ class CommentDto {
             groupId = comment.group?.id,
             numUpVotes = comment.votes.count { it.isUp == 2 },
             numDownVotes = comment.votes.count { it.isUp == 0 },
-            deleted = comment.deleted == 1 || comment.deleted == 2
+            deleted = comment.deleted == 1 || comment.deleted == 2,
+            createdAt = comment.createdAt
         )
     }
 
