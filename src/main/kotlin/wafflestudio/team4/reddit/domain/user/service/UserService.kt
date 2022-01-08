@@ -85,7 +85,8 @@ class UserService(
 
     // profile services
     fun getProfileById(id: Long): UserProfile {
-        return userProfileRepository.findByIdOrNull(id) ?: throw UserProfileNotFoundException()
+        val user = userRepository.findByIdOrNull(id) ?: throw UserNotFoundException()
+        return userProfileRepository.findByIdOrNull(user.userProfile!!.id) ?: throw UserProfileNotFoundException()
     }
 
     fun getFollowNumById(id: Long): Int {
