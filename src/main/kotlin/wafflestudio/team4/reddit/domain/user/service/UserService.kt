@@ -86,6 +86,7 @@ class UserService(
     // profile services
     fun getProfileById(id: Long): UserProfile {
         val user = userRepository.findByIdOrNull(id) ?: throw UserNotFoundException()
+        if (user.userProfile == null) createNewProfileForOldUser(user) // TODO user DB 초기화
         return userProfileRepository.findByIdOrNull(user.userProfile!!.id) ?: throw UserProfileNotFoundException()
     }
 
@@ -104,6 +105,7 @@ class UserService(
             .withMethod(HttpMethod.PUT)
             .withExpiration(expiration)
 
+        if (user.userProfile == null) createNewProfileForOldUser(user)
         val userImage = userImageRepository.findByUserProfile(user.userProfile!!)
             ?: throw UserProfileNotFoundException()
         userImage.url = "https://waffle-team-4-server-s3.s3.ap-northeast-2.amazonaws.com/profiles/" +
@@ -116,20 +118,24 @@ class UserService(
     fun updateProfile(user: User, updateRequest: UserDto.UpdateProfileRequest): UserProfile {
         if (user.userProfile == null) {
             // old user
-            val newUserProfile = UserProfile(
-                user,
-            )
-            val newUserImage = UserImage(
-                newUserProfile,
-            )
-            newUserProfile.userImage = newUserImage
-            user.userProfile = newUserProfile
-            return userRepository.save(user).userProfile!!
+            return createNewProfileForOldUser(user).userProfile!!
         } else {
             var profile = user.userProfile!!
             profile.name = updateRequest.name
             profile.description = updateRequest.description
             return userProfileRepository.save(profile)
         }
+    }
+
+    private fun createNewProfileForOldUser(user: User): User {
+        val newUserProfile = UserProfile(
+            user,
+        )
+        val newUserImage = UserImage(
+            newUserProfile,
+        )
+        newUserProfile.userImage = newUserImage
+        user.userProfile = newUserProfile
+        return userRepository.save(user)
     }
 }
