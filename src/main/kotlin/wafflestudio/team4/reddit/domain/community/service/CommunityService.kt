@@ -2,6 +2,7 @@ package wafflestudio.team4.reddit.domain.community.service
 
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import wafflestudio.team4.reddit.domain.community.dto.CommunityDto
 import wafflestudio.team4.reddit.domain.community.exception.CommunityNotFoundException
@@ -36,8 +37,7 @@ class CommunityService(
     }
 
     fun getCommunityById(communityId: Long): Community {
-        if (!communityRepository.existsById(communityId)) throw CommunityNotFoundException()
-        val community = communityRepository.getById(communityId)
+        val community = communityRepository.findByIdOrNull(communityId) ?: throw CommunityNotFoundException()
         if (community.deleted) throw CommunityDeletedException()
         return community
     }
@@ -90,8 +90,7 @@ class CommunityService(
     }
 
     fun joinCommunity(user: User, communityId: Long, role: String): Community {
-        if (!communityRepository.existsById(communityId)) throw CommunityNotFoundException()
-        var community = communityRepository.getById(communityId)
+        var community = communityRepository.findByIdOrNull(communityId) ?: throw CommunityNotFoundException()
         if (community.deleted) throw CommunityDeletedException()
 
         var userCommunity = UserCommunity(
@@ -116,8 +115,7 @@ class CommunityService(
     }
 
     fun leaveCommunity(user: User, communityId: Long): Community {
-        if (!communityRepository.existsById(communityId)) throw CommunityNotFoundException()
-        var community = communityRepository.getById(communityId)
+        var community = communityRepository.findByIdOrNull(communityId) ?: throw CommunityNotFoundException()
         if (community.deleted) throw CommunityDeletedException()
 
         if (!userCommunityRepository.existsByUserAndCommunity(user, community)) throw NotCurrentlyJoinedException()
@@ -135,8 +133,7 @@ class CommunityService(
     }
 
     fun modifyCommunity(user: User, modifyRequest: CommunityDto.ModifyRequest, communityId: Long): Community {
-        if (!communityRepository.existsById(communityId)) throw CommunityNotFoundException()
-        var community = communityRepository.getById(communityId)
+        var community = communityRepository.findByIdOrNull(communityId) ?: throw CommunityNotFoundException()
         if (community.deleted) throw CommunityDeletedException()
 
         // check if user is this community's manager
@@ -182,8 +179,7 @@ class CommunityService(
     }
 
     fun deleteCommunity(user: User, communityId: Long): Community {
-        if (!communityRepository.existsById(communityId)) throw CommunityNotFoundException()
-        var community = communityRepository.getById(communityId)
+        var community = communityRepository.findByIdOrNull(communityId) ?: throw CommunityNotFoundException()
         if (community.deleted) throw CommunityDeletedException()
 
         // check whether user is this community's manager
