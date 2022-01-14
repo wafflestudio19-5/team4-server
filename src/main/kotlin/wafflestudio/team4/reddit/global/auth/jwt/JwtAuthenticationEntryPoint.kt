@@ -1,4 +1,4 @@
-package wafflestudio.team4.reddit.global.auth
+package wafflestudio.team4.reddit.global.auth.jwt
 
 import org.springframework.security.core.AuthenticationException
 import org.springframework.security.web.AuthenticationEntryPoint

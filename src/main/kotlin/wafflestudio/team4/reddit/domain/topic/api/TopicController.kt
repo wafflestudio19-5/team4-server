@@ -12,8 +12,8 @@ import wafflestudio.team4.reddit.domain.topic.dto.TopicDto
 import wafflestudio.team4.reddit.domain.topic.model.Topic
 import wafflestudio.team4.reddit.domain.topic.service.TopicService
 import wafflestudio.team4.reddit.domain.user.model.User
-import wafflestudio.team4.reddit.global.auth.CurrentUser
 import wafflestudio.team4.reddit.global.common.dto.ListResponse
+import wafflestudio.team4.reddit.global.auth.annotation.CurrentUser
 import javax.validation.Valid
 
 @RestController

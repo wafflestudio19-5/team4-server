@@ -46,6 +46,13 @@ class RedditControllerAdvice {
         return ErrorResponse(e.errorType.code, e.errorType.name, e.detail)
     }
 
+    @ExceptionHandler(value = [InternalServerException::class])
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    fun serverError(e: RedditException): ErrorResponse {
+        logger.error(e.errorType.name + " " + e.detail)
+        return ErrorResponse(e.errorType.code, e.errorType.name, e.detail)
+    }
+
     // DTO Validation
     @ExceptionHandler(value = [MethodArgumentNotValidException::class])
     @ResponseStatus(HttpStatus.BAD_REQUEST)

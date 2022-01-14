@@ -2,6 +2,7 @@ package wafflestudio.team4.reddit.domain.community.service
 
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import wafflestudio.team4.reddit.domain.community.dto.CommunityDto
 import wafflestudio.team4.reddit.domain.community.exception.CommunityNotFoundException
@@ -38,8 +39,7 @@ class CommunityService(
     }
 
     fun getCommunityById(communityId: Long): Community {
-        if (!communityRepository.existsById(communityId)) throw CommunityNotFoundException()
-        val community = communityRepository.getById(communityId)
+        val community = communityRepository.findByIdOrNull(communityId) ?: throw CommunityNotFoundException()
         if (community.deleted) throw CommunityDeletedException()
         return community
     }
@@ -126,7 +126,7 @@ class CommunityService(
 
     // can only join as member, not manager
     fun joinCommunity(user: User, communityId: Long): Community {
-        var community = getCommunityById(communityId)
+        var community = getCommunityById(communityId) // check whether throws correct exception
 
         var userCommunity = UserCommunity(
             user = user,

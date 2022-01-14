@@ -6,10 +6,8 @@ import wafflestudio.team4.reddit.domain.community.model.Community
 import org.springframework.data.jpa.repository.JpaRepository
 
 interface CommunityRepository : JpaRepository<Community, Long?> {
-    override fun getById(id: Long): Community
-    override fun findAll(): List<Community>
     fun existsByName(name: String): Boolean
     fun getByName(name: String): Community
     fun findByIdLessThanOrderByIdDesc(lastCommunityId: Long, pageRequest: Pageable): Page<Community>
-    fun findByName(name: String): Community
+    fun findByName(name: String): Community?
 }

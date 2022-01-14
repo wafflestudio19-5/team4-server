@@ -15,8 +15,8 @@ import javax.validation.Valid
 import wafflestudio.team4.reddit.domain.community.service.CommunityService
 import wafflestudio.team4.reddit.domain.topic.model.Topic
 import wafflestudio.team4.reddit.domain.user.model.User
-import wafflestudio.team4.reddit.global.auth.CurrentUser
 import wafflestudio.team4.reddit.global.common.dto.ListResponse
+import wafflestudio.team4.reddit.global.auth.annotation.CurrentUser
 import wafflestudio.team4.reddit.global.common.dto.PageLinkDto
 import wafflestudio.team4.reddit.global.common.dto.PageResponse
 
