@@ -10,4 +10,5 @@ interface CommunityTopicRepository : JpaRepository<CommunityTopic, Long?> {
     fun existsByCommunityAndTopic(community: Community, topic: Topic): Boolean
     fun getAllByCommunity(community: Community): List<CommunityTopic>
     fun existsByCommunity(community: Community): Boolean
+    fun findByTopicIdEqualsAndDeletedFalse(topicId: Long): List<CommunityTopic>
 }

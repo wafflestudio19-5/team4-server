@@ -13,11 +13,14 @@ import org.springframework.web.bind.annotation.DeleteMapping
 import wafflestudio.team4.reddit.domain.community.dto.CommunityDto
 import javax.validation.Valid
 import wafflestudio.team4.reddit.domain.community.service.CommunityService
-import wafflestudio.team4.reddit.domain.topic.model.Topic
+import wafflestudio.team4.reddit.domain.post.dto.PostDto
+import wafflestudio.team4.reddit.domain.topic.dto.TopicDto
+// import wafflestudio.team4.reddit.domain.topic.model.Topic
+import wafflestudio.team4.reddit.domain.user.dto.UserDto
 import wafflestudio.team4.reddit.domain.user.model.User
 import wafflestudio.team4.reddit.global.common.dto.ListResponse
 import wafflestudio.team4.reddit.global.auth.annotation.CurrentUser
-import wafflestudio.team4.reddit.global.common.dto.PageLinkDto
+// import wafflestudio.team4.reddit.global.common.dto.PageLinkDto
 import wafflestudio.team4.reddit.global.common.dto.PageResponse
 
 @RestController
@@ -30,13 +33,14 @@ class CommunityController(
     fun getCommunitiesPage(
         @RequestParam(required = false, defaultValue = Long.MAX_VALUE.toString()) lastCommunityId: Long,
         @RequestParam(required = false, defaultValue = "10") size: Int,
+        @RequestParam(required = false, defaultValue = "-1") topicId: Long
     ): PageResponse<CommunityDto.Response> {
-        val communitiesPage = communityService.getCommunitiesPage(lastCommunityId, size)
-        val communityLinks = buildPageLink(lastCommunityId, size)
-        return PageResponse(communitiesPage.map { CommunityDto.Response(it) }, communityLinks)
+        val communitiesPage = communityService.getCommunitiesPage(lastCommunityId, size, topicId)
+        // val communityLinks = buildPageLink(lastCommunityId, size)
+        return PageResponse(communitiesPage.map { CommunityDto.Response(it) }) // , communityLinks)
     }
 
-    private fun buildPageLink(lastCommunityId: Long, size: Int): PageLinkDto {
+    /*private fun buildPageLink(lastCommunityId: Long, size: Int): PageLinkDto {
         val first = "size=$size"
         val self = "lastCommunityId=$lastCommunityId&size=$size"
         val last = "lastCommunityId=${size + 1}&size=$size"
@@ -47,7 +51,7 @@ class CommunityController(
                 Long.MAX_VALUE else lastCommunityId + size}&size=$size"
 
         return PageLinkDto(first, prev, self, next, last)
-    }
+    }*/
 
     // get community by id
     @GetMapping("/{community_id}/")
@@ -56,19 +60,34 @@ class CommunityController(
         return ResponseEntity.status(200).body(CommunityDto.Response(community))
     }
 
+    @GetMapping("/{community_id}/posts/")
+    fun getPostList(
+        @PathVariable("community_id") communityId: Long,
+        @RequestParam(required = false, defaultValue = Long.MAX_VALUE.toString()) lastPostId: Long,
+        @RequestParam(required = false, defaultValue = "10") size: Int,
+    ): ListResponse<PostDto.Response> {
+        val posts = communityService.getCommunityPosts(communityId, lastPostId, size)
+        return ListResponse(posts.map { PostDto.Response(it) })
+    }
+
     @GetMapping("/{community_id}/about/moderators/")
-    fun getManagers(@PathVariable("community_id") communityId: Long): ListResponse<User> {
+    fun getManagers(@PathVariable("community_id") communityId: Long): ListResponse<UserDto.Response> {
         val managers = communityService.getManagers(communityId)
-        return ListResponse(managers)
+        return ListResponse(managers.map { UserDto.Response(it) })
     }
 
     @GetMapping("/{community_id}/about/topics/")
-    fun getCommunityTopics(@PathVariable("community_id") communityId: Long): ListResponse<Topic> {
+    fun getCommunityTopics(@PathVariable("community_id") communityId: Long): ListResponse<TopicDto.Response> {
         val topics = communityService.getTopics(communityId)
-        return ListResponse(topics)
+        return ListResponse(topics.map { TopicDto.Response(it) })
     }
 
-    // TODO redirect to about page (/about/)
+    @GetMapping("/{community_id}/about/description/")
+    fun getDescription(@PathVariable("community_id") communityId: Long):
+        ResponseEntity<CommunityDto.Description> {
+        val description = communityService.getDescription(communityId)
+        return ResponseEntity.status(200).body(CommunityDto.Description(description))
+    }
 
     // create community
     // anyone allowed to make community
@@ -115,7 +134,7 @@ class CommunityController(
     }
 
     // 2) add, delete manager
-    @PutMapping("/{community_id}/about/moderators/{user_id}/add/")
+    @PostMapping("/{community_id}/about/moderators/{user_id}/")
     fun addCommunityManager(
         @CurrentUser user: User,
         @PathVariable("community_id") communityId: Long,
@@ -125,7 +144,7 @@ class CommunityController(
         return ResponseEntity.status(200).body(CommunityDto.Response(community))
     }
 
-    @PutMapping("/{community_id}/about/moderators/{user_id}/delete/")
+    @DeleteMapping("/{community_id}/about/moderators/{user_id}/")
     fun deleteCommunityManager(
         @CurrentUser user: User,
         @PathVariable("community_id") communityId: Long,

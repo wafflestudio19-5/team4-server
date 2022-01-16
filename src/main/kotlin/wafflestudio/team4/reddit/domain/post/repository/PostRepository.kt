@@ -7,4 +7,9 @@ import wafflestudio.team4.reddit.domain.post.model.Post
 
 interface PostRepository : JpaRepository<Post, Long?> {
     fun findByIdLessThanAndDeletedIsFalseOrderByIdDesc(lastPostId: Long, pageable: Pageable): Page<Post>
+    fun findByCommunityIdEqualsAndIdLessThanAndDeletedIsFalseOrderByIdDesc(
+        communityId: Long,
+        lastPostId: Long,
+        pageRequest: Pageable
+    ): Page<Post>
 }

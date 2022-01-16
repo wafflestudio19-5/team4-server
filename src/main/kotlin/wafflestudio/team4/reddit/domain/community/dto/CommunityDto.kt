@@ -44,4 +44,8 @@ class CommunityDto {
         val description: String,
         // val topics: List<String>,
     )
+
+    data class Description(
+        val description: String
+    )
 }

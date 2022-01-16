@@ -1,9 +1,11 @@
 package wafflestudio.team4.reddit.domain.community.service
 
 import org.springframework.data.domain.Page
+// import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import wafflestudio.team4.reddit.domain.community.dto.CommunityDto
 import wafflestudio.team4.reddit.domain.community.exception.CommunityNotFoundException
 import wafflestudio.team4.reddit.domain.community.exception.CommunityDeletedException
@@ -17,6 +19,8 @@ import wafflestudio.team4.reddit.domain.community.model.UserCommunity
 import wafflestudio.team4.reddit.domain.community.repository.CommunityRepository
 import wafflestudio.team4.reddit.domain.community.repository.CommunityTopicRepository
 import wafflestudio.team4.reddit.domain.community.repository.UserCommunityRepository
+import wafflestudio.team4.reddit.domain.post.model.Post
+import wafflestudio.team4.reddit.domain.post.repository.PostRepository
 import wafflestudio.team4.reddit.domain.topic.exceptions.TopicNotFoundException
 import wafflestudio.team4.reddit.domain.topic.model.Topic
 import wafflestudio.team4.reddit.domain.topic.service.TopicService
@@ -28,20 +32,39 @@ class CommunityService(
     private val communityRepository: CommunityRepository,
     private val userCommunityRepository: UserCommunityRepository,
     private val communityTopicRepository: CommunityTopicRepository,
+    private val postRepository: PostRepository,
     private val topicService: TopicService,
     private val userService: UserService
 ) {
 
     // used in search query
-    fun getCommunitiesPage(lastCommunityId: Long, size: Int): Page<Community> {
+    fun getCommunitiesPage(lastCommunityId: Long, size: Int, topicId: Long): Page<Community> {
         val pageRequest = Pageable.ofSize(size)
-        return communityRepository.findByIdLessThanOrderByIdDesc(lastCommunityId, pageRequest)
+        if (topicId == -1L) return communityRepository.findByIdLessThanOrderByIdDesc(lastCommunityId, pageRequest)
+
+        val communityTopics = communityTopicRepository.findByTopicIdEqualsAndDeletedFalse(topicId)
+        val communityIds = mutableListOf<Long>()
+        for (communityTopic in communityTopics) {
+            communityIds.add(communityTopic.community.id)
+        }
+
+        return communityRepository.findByIdInAndIdLessThanOrderByIdDesc(communityIds, lastCommunityId, pageRequest)
+        // TODO maybe change return type to list
     }
 
     fun getCommunityById(communityId: Long): Community {
         val community = communityRepository.findByIdOrNull(communityId) ?: throw CommunityNotFoundException()
         if (community.deleted) throw CommunityDeletedException()
         return community
+    }
+
+    fun getCommunityPosts(communityId: Long, lastPostId: Long, size: Int): List<Post> {
+        val pageRequest = Pageable.ofSize(size)
+        return postRepository.findByCommunityIdEqualsAndIdLessThanAndDeletedIsFalseOrderByIdDesc(
+            communityId,
+            lastPostId,
+            pageRequest
+        ).content
     }
 
     fun getManagers(communityId: Long): List<User> {
@@ -66,6 +89,12 @@ class CommunityService(
         return topics
     }
 
+    fun getDescription(communityId: Long): String {
+        val community = getCommunityById(communityId)
+        return community.description
+    }
+
+    @Transactional
     fun createCommunity(createRequest: CommunityDto.CreateRequest, user: User): Community {
         var community = Community(
             name = createRequest.name,
@@ -91,11 +120,8 @@ class CommunityService(
         )
         userCommunityRepository.save(userCommunity)
 
-        /*val managerCommunity = ManagerCommunity(
-            manager = user,
-            community = community
-        )
-        managerCommunityRepository.save(managerCommunity)*/
+        // TODO don't save community in communityRepository until after topic checking
+        // maybe problem is @Transactional
 
         val topics = mutableListOf<Topic>()
         for (topicName in createRequest.topics) {
@@ -221,7 +247,7 @@ class CommunityService(
         // check community existence -> necessary?
         var community = getCommunityById(communityId)
 
-        // check if user is this community's manager -> necessary?
+        // check if user is this community's manager
         checkManagerStatus(user, community)
 
         val manager = userService.getUserById(userId)
@@ -289,6 +315,7 @@ class CommunityService(
             )
             managerCommunityRepository.save(managerCommunity)
         }*/
+        // TODO what if already manager?
 
         // if not user, add as user
         if (!userCommunityRepository.existsByUserAndCommunity(manager, community)) { // first join
