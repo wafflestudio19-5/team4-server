@@ -5,14 +5,14 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
 import wafflestudio.team4.reddit.domain.community.dto.CommunityDto
 import wafflestudio.team4.reddit.domain.community.exception.CommunityNotFoundException
 import wafflestudio.team4.reddit.domain.community.exception.CommunityDeletedException
-import wafflestudio.team4.reddit.domain.community.exception.AlreadyJoinedException
 import wafflestudio.team4.reddit.domain.community.exception.CommunityAlreadyExistsException
+import wafflestudio.team4.reddit.domain.community.exception.AlreadyJoinedException
 import wafflestudio.team4.reddit.domain.community.exception.NotCurrentlyJoinedException
 import wafflestudio.team4.reddit.domain.community.exception.NotCommunityManagerException
+import wafflestudio.team4.reddit.domain.community.exception.AlreadyManagerException
 import wafflestudio.team4.reddit.domain.community.model.Community
 import wafflestudio.team4.reddit.domain.community.model.CommunityTopic
 import wafflestudio.team4.reddit.domain.community.model.UserCommunity
@@ -26,6 +26,7 @@ import wafflestudio.team4.reddit.domain.topic.model.Topic
 import wafflestudio.team4.reddit.domain.topic.service.TopicService
 import wafflestudio.team4.reddit.domain.user.model.User
 import wafflestudio.team4.reddit.domain.user.service.UserService
+import java.time.LocalDateTime
 
 @Service
 class CommunityService(
@@ -40,7 +41,10 @@ class CommunityService(
     // used in search query
     fun getCommunitiesPage(lastCommunityId: Long, size: Int, topicId: Long): Page<Community> {
         val pageRequest = Pageable.ofSize(size)
-        if (topicId == -1L) return communityRepository.findByIdLessThanOrderByIdDesc(lastCommunityId, pageRequest)
+        if (topicId == -1L) return communityRepository.findByIdLessThanAndDeletedFalseOrderByIdDesc(
+            lastCommunityId,
+            pageRequest
+        )
 
         val communityTopics = communityTopicRepository.findByTopicIdEqualsAndDeletedFalse(topicId)
         val communityIds = mutableListOf<Long>()
@@ -48,7 +52,11 @@ class CommunityService(
             communityIds.add(communityTopic.community.id)
         }
 
-        return communityRepository.findByIdInAndIdLessThanOrderByIdDesc(communityIds, lastCommunityId, pageRequest)
+        return communityRepository.findByIdInAndIdLessThanAndDeletedFalseOrderByIdDesc(
+            communityIds,
+            lastCommunityId,
+            pageRequest
+        )
         // TODO maybe change return type to list
     }
 
@@ -59,6 +67,7 @@ class CommunityService(
     }
 
     fun getCommunityPosts(communityId: Long, lastPostId: Long, size: Int): List<Post> {
+        getCommunityById(communityId) // check whether community with id exists, if not exception
         val pageRequest = Pageable.ofSize(size)
         return postRepository.findByCommunityIdEqualsAndIdLessThanAndDeletedIsFalseOrderByIdDesc(
             communityId,
@@ -94,7 +103,6 @@ class CommunityService(
         return community.description
     }
 
-    @Transactional
     fun createCommunity(createRequest: CommunityDto.CreateRequest, user: User): Community {
         var community = Community(
             name = createRequest.name,
@@ -103,26 +111,19 @@ class CommunityService(
             description = createRequest.description,
             deleted = false
         )
+
         if (communityRepository.existsByName(createRequest.name)) {
-            var oldCommunity = communityRepository.getByName(createRequest.name)
+            val oldCommunity = communityRepository.getByName(createRequest.name)
             if (!oldCommunity.deleted) throw CommunityAlreadyExistsException()
             else {
-                oldCommunity = community
-                community = communityRepository.save(oldCommunity)
+                oldCommunity.name += ("-deprecated" + LocalDateTime.now() + user.id)
+                communityRepository.save(oldCommunity)
+                // oldCommunity = community
+                // community = communityRepository.save(oldCommunity)
             }
-        } else community = communityRepository.save(community)
+        }
 
-        // creator becomes one of managers
-        val userCommunity = UserCommunity(
-            user = user,
-            community = community,
-            isManager = true,
-        )
-        userCommunityRepository.save(userCommunity)
-
-        // TODO don't save community in communityRepository until after topic checking
-        // maybe problem is @Transactional
-
+        // TODO make topic optional
         val topics = mutableListOf<Topic>()
         for (topicName in createRequest.topics) {
             if (!topicService.checkTopicExistence(topicName)) throw TopicNotFoundException()
@@ -146,6 +147,16 @@ class CommunityService(
                 communityTopicRepository.save(newCommunityTopic)
             }
         }
+
+        // creator becomes one of managers
+        val userCommunity = UserCommunity(
+            user = user,
+            community = community,
+            isManager = true,
+        )
+        userCommunityRepository.save(userCommunity)
+
+        community = communityRepository.save(community)
 
         return community
     }
@@ -315,7 +326,6 @@ class CommunityService(
             )
             managerCommunityRepository.save(managerCommunity)
         }*/
-        // TODO what if already manager?
 
         // if not user, add as user
         if (!userCommunityRepository.existsByUserAndCommunity(manager, community)) { // first join
@@ -327,10 +337,15 @@ class CommunityService(
             userCommunityRepository.save(userCommunity)
         } else {
             val userCommunity = userCommunityRepository.getByUserAndCommunity(manager, community)
+            // currently joined
+            if (userCommunity.joined) {
+                if (userCommunity.isManager) throw AlreadyManagerException()
+                else community.num_members -= 1
+            }
+            // currently not joined
             if (!userCommunity.joined) { // rejoin
                 userCommunity.joined = true
             }
-            if (userCommunity.joined && !userCommunity.isManager) community.num_members -= 1
             userCommunity.isManager = true
             userCommunityRepository.save(userCommunity)
         }

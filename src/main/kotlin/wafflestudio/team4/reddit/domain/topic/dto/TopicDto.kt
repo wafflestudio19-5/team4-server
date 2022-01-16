@@ -7,7 +7,7 @@ import javax.validation.constraints.NotNull
 class TopicDto {
     data class Response(
         val id: Long,
-        // TODO unique
+
         @field:NotBlank
         val name: String,
 

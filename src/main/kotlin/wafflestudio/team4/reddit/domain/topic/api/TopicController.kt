@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.PutMapping
 import wafflestudio.team4.reddit.domain.topic.dto.TopicDto
-import wafflestudio.team4.reddit.domain.topic.model.Topic
 import wafflestudio.team4.reddit.domain.topic.service.TopicService
 import wafflestudio.team4.reddit.domain.user.model.User
 import wafflestudio.team4.reddit.global.common.dto.ListResponse
@@ -23,9 +22,9 @@ class TopicController(
     private val topicService: TopicService
 ) {
     @GetMapping("/")
-    fun getTopics(): ListResponse<Topic> { // did not apply pagination
+    fun getTopics(): ListResponse<TopicDto.Response> { // did not apply pagination
         val topics = topicService.getAllTopics()
-        return ListResponse(topics)
+        return ListResponse(topics.map { TopicDto.Response(it) })
     }
 
     @GetMapping("/{topic_id}/")
@@ -34,7 +33,7 @@ class TopicController(
         return ResponseEntity.status(200).body(TopicDto.Response(topic))
     }
 
-    // anyone can create topic
+    // TODO only admin creates topic
     @PostMapping("/")
     fun createTopic(@CurrentUser user: User, @Valid @RequestBody createRequest: TopicDto.CreateRequest):
         ResponseEntity<TopicDto.Response> {
