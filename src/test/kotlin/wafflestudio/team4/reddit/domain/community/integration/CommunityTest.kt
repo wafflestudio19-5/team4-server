@@ -100,11 +100,11 @@ class CommunityTest(
     }
 
     private fun addCommunityManager(communityId: Long, userId: Long, authentication: String?): ResultActionsDsl {
-        return testHelper.put("/communities/$communityId/about/moderators/$userId/add/", null, authentication)
+        return testHelper.post("/communities/$communityId/about/moderators/$userId/", null, authentication)
     }
 
     private fun deleteCommunityManager(communityId: Long, userId: Long, authentication: String?): ResultActionsDsl {
-        return testHelper.put("/communities/$communityId/about/moderators/$userId/delete/", null, authentication)
+        return testHelper.delete("/communities/$communityId/about/moderators/$userId/", null, authentication)
     }
 
     private fun changeCommunityTopic(communityId: Long, topicId: Long, authentication: String?): ResultActionsDsl {
