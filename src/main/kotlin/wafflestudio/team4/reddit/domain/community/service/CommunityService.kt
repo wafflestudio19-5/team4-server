@@ -72,6 +72,7 @@ class CommunityService(
         val communityTopic = CommunityTopic(
             community = community,
             topic = topics[0] // at least one topic, first topic
+            // TODO topic이 빈 리스트인 경우 Index Error. Code refactor 필요
         )
         communityTopicRepository.save(communityTopic)
 
