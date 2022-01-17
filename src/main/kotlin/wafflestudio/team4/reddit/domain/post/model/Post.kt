@@ -23,7 +23,7 @@ class Post(
     @field:NotNull
     @ManyToOne
     @JoinColumn(name = "community_id")
-    val community: Community,
+    val community: Community, // TODO 여기엔 왜 FK가 있지?? PostCommunity 이미 있는데
 
     @field:NotBlank
     var title: String,

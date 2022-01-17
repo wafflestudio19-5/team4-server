@@ -74,4 +74,5 @@ class RedditControllerAdvice {
     }
 
     // TODO jwt expiration
+    // TODO HttpMessageNotReadableException
 }

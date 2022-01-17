@@ -44,7 +44,7 @@ class PostController(
     @GetMapping("/image/")
     fun getImageUploadUrl(
         @CurrentUser user: User,
-        @Valid @RequestBody uploadImageRequest: PostDto.UploadImageRequest
+        @Valid @RequestBody uploadImageRequest: PostDto.UploadImageRequest // TODO 이것도 param
     ): PostDto.UploadImageResponse {
         val preSignedUrl = postService.getPresignedUrl(user, uploadImageRequest.filename)
         val imageUrl = "https://waffle-team-4-server-s3.s3.ap-northeast-2.amazonaws.com/posts/" +

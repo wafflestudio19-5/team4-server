@@ -52,7 +52,7 @@ class CommentService(
         // 대댓글 시 부모와 그룹 코멘트 엔티티 찾기
         if (request.depth != 0) {
             parentComment = commentRepository.findByIdIsAndDeletedIs(request.parentId, 0)
-                ?: throw CommentNotFoundException()
+                ?: throw CommentNotFoundException() // TODO 혼동 방지를 위해 exception 이름 변경
             groupComment = commentRepository.findByIdIsAndDeletedIs(request.groupId, 0)
                 ?: throw CommentNotFoundException()
         }

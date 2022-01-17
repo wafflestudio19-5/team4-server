@@ -27,5 +27,5 @@ class UserProfile(
     var description: String = "",
 
     @field:NotNull
-    var name: String = user.username,
+    var name: String = user.username, // TODO nickname
 ) : BaseTimeEntity()
