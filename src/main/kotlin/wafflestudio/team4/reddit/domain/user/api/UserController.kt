@@ -34,15 +34,30 @@ class UserController(
     fun getUsersPage(
         @RequestParam(required = false, defaultValue = Long.MAX_VALUE.toString()) lastUserId: Long,
         @RequestParam(required = false, defaultValue = "10") size: Int,
+        @RequestParam(required = false) keyword: String?,
     ): PageResponse<UserDto.Response> {
         // TODO order
         // TODO deleted users
-        val usersPage = userService.getUsersPage(lastUserId, size)
-        val userLinks = buildPageLink(lastUserId, size)
+        val usersPage = userService.getUsersPage(lastUserId, size, keyword)
+        val userLinks = buildPageLink(lastUserId, size, keyword)
         return PageResponse(usersPage.map { UserDto.Response(it) }, userLinks)
     }
 
-    private fun buildPageLink(lastUserId: Long, size: Int): PageLinkDto {
+    @GetMapping("/name/")
+    fun getUsernamesPage(
+        @RequestParam(required = false, defaultValue = Long.MAX_VALUE.toString()) lastUserId: Long,
+        @RequestParam(required = false, defaultValue = "10") size: Int,
+        @RequestParam(required = false) keyword: String?,
+    ): PageResponse<UserDto.UsernameResponse> {
+        // TODO order
+        // TODO deleted users
+        val usersPage = userService.getUsersPage(lastUserId, size, keyword)
+        val userLinks = buildPageLink(lastUserId, size, keyword)
+        return PageResponse(usersPage.map { UserDto.UsernameResponse(it) }, userLinks)
+    }
+
+    private fun buildPageLink(lastUserId: Long, size: Int, keyword: String?): PageLinkDto {
+        // TODO refactor
         val first = "size=$size"
         val self = "lastUserId=$lastUserId&size=$size"
         val last = "lastUserId=${size + 1}&size=$size"
@@ -51,7 +66,14 @@ class UserController(
         val prev = "lastUserId=" +
             "${if ((lastUserId - Long.MAX_VALUE) + size > 0) Long.MAX_VALUE else lastUserId + size}&size=$size"
 
-        return PageLinkDto(first, prev, self, next, last)
+        return if (keyword == null) {
+            PageLinkDto(first, prev, self, next, last)
+        } else {
+            PageLinkDto(
+                "$first&keyword=$keyword", "$prev&keyword=$keyword",
+                "$self&keyword=$keyword", "$next&keyword=$keyword", "$last&keyword=$keyword"
+            )
+        }
     }
 
     @GetMapping("/me/")

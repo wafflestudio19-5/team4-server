@@ -24,6 +24,19 @@ class UserDto {
         )
     }
 
+    data class UsernameResponse(
+        val id: Long,
+        val username: String,
+        @JsonProperty("date_joined")
+        val dateJoined: LocalDateTime?,
+    ) {
+        constructor(user: User) : this(
+            id = user.id,
+            username = user.username,
+            dateJoined = user.createdAt,
+        )
+    }
+
     data class SignupRequest(
         @field:UniqueEmail
         @field:NotBlank

@@ -21,6 +21,7 @@ import wafflestudio.team4.reddit.domain.user.model.UserProfile
 import wafflestudio.team4.reddit.domain.user.repository.UserImageRepository
 import wafflestudio.team4.reddit.domain.user.repository.UserProfileRepository
 import wafflestudio.team4.reddit.domain.user.repository.UserRepository
+import wafflestudio.team4.reddit.global.util.search.SearchHelper
 import java.util.Date
 
 @Service
@@ -66,9 +67,15 @@ class UserService(
         return user
     }
 
-    fun getUsersPage(lastUserId: Long, size: Int): Page<User> {
+    fun getUsersPage(lastUserId: Long, size: Int, keyword: String?): Page<User> {
+        // TODO sort
         val pageRequest = PageRequest.of(0, size)
-        return userRepository.findByIdLessThanOrderByIdDesc(lastUserId, pageRequest)
+        return if (keyword == null) {
+            userRepository.findByIdLessThanOrderByIdDesc(lastUserId, pageRequest)
+        } else {
+            val keywordPattern = SearchHelper.makeAbbreviationPattern(keyword)
+            userRepository.findByIdLessThanAndUsernameLikeOrderByIdDesc(lastUserId, keywordPattern, pageRequest)
+        }
     }
 
     fun updateUser(user: User, updateRequest: UserDto.UpdateRequest): User {

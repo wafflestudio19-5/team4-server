@@ -10,4 +10,5 @@ interface UserRepository : JpaRepository<User, Long?> {
     fun existsByEmail(email: String): Boolean
     fun findByEmailAndPassword(email: String, password: String): User?
     fun findByIdLessThanOrderByIdDesc(id: Long, pageable: Pageable): Page<User>
+    fun findByIdLessThanAndUsernameLikeOrderByIdDesc(id: Long, username: String, pageable: Pageable): Page<User>
 }
