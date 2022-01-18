@@ -3,7 +3,6 @@ package wafflestudio.team4.reddit.domain.user.api
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -55,9 +54,10 @@ class UserController(
     }
 
     @GetMapping("/me/")
-    @Transactional
+//    @Transactional
     fun getCurrentUser(@CurrentUser user: User): UserDto.Response {
-        return UserDto.Response(user)
+        val mergedUser = userService.getUserById(user.id) // Response로 넘어갈 때 persistence context에 있어야함
+        return UserDto.Response(mergedUser)
     }
 
     @GetMapping("/{user_id}/")
@@ -82,6 +82,7 @@ class UserController(
         headers.set("Authentication", jwtTokenProvider.generateToken(user.email))
         return ResponseEntity<UserDto.Response>(UserDto.Response(user), headers, HttpStatus.OK)
     }
+
     @PutMapping("/me/")
     fun updateUser(
         @Valid @RequestBody updateRequest: UserDto.UpdateRequest,
@@ -100,15 +101,17 @@ class UserController(
     @GetMapping("/profile/{user_id}/")
     fun getProfile(@PathVariable("user_id") id: Long): UserDto.ProfileResponse {
         val profile = userService.getProfileById(id)
-        val followNum = userService.getFollowNumById(id)
-        return UserDto.ProfileResponse(profile, followNum)
+//        val followNum = userService.getFollowNumById(id)
+//        return UserDto.ProfileResponse(profile, followNum)
+        return UserDto.ProfileResponse(profile)
     }
 
     @GetMapping("/profile/me/")
     fun getCurrentProfile(@CurrentUser user: User): UserDto.ProfileResponse {
         val profile = userService.getProfileById(user.id)
-        val followNum = userService.getFollowNumById(user.id)
-        return UserDto.ProfileResponse(profile, followNum)
+//        val followNum = userService.getFollowNumById(user.id)
+//        return UserDto.ProfileResponse(profile, followNum)
+        return UserDto.ProfileResponse(profile)
     }
 
     @GetMapping("/profile/image/")
@@ -128,7 +131,8 @@ class UserController(
         @Valid @RequestBody updateProfileRequest: UserDto.UpdateProfileRequest
     ): UserDto.ProfileResponse {
         val updatedProfile = userService.updateProfile(user, updateProfileRequest)
-        val followNum = userService.getFollowNumById(user.id)
-        return UserDto.ProfileResponse(updatedProfile, followNum)
+//        val followNum = userService.getFollowNumById(user.id)
+//        return UserDto.ProfileResponse(updatedProfile, followNum)
+        return UserDto.ProfileResponse(updatedProfile)
     }
 }
