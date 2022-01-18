@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import wafflestudio.team4.reddit.domain.follow.exception.AlreadyFollowingException
 import wafflestudio.team4.reddit.domain.follow.exception.NotFollowingException
+import wafflestudio.team4.reddit.domain.follow.exception.SelfFollowException
 import wafflestudio.team4.reddit.domain.follow.model.Follow
 import wafflestudio.team4.reddit.domain.follow.repository.FollowRepository
 import wafflestudio.team4.reddit.domain.user.model.User
@@ -22,6 +23,7 @@ class FollowService(
     }
 
     fun follow(fromUser: User, toUserId: Long): Follow {
+        if (fromUser.id == toUserId) throw SelfFollowException()
         val toUser = userService.getUserById(toUserId)
         if (!followRepository.existsByFromUserAndToUser(fromUser, toUser)) {
             var follow = Follow(fromUser, toUser)

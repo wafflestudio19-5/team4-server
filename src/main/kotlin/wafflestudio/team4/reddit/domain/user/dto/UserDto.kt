@@ -13,6 +13,8 @@ class UserDto {
         val id: Long,
         val username: String,
         val email: String,
+        @JsonProperty("profile")
+        val userProfile: ProfileResponse?,
         @JsonProperty("date_joined")
         val dateJoined: LocalDateTime?,
     ) {
@@ -20,6 +22,7 @@ class UserDto {
             id = user.id,
             username = user.username,
             email = user.email,
+            userProfile = if (user.userProfile != null) ProfileResponse(user.userProfile!!) else null,
             dateJoined = user.createdAt,
         )
     }
@@ -86,17 +89,28 @@ class UserDto {
 
     data class ProfileResponse(
         val userId: Long,
+        @JsonProperty("nickname")
         val name: String,
         val imageUrl: String?,
         val description: String,
         val followers: Int,
+        val followings: Int,
     ) {
-        constructor(userProfile: UserProfile, followersNum: Int) : this(
+//        constructor(userProfile: UserProfile, followersNum: Int) : this(
+//            userId = userProfile.user.id,
+//            name = userProfile.name,
+//            imageUrl = userProfile.userImage?.url,
+//            description = userProfile.description,
+//            followers = followersNum // followRepository.findByToUser(toUser:user)
+//        )
+
+        constructor(userProfile: UserProfile) : this(
             userId = userProfile.user.id,
             name = userProfile.name,
             imageUrl = userProfile.userImage?.url,
             description = userProfile.description,
-            followers = followersNum // followRepository.findByToUser(toUser:user)
+            followers = userProfile.user.followers.size,
+            followings = userProfile.user.followings.size,
         )
     }
 }
