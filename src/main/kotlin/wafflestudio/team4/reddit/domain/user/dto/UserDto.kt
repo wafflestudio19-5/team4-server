@@ -88,9 +88,12 @@ class UserDto {
     )
 
     data class ProfileResponse(
+        val id: Long,
+        @JsonProperty("user_id")
         val userId: Long,
         @JsonProperty("nickname")
         val name: String,
+        @JsonProperty("image_url")
         val imageUrl: String?,
         val description: String,
         val followers: Int,
@@ -105,6 +108,7 @@ class UserDto {
 //        )
 
         constructor(userProfile: UserProfile) : this(
+            id = userProfile.id,
             userId = userProfile.user.id,
             name = userProfile.name,
             imageUrl = userProfile.userImage?.url,
