@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import wafflestudio.team4.reddit.domain.community.dto.CommunityDto
 import wafflestudio.team4.reddit.domain.community.exception.CommunityNotFoundException
 import wafflestudio.team4.reddit.domain.community.exception.CommunityDeletedException
@@ -24,7 +25,9 @@ import wafflestudio.team4.reddit.domain.post.repository.PostRepository
 import wafflestudio.team4.reddit.domain.topic.exceptions.TopicNotFoundException
 import wafflestudio.team4.reddit.domain.topic.model.Topic
 import wafflestudio.team4.reddit.domain.topic.service.TopicService
+import wafflestudio.team4.reddit.domain.user.exception.UserNotFoundException
 import wafflestudio.team4.reddit.domain.user.model.User
+import wafflestudio.team4.reddit.domain.user.repository.UserRepository
 import wafflestudio.team4.reddit.domain.user.service.UserService
 import java.time.LocalDateTime
 
@@ -34,6 +37,7 @@ class CommunityService(
     private val userCommunityRepository: UserCommunityRepository,
     private val communityTopicRepository: CommunityTopicRepository,
     private val postRepository: PostRepository,
+    private val userRepository: UserRepository,
     private val topicService: TopicService,
     private val userService: UserService
 ) {
@@ -207,6 +211,86 @@ class CommunityService(
         userCommunityRepository.save(userCommunity)
         community = communityRepository.save(community)
 
+        return community
+    }
+
+    @Transactional
+    fun modifyCommunity(user: User, modifyRequest: CommunityDto.ModifyRequest, communityId: Long):
+        Community {
+        // check community existence
+        var community = getCommunityById(communityId)
+
+        // check if user is this community's manager
+        checkManagerStatus(user, community)
+
+        // change description
+        if (modifyRequest.description != null) {
+            community.description = modifyRequest.description
+            communityRepository.save(community)
+        }
+
+        // add, delete topics
+        // delete newly deleted topics
+        // if no already assigned topics, skip this block
+        val oldTopics = if (communityTopicRepository.existsByCommunity(community))
+            communityTopicRepository.getAllByCommunity(community) else null
+        if (modifyRequest.topics != null && oldTopics != null) {
+            for (communityTopic in oldTopics) {
+                if (communityTopic.topic.name !in modifyRequest.topics) communityTopic.deleted = true
+                communityTopicRepository.save(communityTopic)
+            }
+        }
+
+        // add newly added topics
+        if (modifyRequest.topics != null && modifyRequest.topics.isNotEmpty()) {
+            for (topicName in modifyRequest.topics) {
+                // check if topic is an existing topic
+                if (!topicService.checkTopicExistence(topicName)) throw TopicNotFoundException()
+                val topic = topicService.getTopicByName(topicName)
+                if (!communityTopicRepository.existsByCommunityAndTopic(community, topic)) {
+                    val newCommunityTopic = CommunityTopic(community, topic)
+                    communityTopicRepository.save(newCommunityTopic)
+                } else {
+                    val communityTopic = communityTopicRepository.getByCommunityAndTopic(community, topic)
+                    if (communityTopic.deleted) {
+                        communityTopic.deleted = false
+                        communityTopicRepository.save(communityTopic)
+                    }
+                }
+            }
+        }
+
+        // add, delete managers
+        val oldManagers = userCommunityRepository.findAllByCommunity(community)
+
+        // delete newly deleted managers
+        if (modifyRequest.managers != null && oldManagers.isNotEmpty()) {
+            for (managerCommunity in oldManagers) {
+                /*if (managerCommunity.user.email !in modifyRequest.managers) managerCommunity.joined = false
+                userCommunityRepository.save(managerCommunity)*/
+                if (managerCommunity.user.email !in modifyRequest.managers)
+                    community = deleteManager(community, managerCommunity.user)
+            }
+        }
+
+        // add newly added managers
+        if (modifyRequest.managers != null && modifyRequest.managers.isNotEmpty()) {
+            for (managerEmail in modifyRequest.managers) {
+                // check if user with email (managerEmail) exists
+                val manager = userRepository.findByEmail(managerEmail) ?: throw UserNotFoundException()
+                /*if (!userCommunityRepository.existsByUserAndCommunity(manager, community)) {
+                    val newUserCommunity = UserCommunity(manager, community)
+                    userCommunityRepository.save(newUserCommunity)
+                } else {
+                    val userCommunity = userCommunityRepository.getByUserAndCommunity(manager, community)
+                    if (!userCommunity.joined) {
+                        userCommunity.joined = true
+                        userCommunityRepository.save(userCommunity)
+                    }
+                }*/
+                community = addManager(community, manager)
+            }
+        }
         return community
     }
 

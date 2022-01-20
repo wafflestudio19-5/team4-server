@@ -122,6 +122,17 @@ class CommunityController(
 
     // change community info
     // only this community's managers allowed to change info
+
+    @PutMapping("/{community_id}/about/")
+    fun modifyCommunity(
+        @CurrentUser user: User,
+        @PathVariable("community_id") communityId: Long,
+        @Valid @RequestBody modifyRequest: CommunityDto.ModifyRequest
+    ): ResponseEntity<CommunityDto.Response> {
+        val community = communityService.modifyCommunity(user, modifyRequest, communityId)
+        return ResponseEntity.status(200).body(CommunityDto.Response(community))
+    }
+
     // 1) change description
     @PutMapping("/{community_id}/about/description/")
     fun modifyCommunityDescription(

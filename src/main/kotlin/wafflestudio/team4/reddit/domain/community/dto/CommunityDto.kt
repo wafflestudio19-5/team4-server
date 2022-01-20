@@ -38,7 +38,13 @@ class CommunityDto {
         val topics: List<String> // at least one topic
     )
 
-    // ModifyRequest
+    data class ModifyRequest(
+        val description: String?,
+        val managers: List<String>?,
+        val topics: List<String>?
+    )
+
+    // ModifyDescriptionRequest
     data class ModifyDescriptionRequest(
         // val name: String,
         val description: String,
