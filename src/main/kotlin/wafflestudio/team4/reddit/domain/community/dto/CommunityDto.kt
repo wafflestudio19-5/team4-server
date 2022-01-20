@@ -35,7 +35,7 @@ class CommunityDto {
         @field:NotBlank
         val description: String,
         @field:NotNull
-        val topics: List<String> // at least one topic
+        val topics: List<String>
     )
 
     data class ModifyRequest(

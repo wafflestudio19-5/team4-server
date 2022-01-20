@@ -127,6 +127,8 @@ class CommunityService(
             }
         }
 
+        community = communityRepository.save(community)
+
         // TODO make topic optional
         val topics = mutableListOf<Topic>()
         for (topicName in createRequest.topics) {
@@ -135,15 +137,16 @@ class CommunityService(
             topics.add(topic)
         }
 
-        val communityTopic = CommunityTopic(
+        /*val communityTopic = CommunityTopic(
             community = community,
-            topic = topics[0] // at least one topic, first topic
+            topic = topics[0]
         )
         communityTopicRepository.save(communityTopic)
+        */
 
         // add additional topics
-        if (topics.size > 1) {
-            for (i in 1 until topics.size) {
+        if (topics.size >= 1) {
+            for (i in 0 until topics.size) {
                 val newCommunityTopic = CommunityTopic(
                     community = community,
                     topic = topics[i]
@@ -159,8 +162,6 @@ class CommunityService(
             isManager = true,
         )
         userCommunityRepository.save(userCommunity)
-
-        community = communityRepository.save(community)
 
         return community
     }
