@@ -6,6 +6,7 @@ import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import wafflestudio.team4.reddit.domain.community.exception.CommunityDeletedException
 import wafflestudio.team4.reddit.domain.community.exception.CommunityNotFoundException
 import wafflestudio.team4.reddit.domain.community.repository.CommunityRepository
 import wafflestudio.team4.reddit.domain.post.dto.PostDto
@@ -57,6 +58,7 @@ class PostService(
 
     fun createPost(user: User, request: PostDto.CreateRequest): Post {
         val community = communityRepository.findByName(request.community) ?: throw CommunityNotFoundException()
+        if (community.deleted) throw CommunityDeletedException()
 
         val newPost = Post(
             user = user,

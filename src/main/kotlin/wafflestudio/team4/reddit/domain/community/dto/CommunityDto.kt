@@ -5,7 +5,6 @@ import javax.validation.constraints.NotBlank
 import javax.validation.constraints.NotNull
 
 class CommunityDto {
-    // Response
     data class Response(
         val id: Long,
         @field:NotBlank
@@ -14,7 +13,7 @@ class CommunityDto {
         val num_members: Int,
         @field:NotNull
         val num_managers: Int,
-        @field:NotBlank
+        // @field:NotBlank
         val description: String,
         @field:NotNull
         val deleted: Boolean
@@ -22,7 +21,6 @@ class CommunityDto {
         constructor(community: Community) : this(
             id = community.id,
             name = community.name,
-            // managers = community.managers.map{},
             num_members = community.num_members,
             num_managers = community.num_managers,
             description = community.description,
@@ -37,19 +35,23 @@ class CommunityDto {
         @field:NotBlank
         val description: String,
         @field:NotNull
-        val topics: List<String> // at least one topic
-    )
-
-    // JoinRequest
-    data class JoinRequest(
-        @field:NotBlank
-        val role: String
-    )
-
-    // ModifyRequest
-    data class ModifyRequest(
-        val name: String,
-        val description: String,
         val topics: List<String>
+    )
+
+    data class ModifyRequest(
+        val description: String?,
+        val managers: List<String>?,
+        val topics: List<String>?
+    )
+
+    // ModifyDescriptionRequest
+    data class ModifyDescriptionRequest(
+        // val name: String,
+        val description: String,
+        // val topics: List<String>,
+    )
+
+    data class Description(
+        val description: String
     )
 }

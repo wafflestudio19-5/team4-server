@@ -20,7 +20,7 @@ class FollowController(
     val followService: FollowService
 ) {
 
-    // get following?
+    // TODO get following?
 
     @GetMapping("/{toUser_id}/followers/")
     fun getFollowersPage(
