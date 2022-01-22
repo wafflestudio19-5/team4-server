@@ -22,6 +22,8 @@ import wafflestudio.team4.reddit.domain.post.repository.PostRepository
 import wafflestudio.team4.reddit.domain.post.repository.PostVoteRepository
 import wafflestudio.team4.reddit.domain.user.model.User
 import java.util.Date
+import java.util.Collections
+import kotlin.math.min
 
 @Service
 class PostService(
@@ -30,13 +32,32 @@ class PostService(
     private val postVoteRepository: PostVoteRepository,
     private val communityRepository: CommunityRepository,
     private val postImageRepository: PostImageRepository,
-
     private val amazonS3: AmazonS3,
 ) {
 
     fun getPosts(lasPostId: Long, size: Int): List<Post> {
         val pageRequest: PageRequest = PageRequest.of(0, size)
         return postRepository.findByIdLessThanAndDeletedIsFalseOrderByIdDesc(lasPostId, pageRequest).content
+    }
+
+    fun getPostsByPopularity(lastPostId: Long, size: Int): List<Post> {
+        // get all posts
+        val posts = postRepository.findAll()
+
+        // sort
+        val postComparator = PostComparator()
+        postComparator.order = "popular"
+        Collections.sort(posts, postComparator)
+        // posts.reverse()
+
+        // pagination
+        if (posts.isEmpty()) return posts
+        val lastPost: Post? = posts.find { it.id == lastPostId }
+        val lastPostIndex = posts.indexOf(lastPost) // if not found, -1 (lastPostId > maxId)
+        val firstIndex = if (lastPostIndex == -1) 0 else lastPostIndex
+        val lastIndex = min((firstIndex + (size - 1)), posts.lastIndex)
+        val postPage = posts.slice(IntRange(firstIndex, lastIndex))
+        return postPage
     }
 
     fun getPostById(postId: Long): Post {

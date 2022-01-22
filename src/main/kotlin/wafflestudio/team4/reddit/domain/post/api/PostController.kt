@@ -33,6 +33,15 @@ class PostController(
         return ListResponse(posts.map { PostDto.Response(it) })
     }
 
+    @GetMapping("/popular/")
+    fun getPostsByPopularity(
+        @RequestParam(name = "lastPostId", defaultValue = Long.MAX_VALUE.toString()) lastPostId: Long,
+        @RequestParam(name = "size", defaultValue = "10") size: Int
+    ): ListResponse<PostDto.Response> {
+        val posts = postService.getPostsByPopularity(lastPostId, size)
+        return ListResponse(posts.map { PostDto.Response(it) })
+    }
+
     @GetMapping("/{post_id}/")
     fun getPost(
         @PathVariable("post_id") id: Long,
