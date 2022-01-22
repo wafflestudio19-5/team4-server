@@ -7,6 +7,12 @@ import org.springframework.data.jpa.repository.JpaRepository
 
 interface CommunityRepository : JpaRepository<Community, Long?> {
     fun existsByName(name: String): Boolean
-    fun findByIdLessThanOrderByIdDesc(lastCommunityId: Long, pageRequest: Pageable): Page<Community>
+    fun getByName(name: String): Community
+    fun findByIdLessThanAndDeletedFalseOrderByIdDesc(lastCommunityId: Long, pageRequest: Pageable): Page<Community>
+    fun findByIdInAndIdLessThanAndDeletedFalseOrderByIdDesc(
+        communityIds: List<Long>,
+        lastCommunityId: Long,
+        pageRequest: Pageable
+    ): Page<Community>
     fun findByName(name: String): Community?
 }

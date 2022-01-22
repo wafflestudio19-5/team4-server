@@ -6,13 +6,6 @@ import wafflestudio.team4.reddit.global.common.exception.ErrorType
 import wafflestudio.team4.reddit.global.util.TestAnswer
 
 object CommunityTestAnswer : TestAnswer {
-    private val username1 = "username1"
-    private val username2 = "username2"
-    private val username3 = "username3"
-
-    private val communityName1 = "communityName1"
-    private val communityName2 = "communityName2"
-
     private val ans1 = arrayOf(
         // 1 1
         CommunityDto.Response(
@@ -29,8 +22,7 @@ object CommunityTestAnswer : TestAnswer {
             ErrorType.COMMUNITY_ALREADY_EXISTS.code,
             ErrorType.COMMUNITY_ALREADY_EXISTS.name,
             "Community Already Exists",
-        ),
-
+        )
     )
 
     private val ans2 = arrayOf(
@@ -38,27 +30,18 @@ object CommunityTestAnswer : TestAnswer {
         CommunityDto.Response(
             1,
             "communityName1",
-            0,
-            2,
+            1,
+            1,
             "description",
             false
         ),
         // 2 2
-        CommunityDto.Response(
-            1,
-            "communityName1",
-            1,
-            2,
-            "description",
-            false
-        ),
-        // 2 3
         ErrorResponse(
             ErrorType.COMMUNITY_NOT_FOUND.code,
             ErrorType.COMMUNITY_NOT_FOUND.name,
             "Community Not Found",
         ),
-        // 2 4
+        // 2 3
         ErrorResponse(
             ErrorType.INVALID_REQUEST.code,
             ErrorType.INVALID_REQUEST.name,
@@ -73,7 +56,7 @@ object CommunityTestAnswer : TestAnswer {
             "communityName1",
             1,
             1,
-            "description",
+            "changedDescription",
             false
         ),
         // 3 2
@@ -81,38 +64,44 @@ object CommunityTestAnswer : TestAnswer {
             1,
             "communityName1",
             0,
-            1,
-            "description",
+            3,
+            "changedDescription",
             false
         ),
         // 3 3
-        ErrorResponse(
-            ErrorType.COMMUNITY_NOT_FOUND.code,
-            ErrorType.COMMUNITY_NOT_FOUND.name,
-            "Community Not Found",
+        CommunityDto.Response(
+            1,
+            "communityName1",
+            0,
+            2,
+            "changedDescription",
+            false
         ),
         // 3 4
-        ErrorResponse(
-            ErrorType.INVALID_REQUEST.code,
-            ErrorType.INVALID_REQUEST.name,
-            "Not Currently Joined"
+        CommunityDto.Response(
+            1,
+            "communityName1",
+            0,
+            2,
+            "changedDescription",
+            false
         ),
-        // 3 5
+
+        // dummy
         ErrorResponse(
             ErrorType.INVALID_REQUEST.code,
             ErrorType.INVALID_REQUEST.name,
-            "Not Currently Joined"
+            "Invalid Request"
         )
-
     )
 
     private val ans4 = arrayOf(
         // 4 1
         CommunityDto.Response(
             1,
-            "changedName1",
+            "communityName1",
             0,
-            1,
+            2,
             "changedDescription",
             false
         ),
@@ -124,15 +113,15 @@ object CommunityTestAnswer : TestAnswer {
         ),
         // 4 3
         ErrorResponse(
-            ErrorType.UNAUTHORIZED.code,
-            ErrorType.UNAUTHORIZED.name,
-            "Not Community Manager"
+            ErrorType.INVALID_REQUEST.code,
+            ErrorType.INVALID_REQUEST.name,
+            "Not Currently Joined"
         ),
         // 4 4
         ErrorResponse(
-            ErrorType.NOT_FOUND.code,
-            ErrorType.NOT_FOUND.name,
-            "Topic Not Found"
+            ErrorType.INVALID_REQUEST.code,
+            ErrorType.INVALID_REQUEST.name,
+            "Not Currently Joined"
         )
     )
 
@@ -140,9 +129,9 @@ object CommunityTestAnswer : TestAnswer {
         // 5 1
         CommunityDto.Response(
             1,
-            "changedName1",
-            1,
-            1,
+            "communityName1",
+            0,
+            2,
             "changedDescription",
             true
         ),
@@ -157,7 +146,7 @@ object CommunityTestAnswer : TestAnswer {
             ErrorType.UNAUTHORIZED.code,
             ErrorType.UNAUTHORIZED.name,
             "Not Community Manager"
-        ),
+        )
     )
 
     override val ans = arrayOf(ans1, ans2, ans3, ans4, ans5)

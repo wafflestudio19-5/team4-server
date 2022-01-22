@@ -13,5 +13,8 @@ class Topic(
     // name String NOT NULL
     @Column(unique = true)
     @field:NotNull
-    val name: String
+    var name: String,
+
+    @field:NotNull
+    var deleted: Boolean = false
 ) : BaseTimeEntity()
