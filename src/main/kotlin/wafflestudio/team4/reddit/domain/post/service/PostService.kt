@@ -54,7 +54,7 @@ class PostService(
         if (posts.isEmpty()) return posts
         val lastPost: Post? = posts.find { it.id == lastPostId }
         val lastPostIndex = posts.indexOf(lastPost) // if not found, -1 (lastPostId > maxId)
-        val firstIndex = if (lastPostIndex == -1) 0 else lastPostIndex
+        val firstIndex = lastPostIndex + 1
         val lastIndex = min((firstIndex + (size - 1)), posts.lastIndex)
         val postPage = posts.slice(IntRange(firstIndex, lastIndex))
         return postPage
