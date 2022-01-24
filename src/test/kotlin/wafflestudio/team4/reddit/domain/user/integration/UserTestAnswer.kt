@@ -17,6 +17,15 @@ object UserTestAnswer : TestAnswer {
             3,
             username3,
             "$username3@snu.ac.kr",
+            UserDto.ProfileResponse(
+                3,
+                3,
+                username3,
+                "",
+                "",
+                0,
+                0
+            ),
             null,
         ),
 
@@ -37,6 +46,15 @@ object UserTestAnswer : TestAnswer {
             1,
             username1,
             "$username1@snu.ac.kr",
+            UserDto.ProfileResponse(
+                1,
+                1,
+                username1,
+                "",
+                "",
+                0,
+                0
+            ),
             null,
         ),
 
@@ -45,6 +63,15 @@ object UserTestAnswer : TestAnswer {
             2,
             username2,
             "$username2@snu.ac.kr",
+            UserDto.ProfileResponse(
+                2,
+                2,
+                username2,
+                "",
+                "",
+                0,
+                0
+            ),
             null,
         ),
 
@@ -62,6 +89,15 @@ object UserTestAnswer : TestAnswer {
             2,
             updateUsername,
             "$updateUsername@snu.ac.kr",
+            UserDto.ProfileResponse(
+                2,
+                2,
+                username2,
+                "",
+                "",
+                0,
+                0
+            ),
             null,
         ),
 
@@ -70,6 +106,15 @@ object UserTestAnswer : TestAnswer {
             2,
             updateUsername,
             "$username2@snu.ac.kr",
+            UserDto.ProfileResponse(
+                2,
+                2,
+                username2,
+                "",
+                "",
+                0,
+                0
+            ),
             null,
         ),
 
@@ -78,6 +123,15 @@ object UserTestAnswer : TestAnswer {
             2,
             username2,
             "$updateUsername@snu.ac.kr",
+            UserDto.ProfileResponse(
+                2,
+                2,
+                username2,
+                "",
+                "",
+                0,
+                0
+            ),
             null,
         ),
 
@@ -86,6 +140,15 @@ object UserTestAnswer : TestAnswer {
             2,
             updateUsername,
             "$updateUsername@snu.ac.kr",
+            UserDto.ProfileResponse(
+                2,
+                2,
+                username2,
+                "",
+                "",
+                0,
+                0
+            ),
             null,
         ),
 

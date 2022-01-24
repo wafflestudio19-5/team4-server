@@ -77,6 +77,7 @@ class UserService(
     }
 
     fun updateUser(user: User, updateRequest: UserDto.UpdateRequest): User {
+        // TODO description, nickname update
         val newEncodedPassword =
             if (updateRequest.password != null) passwordEncoder.encode(updateRequest.password) else null
         val updatedUser = user.updatedBy(updateRequest, newEncodedPassword)

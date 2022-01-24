@@ -114,7 +114,7 @@ class TestHelper(
         return objectMapper.writeValueAsString(dtoObject)
     }
 
-    fun jsonString2Map(jsonString: String): Map<String, String> {
+    fun jsonString2Map(jsonString: String): Map<String, Any> {
         return objectMapper.readValue(jsonString)
     }
 
@@ -122,7 +122,7 @@ class TestHelper(
         return compare(jsonString2Map(testResult), jsonString2Map(rightResult))
     }
 
-    fun compare(testResult: Map<String, String>, rightResult: Map<String, String>): Boolean {
+    fun compare(testResult: Map<String, Any>, rightResult: Map<String, Any>): Boolean {
         val testResultWithoutLocalDateTime = HashMap(testResult)
         val rightResultWithoutLocalDateTime = HashMap(rightResult)
         testResultWithoutLocalDateTime.keys.removeIf { key ->
