@@ -61,7 +61,29 @@ class CommunityService(
             lastCommunityId,
             pageRequest
         )
-        // TODO maybe change return type to list
+    }
+
+    // lastCommunityIds for each of community page links
+    fun getCommunityLinkIds(lastCommunityId: Long, size: Int, topicId: Long): List<Long> {
+        // first, last, next, prev
+        val communityTopics = communityTopicRepository.findByTopicIdEqualsAndDeletedFalse(topicId)
+        val communityIds = mutableListOf<Long>()
+        for (communityTopic in communityTopics) {
+            communityIds.add(communityTopic.community.id)
+        }
+        communityIds.sortDescending()
+        val first = communityIds[0] + 1
+        val last = if (communityIds.size - size >= 0) communityIds[communityIds.size - size] + 1
+        else communityIds[0] + 1
+        val indexOflastCommunity = if (lastCommunityId == Long.MAX_VALUE) 0
+        else communityIds.indexOf(lastCommunityId - 1)
+        val next = communityIds[
+            if (indexOflastCommunity + size < communityIds.size)
+                indexOflastCommunity + size - 1 else communityIds.size - 1
+        ]
+        val prev = communityIds[if (indexOflastCommunity - size >= 0) indexOflastCommunity - size else 0] + 1
+
+        return listOf(first, last, next, prev)
     }
 
     fun getCommunityById(communityId: Long): Community {

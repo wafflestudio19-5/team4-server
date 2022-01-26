@@ -20,6 +20,7 @@ import wafflestudio.team4.reddit.domain.user.dto.UserDto
 import wafflestudio.team4.reddit.domain.user.model.User
 import wafflestudio.team4.reddit.global.common.dto.ListResponse
 import wafflestudio.team4.reddit.global.auth.annotation.CurrentUser
+import wafflestudio.team4.reddit.global.common.dto.PageLinkDto
 // import wafflestudio.team4.reddit.global.common.dto.PageLinkDto
 import wafflestudio.team4.reddit.global.common.dto.PageResponse
 
@@ -36,22 +37,26 @@ class CommunityController(
         @RequestParam(required = false, defaultValue = "-1") topicId: Long
     ): PageResponse<CommunityDto.Response> {
         val communitiesPage = communityService.getCommunitiesPage(lastCommunityId, size, topicId)
-        // val communityLinks = buildPageLink(lastCommunityId, size)
-        return PageResponse(communitiesPage.map { CommunityDto.Response(it) }) // , communityLinks)
+        val communityLinks = buildPageLink(lastCommunityId, size, topicId)
+        return PageResponse(communitiesPage.map { CommunityDto.Response(it) }, communityLinks)
     }
 
-    /*private fun buildPageLink(lastCommunityId: Long, size: Int): PageLinkDto {
-        val first = "size=$size"
-        val self = "lastCommunityId=$lastCommunityId&size=$size"
-        val last = "lastCommunityId=${size + 1}&size=$size"
+    private fun buildPageLink(lastCommunityId: Long, size: Int, topicId: Long): PageLinkDto {
+        val linkIds = if (topicId != -1L) communityService.getCommunityLinkIds(lastCommunityId, size, topicId) else null
+        val firstId = if (linkIds != null) linkIds[0] else Long.MAX_VALUE.toString()
+        val lastId = if (linkIds != null) linkIds[1] else size + 1
+        val nextId = if (linkIds != null) linkIds[2] else java.lang.Long.max(0, lastCommunityId - size)
+        val prevId = if (linkIds != null) linkIds[3] else
+            (if ((lastCommunityId - Long.MAX_VALUE) + size > 0) Long.MAX_VALUE else lastCommunityId + size)
 
-        val next = "lastCommunityId=${java.lang.Long.max(0, lastCommunityId - size)}&size=$size"
-        val prev = "lastCommunityId=" +
-            "${if ((lastCommunityId - Long.MAX_VALUE) + size > 0)
-                Long.MAX_VALUE else lastCommunityId + size}&size=$size"
+        val first = "lastCommunityId=$firstId&size=$size&topicId=$topicId"
+        val self = "lastCommunityId=$lastCommunityId&size=$size&topicId=$topicId"
+        val last = "lastCommunityId=$lastId&size=$size&topicId=$topicId"
+        val next = "lastCommunityId=$nextId&size=$size&topicId=$topicId"
+        val prev = "lastCommunityId=$prevId&size=$size&topicId=$topicId"
 
         return PageLinkDto(first, prev, self, next, last)
-    }*/
+    }
 
     // get community by id
     @GetMapping("/{community_id}/")
