@@ -9,7 +9,6 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import wafflestudio.team4.reddit.domain.follow.repository.FollowRepository
 import wafflestudio.team4.reddit.domain.user.dto.UserDto
 import wafflestudio.team4.reddit.domain.user.exception.UserProfileNotFoundException
 import wafflestudio.team4.reddit.domain.user.exception.UnauthorizedSigninException
@@ -29,7 +28,6 @@ class UserService(
     private val userRepository: UserRepository,
     private val userProfileRepository: UserProfileRepository,
     private val userImageRepository: UserImageRepository,
-    private val followRepository: FollowRepository,
     private val amazonS3: AmazonS3,
     private val passwordEncoder: PasswordEncoder,
 ) {
@@ -79,6 +77,7 @@ class UserService(
     }
 
     fun updateUser(user: User, updateRequest: UserDto.UpdateRequest): User {
+        // TODO description, nickname update
         val newEncodedPassword =
             if (updateRequest.password != null) passwordEncoder.encode(updateRequest.password) else null
         val updatedUser = user.updatedBy(updateRequest, newEncodedPassword)
@@ -93,17 +92,17 @@ class UserService(
     // profile services
     fun getProfileById(id: Long): UserProfile {
         val user = userRepository.findByIdOrNull(id) ?: throw UserNotFoundException()
-        if (user.userProfile == null) createNewProfileForOldUser(user) // TODO user DB 초기화
+        if (user.userProfile == null) createNewProfileForOldUser(user)
         return userProfileRepository.findByIdOrNull(user.userProfile!!.id) ?: throw UserProfileNotFoundException()
     }
 
-    fun getFollowNumById(id: Long): Int {
-        val user = userRepository.findByIdOrNull(id) ?: throw UserNotFoundException()
-        return followRepository.findByToUser(user).count()
-    }
+//    fun getFollowNumById(id: Long): Int {
+//        val user = userRepository.findByIdOrNull(id) ?: throw UserNotFoundException()
+//        return followRepository.findByToUser(user).count()
+//    }
 
     fun getPresignedUrlAndSaveImage(user: User, fileName: String): String {
-        val expiration: Date = Date()
+        val expiration = Date()
         var expTimeMillis = expiration.time
         expTimeMillis += (1000 * 60 * 60).toLong() // 1시간
         expiration.time = expTimeMillis
@@ -123,14 +122,14 @@ class UserService(
     }
 
     fun updateProfile(user: User, updateRequest: UserDto.UpdateProfileRequest): UserProfile {
-        if (user.userProfile == null) {
+        return if (user.userProfile == null) {
             // old user
-            return createNewProfileForOldUser(user).userProfile!!
+            createNewProfileForOldUser(user).userProfile!!
         } else {
-            var profile = user.userProfile!!
+            val profile = user.userProfile!!
             profile.name = updateRequest.name
             profile.description = updateRequest.description
-            return userProfileRepository.save(profile)
+            userProfileRepository.save(profile)
         }
     }
 
