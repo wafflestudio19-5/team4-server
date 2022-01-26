@@ -22,4 +22,8 @@ open class BaseTimeEntity(
 
     @LastModifiedDate
     open var updatedAt: LocalDateTime? = LocalDateTime.now()
-)
+) : Comparable<Any> {
+    override fun compareTo(other: Any): Int {
+        return 0
+    }
+}
