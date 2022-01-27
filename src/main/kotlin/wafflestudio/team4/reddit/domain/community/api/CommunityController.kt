@@ -34,26 +34,26 @@ class CommunityController(
     fun getCommunitiesPage(
         @RequestParam(required = false, defaultValue = Long.MAX_VALUE.toString()) lastCommunityId: Long,
         @RequestParam(required = false, defaultValue = "10") size: Int,
-        @RequestParam(required = false, defaultValue = "-1") topicId: Long
+        @RequestParam(required = false, defaultValue = "-1") topicId: Long,
+        @RequestParam(required = false) keyword: String?
     ): PageResponse<CommunityDto.Response> {
-        val communitiesPage = communityService.getCommunitiesPage(lastCommunityId, size, topicId)
-        val communityLinks = buildPageLink(lastCommunityId, size, topicId)
+        val communitiesPage = communityService.getCommunitiesPage(lastCommunityId, size, topicId, keyword)
+        val communityLinks = buildPageLink(lastCommunityId, size, topicId, keyword)
         return PageResponse(communitiesPage.map { CommunityDto.Response(it) }, communityLinks)
     }
 
-    private fun buildPageLink(lastCommunityId: Long, size: Int, topicId: Long): PageLinkDto {
-        val linkIds = if (topicId != -1L) communityService.getCommunityLinkIds(lastCommunityId, size, topicId) else null
-        val firstId = if (linkIds != null) linkIds[0] else Long.MAX_VALUE.toString()
-        val lastId = if (linkIds != null) linkIds[1] else size + 1
-        val nextId = if (linkIds != null) linkIds[2] else java.lang.Long.max(0, lastCommunityId - size)
-        val prevId = if (linkIds != null) linkIds[3] else
-            (if ((lastCommunityId - Long.MAX_VALUE) + size > 0) Long.MAX_VALUE else lastCommunityId + size)
+    private fun buildPageLink(lastCommunityId: Long, size: Int, topicId: Long, keyword: String?): PageLinkDto {
+        val linkIds = communityService.getCommunityLinkIds(lastCommunityId, size, topicId, keyword)
+        val firstId = linkIds[0]
+        val lastId = linkIds[1]
+        val nextId = linkIds[2]
+        val prevId = linkIds[3]
 
-        val first = "lastCommunityId=$firstId&size=$size&topicId=$topicId"
-        val self = "lastCommunityId=$lastCommunityId&size=$size&topicId=$topicId"
-        val last = "lastCommunityId=$lastId&size=$size&topicId=$topicId"
-        val next = "lastCommunityId=$nextId&size=$size&topicId=$topicId"
-        val prev = "lastCommunityId=$prevId&size=$size&topicId=$topicId"
+        val first = "lastCommunityId=$firstId&size=$size&topicId=$topicId&keyword=$keyword"
+        val self = "lastCommunityId=$lastCommunityId&size=$size&topicId=$topicId&keyword=$keyword"
+        val last = "lastCommunityId=$lastId&size=$size&topicId=$topicId&keyword=$keyword"
+        val next = "lastCommunityId=$nextId&size=$size&topicId=$topicId&keyword=$keyword"
+        val prev = "lastCommunityId=$prevId&size=$size&topicId=$topicId&keyword=$keyword"
 
         return PageLinkDto(first, prev, self, next, last)
     }
