@@ -43,6 +43,17 @@ class CommentController(
         return ResponseEntity.status(201).body(CommentDto.Response(newComment))
     }
 
+    @PostMapping("/{post_id}/{comment_id}/reply/")
+    fun replyComment(
+        @CurrentUser user: User,
+        @PathVariable("post_id") postId: Long,
+        @PathVariable("comment_id") commentId: Long,
+        @Valid @RequestBody replyRequest: CommentDto.ReplyRequest,
+    ): ResponseEntity<CommentDto.Response> {
+        val newReplyComment = commentService.replyComment(user, postId, commentId, replyRequest)
+        return ResponseEntity.status(201).body(CommentDto.Response(newReplyComment))
+    }
+
     @DeleteMapping("/{comment_id}/")
     fun deleteComment(
         @CurrentUser user: User,

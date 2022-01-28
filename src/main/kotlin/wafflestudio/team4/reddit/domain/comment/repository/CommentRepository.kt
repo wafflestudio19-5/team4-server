@@ -14,13 +14,6 @@ interface CommentRepository : JpaRepository<Comment, Long?> {
         depth: Int = 0,
         pageable: Pageable
     ): Page<Comment>
-    fun findByIdIsAndDeletedIs(id: Long, deleteStatusFilter: Int = 0): Comment?
-    // child 여부 찾기
-    fun findByParentIsAndDeletedIsNot(comment: Comment, deleteStatusFilter: Int = 2): List<Comment>
-    fun existsByParentIsAndDeletedIsNot(comment: Comment, deleteStatusFilter: Int = 2): Boolean
-    fun findByPostIsAndGroupIsAndDeletedIsNotOrderByDepthAsc(
-        post: Post,
-        group: Comment,
-        deleteStatusFilter: Int = 2
-    ): MutableList<Comment>
+    fun findByParentCommentIsAndDeletedIsNot(comment: Comment, deleteStatusFilter: Int = 2): List<Comment>
+    fun existsByParentCommentIsAndDeletedIsNot(comment: Comment, deleteStatusFilter: Int = 2): Boolean
 }
