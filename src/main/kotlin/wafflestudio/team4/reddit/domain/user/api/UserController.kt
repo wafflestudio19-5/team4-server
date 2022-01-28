@@ -3,6 +3,7 @@ package wafflestudio.team4.reddit.domain.user.api
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -78,7 +79,7 @@ class UserController(
     @GetMapping("/me/")
 //    @Transactional
     fun getCurrentUser(@CurrentUser user: User): UserDto.Response {
-        val mergedUser = userService.getUserById(user.id) // Response로 넘어갈 때 persistence context에 있어야함
+        val mergedUser = userService.mergeUser(user) // Response로 넘어갈 때 persistence context에 있어야함
         return UserDto.Response(mergedUser)
     }
 
@@ -89,6 +90,7 @@ class UserController(
     }
 
     @PostMapping("/")
+    @Transactional
     fun signup(@Valid @RequestBody signupRequest: UserDto.SignupRequest): ResponseEntity<UserDto.Response> {
         val user = userService.signup(signupRequest)
         val headers = HttpHeaders()
@@ -106,6 +108,7 @@ class UserController(
     }
 
     @PutMapping("/me/")
+    @Transactional
     fun updateUser(
         @Valid @RequestBody updateRequest: UserDto.UpdateRequest,
         @CurrentUser user: User,
@@ -115,6 +118,7 @@ class UserController(
     }
 
     @DeleteMapping("/me/")
+    @Transactional
     fun deleteUser(@CurrentUser user: User): ResponseEntity<String> {
         userService.deleteUser(user)
         return ResponseEntity.noContent().build()
@@ -148,6 +152,7 @@ class UserController(
     }
 
     @PutMapping("/profile/me/")
+    @Transactional
     fun updateProfile(
         @CurrentUser user: User,
         @Valid @RequestBody updateProfileRequest: UserDto.UpdateProfileRequest

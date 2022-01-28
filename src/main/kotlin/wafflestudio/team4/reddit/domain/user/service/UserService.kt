@@ -69,10 +69,12 @@ class UserService(
         // TODO sort
         val pageRequest = PageRequest.of(0, size)
         return if (keyword == null) {
-            userRepository.findByIdLessThanOrderByIdDesc(lastUserId, pageRequest)
+            userRepository.findByIdLessThanAndDeletedIsFalseOrderByIdDesc(lastUserId, pageRequest)
         } else {
             val keywordPattern = SearchHelper.makeAbbreviationPattern(keyword)
-            userRepository.findByIdLessThanAndUsernameLikeOrderByIdDesc(lastUserId, keywordPattern, pageRequest)
+            userRepository.findByIdLessThanAndDeletedIsFalseAndUsernameLikeOrderByIdDesc(
+                lastUserId, keywordPattern, pageRequest
+            )
         }
     }
 
@@ -131,6 +133,10 @@ class UserService(
             profile.description = updateRequest.description
             userProfileRepository.save(profile)
         }
+    }
+
+    fun mergeUser(user: User): User {
+        return userRepository.findByIdOrNull(user.id) ?: throw UserNotFoundException()
     }
 
     private fun createNewProfileForOldUser(user: User): User {

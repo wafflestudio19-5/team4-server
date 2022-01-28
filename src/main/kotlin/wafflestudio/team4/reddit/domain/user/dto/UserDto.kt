@@ -78,7 +78,9 @@ class UserDto {
     )
 
     data class UploadImageResponse(
+        @JsonProperty("presigned_url")
         val preSignedUrl: String,
+        @JsonProperty("image_url")
         val imageUrl: String,
     )
 

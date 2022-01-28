@@ -12,4 +12,9 @@ interface PostRepository : JpaRepository<Post, Long?> {
         lastPostId: Long,
         pageRequest: Pageable
     ): Page<Post>
+    fun findByIdLessThanAndDeletedIsFalseAndTitleLikeOrderByIdDesc(
+        lastPostId: Long,
+        pattern: String,
+        pageable: Pageable
+    ): Page<Post>
 }
