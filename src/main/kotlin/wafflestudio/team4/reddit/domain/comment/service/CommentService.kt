@@ -12,14 +12,22 @@ import wafflestudio.team4.reddit.domain.comment.repository.CommentRepository
 import wafflestudio.team4.reddit.domain.comment.repository.CommentVoteRepository
 import wafflestudio.team4.reddit.domain.post.exception.PostNotFoundException
 import wafflestudio.team4.reddit.domain.post.repository.PostRepository
+import wafflestudio.team4.reddit.domain.user.exception.UserNotFoundException
 import wafflestudio.team4.reddit.domain.user.model.User
+import wafflestudio.team4.reddit.domain.user.repository.UserRepository
 
 @Service
 class CommentService(
     private val commentRepository: CommentRepository,
     private val commentVoteRepository: CommentVoteRepository,
     private val postRepository: PostRepository,
+    private val userRepository: UserRepository,
 ) {
+
+    fun mergeUser(user: User): User {
+        return userRepository.findByIdOrNull(user.id) ?: throw UserNotFoundException()
+    }
+
     fun getComments(lastCommentId: Long, size: Int, postId: Long): List<Comment> {
         val post = postRepository.findByIdOrNull(postId) ?: throw PostNotFoundException()
         val pageRequest: PageRequest = PageRequest.of(0, size)
