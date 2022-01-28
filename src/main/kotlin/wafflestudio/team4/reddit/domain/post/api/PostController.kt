@@ -1,6 +1,7 @@
 package wafflestudio.team4.reddit.domain.post.api
 
 import org.springframework.http.ResponseEntity
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.PutMapping
 import wafflestudio.team4.reddit.domain.post.dto.PostDto
 import wafflestudio.team4.reddit.domain.post.service.PostService
 import wafflestudio.team4.reddit.domain.user.model.User
+import wafflestudio.team4.reddit.domain.user.service.UserService
 import wafflestudio.team4.reddit.global.auth.annotation.CurrentUser
 import wafflestudio.team4.reddit.global.common.dto.ListResponse
 import wafflestudio.team4.reddit.global.common.dto.PageLinkDto
@@ -24,6 +26,7 @@ import javax.validation.Valid
 @RequestMapping("/api/v1/posts")
 class PostController(
     private val postService: PostService,
+    private val userService: UserService,
 ) {
     @GetMapping("/")
     fun getPostsPage(
@@ -91,27 +94,32 @@ class PostController(
         @CurrentUser user: User,
         @Valid @RequestBody uploadImageRequest: PostDto.UploadImageRequest // TODO 이것도 param
     ): PostDto.UploadImageResponse {
-        val preSignedUrl = postService.getPresignedUrl(user, uploadImageRequest.filename)
+        val mergedUser = userService.mergeUser(user)
+        val preSignedUrl = postService.getPresignedUrl(mergedUser, uploadImageRequest.filename)
         val imageUrl = "https://waffle-team-4-server-s3.s3.ap-northeast-2.amazonaws.com/posts/" +
-            "${user.id}/${uploadImageRequest.filename}"
+            "${mergedUser.id}/${uploadImageRequest.filename}"
         return PostDto.UploadImageResponse(preSignedUrl, imageUrl)
     }
 
     @PostMapping("/")
+    @Transactional
     fun createPost(
         @CurrentUser user: User,
         @Valid @RequestBody createRequest: PostDto.CreateRequest
     ): ResponseEntity<PostDto.Response> {
-        val newPost = postService.createPost(user, createRequest)
+        val mergedUser = userService.mergeUser(user)
+        val newPost = postService.createPost(mergedUser, createRequest)
         return ResponseEntity.status(201).body(PostDto.Response(newPost))
     }
 
     @DeleteMapping("/{post_id}/")
+    @Transactional
     fun deletePost(
         @CurrentUser user: User,
         @PathVariable("post_id") id: Long
     ): ResponseEntity<String> {
-        postService.deletePost(user, id)
+        val mergedUser = userService.mergeUser(user)
+        postService.deletePost(mergedUser, id)
         return ResponseEntity.noContent().build()
     }
 
@@ -126,11 +134,13 @@ class PostController(
 //    }
 
     @PutMapping("/{post_id}/vote/")
+    @Transactional
     fun votePost(
         @CurrentUser user: User,
         @PathVariable("post_id") id: Long,
         @RequestParam(name = "isUp", required = true) isUp: Int,
     ): PostDto.Response {
-        return PostDto.Response(postService.vote(user, id, isUp))
+        val mergedUser = userService.mergeUser(user)
+        return PostDto.Response(postService.vote(mergedUser, id, isUp))
     }
 }

@@ -4,6 +4,8 @@ import wafflestudio.team4.reddit.domain.model.BaseTimeEntity
 import javax.persistence.Entity
 import javax.persistence.Table
 import javax.persistence.Column
+import javax.persistence.OneToMany
+import javax.persistence.CascadeType
 import javax.validation.constraints.NotBlank
 import javax.validation.constraints.NotNull
 
@@ -14,17 +16,20 @@ class Community(
     @field:NotBlank
     var name: String,
 
-    /*@OneToMany(cascade = [CascadeType.MERGE], mappedBy = "moderating", fetch = FetchType.LAZY) // why merge?
-    var managers: MutableSet<User> = mutableSetOf(),*/
-
     @field:NotNull
     var num_members: Int = 0,
 
     @field:NotNull
     var num_managers: Int = 0,
 
+    @OneToMany(mappedBy = "community", cascade = [CascadeType.ALL]) // why merge?
+    var users: MutableSet<UserCommunity> = mutableSetOf(),
+
     // @field:NotBlank
     var description: String = "",
+
+    @OneToMany(mappedBy = "community", cascade = [CascadeType.ALL]) // why merge?
+    var topics: MutableSet<CommunityTopic> = mutableSetOf(),
 
     @field:NotNull
     var deleted: Boolean = false

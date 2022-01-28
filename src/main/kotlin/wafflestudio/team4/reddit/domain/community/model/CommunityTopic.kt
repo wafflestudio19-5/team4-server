@@ -6,7 +6,6 @@ import javax.persistence.Entity
 import javax.persistence.Table
 import javax.persistence.ManyToOne
 import javax.persistence.FetchType
-import javax.persistence.CascadeType
 import javax.persistence.JoinColumn
 import javax.validation.constraints.NotNull
 
@@ -14,12 +13,12 @@ import javax.validation.constraints.NotNull
 @Table(name = "reddit_community_topic")
 class CommunityTopic(
     @field:NotNull
-    @ManyToOne(fetch = FetchType.EAGER, cascade = [CascadeType.ALL])
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "community_id")
     val community: Community,
 
     @field:NotNull
-    @ManyToOne(fetch = FetchType.EAGER, cascade = [CascadeType.ALL])
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "topic_id")
     val topic: Topic,
 
