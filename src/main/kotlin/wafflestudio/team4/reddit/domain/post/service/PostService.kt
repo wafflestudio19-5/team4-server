@@ -3,6 +3,7 @@ package wafflestudio.team4.reddit.domain.post.service
 import com.amazonaws.HttpMethod
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest
+import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -21,6 +22,7 @@ import wafflestudio.team4.reddit.domain.post.repository.PostImageRepository
 import wafflestudio.team4.reddit.domain.post.repository.PostRepository
 import wafflestudio.team4.reddit.domain.post.repository.PostVoteRepository
 import wafflestudio.team4.reddit.domain.user.model.User
+import wafflestudio.team4.reddit.global.util.search.SearchHelper
 import java.util.Date
 import java.util.Collections
 import kotlin.math.min
@@ -38,6 +40,18 @@ class PostService(
     fun getPosts(lasPostId: Long, size: Int): List<Post> {
         val pageRequest: PageRequest = PageRequest.of(0, size)
         return postRepository.findByIdLessThanAndDeletedIsFalseOrderByIdDesc(lasPostId, pageRequest).content
+    }
+
+    fun getPostsPage(lastPostId: Long, size: Int, keyword: String?): Page<Post> {
+        val pageRequest = PageRequest.of(0, size)
+        return if (keyword == null) {
+            postRepository.findByIdLessThanAndDeletedIsFalseOrderByIdDesc(lastPostId, pageRequest)
+        } else {
+            val keywordPattern = SearchHelper.makeAbbreviationPattern(keyword)
+            postRepository.findByIdLessThanAndDeletedIsFalseAndTitleLikeOrderByIdDesc(
+                lastPostId, keywordPattern, pageRequest
+            )
+        }
     }
 
     fun getPostsByPopularity(lastPostId: Long, size: Int): List<Post> {
