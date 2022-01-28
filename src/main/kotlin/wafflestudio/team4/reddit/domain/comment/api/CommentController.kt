@@ -33,6 +33,14 @@ class CommentController(
         return ListResponse(comments.map { CommentDto.Response(it) })
     }
 
+    @GetMapping("/comment/{comment_id}/")
+    fun getCommentById(
+        @PathVariable("comment_id") commentId: Long
+    ): CommentDto.Response {
+        val comment = commentService.getCommentById(commentId)
+        return CommentDto.Response(comment)
+    }
+
     @PostMapping("/{post_id}/")
     fun createComment(
         @CurrentUser user: User,

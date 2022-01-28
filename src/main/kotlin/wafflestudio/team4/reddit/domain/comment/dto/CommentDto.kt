@@ -5,7 +5,6 @@ import wafflestudio.team4.reddit.domain.comment.model.Comment
 import wafflestudio.team4.reddit.domain.user.dto.UserDto
 import java.time.LocalDateTime
 import javax.validation.constraints.NotBlank
-import javax.validation.constraints.NotNull
 
 class CommentDto {
     data class Response(
@@ -17,8 +16,8 @@ class CommentDto {
         val rootCommentId: Long,
         @JsonProperty("parent_comment_id")
         val parentCommentId: Long?,
-        @JsonProperty("children_comment_id_list")
-        val childrenCommentIdList: List<Long>,
+        @JsonProperty("children_comment_list")
+        val childrenCommentList: List<Response>,
         @JsonProperty("num_up_votes")
         val numUpVotes: Int,
         @JsonProperty("num_down_votes")
@@ -34,7 +33,7 @@ class CommentDto {
             depth = comment.depth,
             rootCommentId = comment.rootComment!!.id,
             parentCommentId = comment.parentComment?.id,
-            childrenCommentIdList = comment.childrenComments.map { it.id },
+            childrenCommentList = comment.childrenComments.map { Response(it) },
             numUpVotes = comment.votes.count { it.isUp == 2 },
             numDownVotes = comment.votes.count { it.isUp == 0 },
             deleted = comment.deleted == 1 || comment.deleted == 2,
@@ -50,9 +49,6 @@ class CommentDto {
     data class ReplyRequest(
         @field:NotBlank
         val text: String,
-
-        @field:NotNull
-        val parentId: Long,
     )
 
     data class ModifyRequest(
