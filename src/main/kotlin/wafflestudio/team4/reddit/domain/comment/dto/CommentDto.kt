@@ -1,6 +1,9 @@
 package wafflestudio.team4.reddit.domain.comment.dto
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import wafflestudio.team4.reddit.domain.comment.model.Comment
+import wafflestudio.team4.reddit.domain.user.dto.UserDto
+import wafflestudio.team4.reddit.domain.user.model.UserProfile
 import java.time.LocalDateTime
 import javax.validation.constraints.NotBlank
 import javax.validation.constraints.NotNull
@@ -8,10 +11,15 @@ import javax.validation.constraints.NotNull
 class CommentDto {
     data class Response(
         val id: Long,
+        @JsonProperty("user_id")
         val userId: Long,
-        val userName: String,
-        val userImageUrl: String?,
+        @JsonProperty("username")
+        val username: String,
+        @JsonProperty("user_profile")
+        val userProfile: UserDto.ProfileResponse?,
         val text: String,
+
+        // Parent and child comments
         val depth: Int,
         val parentId: Long?,
         val groupId: Long?,
@@ -23,8 +31,8 @@ class CommentDto {
         constructor(comment: Comment) : this(
             id = comment.id,
             userId = comment.user.id,
-            userName = comment.user.username,
-            userImageUrl = comment.user.userProfile?.userImage?.url,
+            username = comment.user.username,
+            userImageUrl = if (comment.user.userProfile != null) UserDto.ProfileResponse(comment.user.userProfile!!) else null,
             text = comment.text,
             depth = comment.depth,
             parentId = comment.parent?.id,
