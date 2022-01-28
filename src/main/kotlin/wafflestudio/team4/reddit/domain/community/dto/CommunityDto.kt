@@ -1,6 +1,8 @@
 package wafflestudio.team4.reddit.domain.community.dto
 
 import wafflestudio.team4.reddit.domain.community.model.Community
+import wafflestudio.team4.reddit.domain.topic.dto.TopicDto
+import wafflestudio.team4.reddit.domain.user.dto.UserDto
 import javax.validation.constraints.NotBlank
 import javax.validation.constraints.NotNull
 
@@ -13,8 +15,12 @@ class CommunityDto {
         val num_members: Int,
         @field:NotNull
         val num_managers: Int,
+        @field:NotNull
+        val managers: List<UserDto.UsernameResponse>,
         // @field:NotBlank
         val description: String,
+        @field:NotNull
+        val topics: List<TopicDto.Response>,
         @field:NotNull
         val deleted: Boolean
     ) {
@@ -23,7 +29,9 @@ class CommunityDto {
             name = community.name,
             num_members = community.num_members,
             num_managers = community.num_managers,
+            managers = community.users.filter { it.isManager }.map { UserDto.UsernameResponse(it.user) },
             description = community.description,
+            topics = community.topics.filter { !it.deleted }.map { TopicDto.Response(it.topic) },
             deleted = community.deleted
         )
     }
