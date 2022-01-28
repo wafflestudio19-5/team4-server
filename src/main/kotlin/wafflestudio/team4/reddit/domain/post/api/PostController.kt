@@ -37,6 +37,18 @@ class PostController(
         return PageResponse(postsPage.map { PostDto.Response(it) }, postLinks)
     }
 
+    @GetMapping("/title/")
+    fun getPostNamesPage(
+//      @RequestParam(defaultValue = "new", name = "order") order: String,
+        @RequestParam(name = "lastPostId", defaultValue = Long.MAX_VALUE.toString()) lastPostId: Long, // 현재 페이지
+        @RequestParam(name = "size", defaultValue = "10") size: Int, // 각 페이지 당 게시글 수
+        @RequestParam(required = false) keyword: String?,
+    ): PageResponse<PostDto.PostNameResponse> {
+        val postsPage = postService.getPostsPage(lastPostId, size, keyword)
+        val postLinks = buildPageLink(lastPostId, size, keyword)
+        return PageResponse(postsPage.map { PostDto.PostNameResponse(it) }, postLinks)
+    }
+
     private fun buildPageLink(lastPostId: Long, size: Int, keyword: String?): PageLinkDto {
         // TODO refactor
         val first = "size=$size"
