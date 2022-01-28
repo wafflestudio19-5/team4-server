@@ -16,6 +16,8 @@ import wafflestudio.team4.reddit.domain.post.service.PostService
 import wafflestudio.team4.reddit.domain.user.model.User
 import wafflestudio.team4.reddit.global.auth.annotation.CurrentUser
 import wafflestudio.team4.reddit.global.common.dto.ListResponse
+import wafflestudio.team4.reddit.global.common.dto.PageLinkDto
+import wafflestudio.team4.reddit.global.common.dto.PageResponse
 import javax.validation.Valid
 
 @RestController
@@ -24,13 +26,47 @@ class PostController(
     private val postService: PostService,
 ) {
     @GetMapping("/")
-    fun getPosts(
+    fun getPostsPage(
 //      @RequestParam(defaultValue = "new", name = "order") order: String,
         @RequestParam(name = "lastPostId", defaultValue = Long.MAX_VALUE.toString()) lastPostId: Long, // 현재 페이지
         @RequestParam(name = "size", defaultValue = "10") size: Int, // 각 페이지 당 게시글 수
-    ): ListResponse<PostDto.Response> {
-        val posts = postService.getPosts(lastPostId, size)
-        return ListResponse(posts.map { PostDto.Response(it) })
+        @RequestParam(required = false) keyword: String?,
+    ): PageResponse<PostDto.Response> {
+        val postsPage = postService.getPostsPage(lastPostId, size, keyword)
+        val postLinks = buildPageLink(lastPostId, size, keyword)
+        return PageResponse(postsPage.map { PostDto.Response(it) }, postLinks)
+    }
+
+    @GetMapping("/title/")
+    fun getPostNamesPage(
+//      @RequestParam(defaultValue = "new", name = "order") order: String,
+        @RequestParam(name = "lastPostId", defaultValue = Long.MAX_VALUE.toString()) lastPostId: Long, // 현재 페이지
+        @RequestParam(name = "size", defaultValue = "10") size: Int, // 각 페이지 당 게시글 수
+        @RequestParam(required = false) keyword: String?,
+    ): PageResponse<PostDto.PostNameResponse> {
+        val postsPage = postService.getPostsPage(lastPostId, size, keyword)
+        val postLinks = buildPageLink(lastPostId, size, keyword)
+        return PageResponse(postsPage.map { PostDto.PostNameResponse(it) }, postLinks)
+    }
+
+    private fun buildPageLink(lastPostId: Long, size: Int, keyword: String?): PageLinkDto {
+        // TODO refactor
+        val first = "size=$size"
+        val self = "lastPostId=$lastPostId&size=$size"
+        val last = "lastPostId=${size + 1}&size=$size"
+
+        val next = "lastPostId=${java.lang.Long.max(0, lastPostId - size)}&size=$size"
+        val prev = "lastPostId=" +
+            "${if ((lastPostId - Long.MAX_VALUE) + size > 0) Long.MAX_VALUE else lastPostId + size}&size=$size"
+
+        return if (keyword == null) {
+            PageLinkDto(first, prev, self, next, last)
+        } else {
+            PageLinkDto(
+                "$first&keyword=$keyword", "$prev&keyword=$keyword",
+                "$self&keyword=$keyword", "$next&keyword=$keyword", "$last&keyword=$keyword"
+            )
+        }
     }
 
     @GetMapping("/popular/")

@@ -1,10 +1,12 @@
 package wafflestudio.team4.reddit.global.common.dto
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import org.springframework.data.domain.Page
 
 data class PageResponse<T> (
     val content: List<T>,
     val size: Int,
+    @JsonProperty("number_of_elements")
     val numberOfElements: Int,
     val links: PageLinkDto?, // TODO
 ) {
