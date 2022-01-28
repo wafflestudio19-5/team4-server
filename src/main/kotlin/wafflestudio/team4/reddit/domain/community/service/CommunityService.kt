@@ -247,10 +247,6 @@ class CommunityService(
             else userCommunity.joined = true // rejoin
         }
 
-        /*if (role == "manager") {
-            userCommunity.isManager = true
-            community.num_managers += 1
-        } else if (role == "member") community.num_members += 1*/
         community.num_members += 1
 
         userCommunityRepository.save(userCommunity)
@@ -555,6 +551,7 @@ class CommunityService(
         managerCommunity.isManager = false
         userCommunityRepository.save(managerCommunity)
 
+        community.num_members += 1
         community.num_managers -= 1
         communityRepository.save(community)
         return community
