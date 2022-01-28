@@ -19,7 +19,9 @@ class CommentDto {
         val parentCommentId: Long?,
         @JsonProperty("children_comment_id")
         val childrenCommentId: List<Long>,
+        @JsonProperty("num_up_votes")
         val numUpVotes: Int,
+        @JsonProperty("num_down_votes")
         val numDownVotes: Int,
         val deleted: Boolean,
         @JsonProperty("created_at")
