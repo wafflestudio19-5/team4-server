@@ -1,23 +1,24 @@
 package wafflestudio.team4.reddit.domain.community.integration
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import org.json.JSONArray
-import org.junit.jupiter.api.TestInstance
-import org.junit.jupiter.api.TestMethodOrder
-import org.junit.jupiter.api.MethodOrderer
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.Order
-import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.Assertions
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.TestConstructor
-import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.MvcResult
-import org.springframework.test.web.servlet.ResultActionsDsl
-import wafflestudio.team4.reddit.domain.user.repository.UserRepository
-import wafflestudio.team4.reddit.global.util.TestHelper
+// import com.fasterxml.jackson.databind.ObjectMapper
+// import org.json.JSONArray
+// import org.junit.jupiter.api.TestInstance
+// import org.junit.jupiter.api.TestMethodOrder
+// import org.junit.jupiter.api.MethodOrderer
+// import org.junit.jupiter.api.Test
+// import org.junit.jupiter.api.Order
+// import org.junit.jupiter.api.BeforeAll
+// import org.junit.jupiter.api.Assertions
+// import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
+// import org.springframework.boot.test.context.SpringBootTest
+// import org.springframework.test.context.TestConstructor
+// import org.springframework.test.web.servlet.MockMvc
+// import org.springframework.test.web.servlet.MvcResult
+// import org.springframework.test.web.servlet.ResultActionsDsl
+// import wafflestudio.team4.reddit.domain.user.repository.UserRepository
+// import wafflestudio.team4.reddit.global.util.TestHelper
 
+/*
 @AutoConfigureMockMvc
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -484,3 +485,4 @@ class CommunityTest(
             }
     }
 }
+*/
