@@ -15,6 +15,7 @@ import wafflestudio.team4.reddit.domain.post.repository.PostRepository
 import wafflestudio.team4.reddit.domain.user.exception.UserNotFoundException
 import wafflestudio.team4.reddit.domain.user.model.User
 import wafflestudio.team4.reddit.domain.user.repository.UserRepository
+import java.util.Collections
 
 @Service
 class CommentService(
@@ -43,6 +44,26 @@ class CommentService(
         ).content
 
         return parentCommentList
+    }
+
+    fun getCommentsByPopularity(lastCommentId: Long, size: Int, postId: Long): List<Comment> {
+        val post = postRepository.findByIdOrNull(postId) ?: throw PostNotFoundException()
+        // get all comments
+        val comments = commentRepository.findByPostIsAndDeletedIsNotAndDepthIs(post, 2, 1)
+
+        // sort
+        val commentComparator = CommentComparator()
+        commentComparator.order = "popular"
+        Collections.sort(comments, commentComparator)
+
+        // pagination
+        if (comments.isEmpty()) return comments
+        val lastComment: Comment? = comments.find { it.id == lastCommentId }
+        val lastCommentIndex = comments.indexOf(lastComment)
+        val firstIndex = lastCommentIndex + 1
+        val lastIndex = kotlin.math.min((firstIndex + (size - 1)), comments.lastIndex)
+        val commentPage = comments.slice(IntRange(firstIndex, lastIndex))
+        return commentPage
     }
 
     fun createComment(user: User, postId: Long, request: CommentDto.CreateRequest): Comment {

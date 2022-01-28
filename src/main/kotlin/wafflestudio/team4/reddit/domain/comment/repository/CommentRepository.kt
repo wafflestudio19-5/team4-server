@@ -14,6 +14,9 @@ interface CommentRepository : JpaRepository<Comment, Long?> {
         depth: Int = 0,
         pageable: Pageable
     ): Page<Comment>
-    fun findByParentCommentIsAndDeletedIsNot(comment: Comment, deleteStatusFilter: Int = 2): List<Comment>
-    fun existsByParentCommentIsAndDeletedIsNot(comment: Comment, deleteStatusFilter: Int = 2): Boolean
+    fun findByPostIsAndDeletedIsNotAndDepthIs(
+        post: Post,
+        deleteStatusFilter: Int = 2,
+        depth: Int = 0
+    ): List<Comment>
 }
