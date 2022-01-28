@@ -1,6 +1,7 @@
 package wafflestudio.team4.reddit.domain.community.api
 
 import org.springframework.http.ResponseEntity
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.GetMapping
@@ -102,6 +103,7 @@ class CommunityController(
     // create community
     // anyone allowed to make community
     @PostMapping("/")
+    @Transactional
     fun createCommunity(@CurrentUser user: User, @Valid @RequestBody createRequest: CommunityDto.CreateRequest):
         ResponseEntity<CommunityDto.Response> {
         val community = communityService.createCommunity(createRequest, user)
@@ -110,6 +112,7 @@ class CommunityController(
 
     // join community
     @PostMapping("/{community_id}/me/")
+    @Transactional
     fun joinCommunity(
         @CurrentUser user: User,
         @PathVariable("community_id") communityId: Long,
@@ -122,6 +125,7 @@ class CommunityController(
 
     // withdraw from community
     @DeleteMapping("/{community_id}/me/")
+    @Transactional
     fun leaveCommunity(
         @CurrentUser user: User,
         @PathVariable("community_id") communityId: Long
@@ -134,6 +138,7 @@ class CommunityController(
     // only this community's managers allowed to change info
 
     @PutMapping("/{community_id}/about/")
+    @Transactional
     fun modifyCommunity(
         @CurrentUser user: User,
         @PathVariable("community_id") communityId: Long,
@@ -145,6 +150,7 @@ class CommunityController(
 
     // 1) change description
     @PutMapping("/{community_id}/about/description/")
+    @Transactional
     fun modifyCommunityDescription(
         @CurrentUser user: User,
         @PathVariable("community_id") communityId: Long,
@@ -156,6 +162,7 @@ class CommunityController(
 
     // 2) add, delete manager
     @PostMapping("/{community_id}/about/moderators/{user_id}/")
+    @Transactional
     fun addCommunityManager(
         @CurrentUser user: User,
         @PathVariable("community_id") communityId: Long,
@@ -166,6 +173,7 @@ class CommunityController(
     }
 
     @DeleteMapping("/{community_id}/about/moderators/{user_id}/")
+    @Transactional
     fun deleteCommunityManager(
         @CurrentUser user: User,
         @PathVariable("community_id") communityId: Long,
@@ -177,6 +185,7 @@ class CommunityController(
 
     // 3) add, delete topic (toggle)
     @PutMapping("/{community_id}/about/topics/{topic_id}/")
+    @Transactional
     fun changeCommunityTopic(
         @CurrentUser user: User,
         @PathVariable("community_id") communityId: Long,
@@ -189,6 +198,7 @@ class CommunityController(
     // delete community
     // only this community's managers allowed to delete
     @DeleteMapping("/{community_id}/")
+    @Transactional
     fun deleteCommunity(@CurrentUser user: User, @PathVariable("community_id") communityId: Long):
         ResponseEntity<Any> {
         val community = communityService.deleteCommunity(user, communityId)
