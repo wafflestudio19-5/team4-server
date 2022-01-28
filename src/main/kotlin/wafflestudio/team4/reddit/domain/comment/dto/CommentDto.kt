@@ -17,8 +17,8 @@ class CommentDto {
         val rootCommentId: Long,
         @JsonProperty("parent_comment_id")
         val parentCommentId: Long?,
-        @JsonProperty("children_comment_id")
-        val childrenCommentId: List<Long>,
+        @JsonProperty("children_comment_id_list")
+        val childrenCommentIdList: List<Long>,
         @JsonProperty("num_up_votes")
         val numUpVotes: Int,
         @JsonProperty("num_down_votes")
@@ -34,7 +34,7 @@ class CommentDto {
             depth = comment.depth,
             rootCommentId = comment.rootComment!!.id,
             parentCommentId = comment.parentComment?.id,
-            childrenCommentId = comment.childrenComments.map { it.id },
+            childrenCommentIdList = comment.childrenComments.map { it.id },
             numUpVotes = comment.votes.count { it.isUp == 2 },
             numDownVotes = comment.votes.count { it.isUp == 0 },
             deleted = comment.deleted == 1 || comment.deleted == 2,
