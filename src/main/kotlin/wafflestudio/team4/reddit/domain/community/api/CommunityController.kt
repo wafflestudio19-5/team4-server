@@ -49,11 +49,16 @@ class CommunityController(
         val nextId = linkIds[2]
         val prevId = linkIds[3]
 
-        val first = "lastCommunityId=$firstId&size=$size&topicId=$topicId&keyword=$keyword"
-        val self = "lastCommunityId=$lastCommunityId&size=$size&topicId=$topicId&keyword=$keyword"
-        val last = "lastCommunityId=$lastId&size=$size&topicId=$topicId&keyword=$keyword"
-        val next = "lastCommunityId=$nextId&size=$size&topicId=$topicId&keyword=$keyword"
-        val prev = "lastCommunityId=$prevId&size=$size&topicId=$topicId&keyword=$keyword"
+        val first = if (keyword != null) "lastCommunityId=$firstId&size=$size&topicId=$topicId&keyword=$keyword"
+        else "lastCommunityId=$firstId&size=$size&topicId=$topicId"
+        val self = if (keyword != null) "lastCommunityId=$lastCommunityId&size=$size&topicId=$topicId&keyword=$keyword"
+        else "lastCommunityId=$lastCommunityId&size=$size&topicId=$topicId"
+        val last = if (keyword != null) "lastCommunityId=$lastId&size=$size&topicId=$topicId&keyword=$keyword"
+        else "lastCommunityId=$lastId&size=$size&topicId=$topicId"
+        val next = if (keyword != null) "lastCommunityId=$nextId&size=$size&topicId=$topicId&keyword=$keyword"
+        else "lastCommunityId=$nextId&size=$size&topicId=$topicId"
+        val prev = if (keyword != null) "lastCommunityId=$prevId&size=$size&topicId=$topicId&keyword=$keyword"
+        else "lastCommunityId=$prevId&size=$size&topicId=$topicId"
 
         return PageLinkDto(first, prev, self, next, last)
     }
