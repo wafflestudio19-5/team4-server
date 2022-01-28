@@ -15,4 +15,10 @@ interface CommunityRepository : JpaRepository<Community, Long?> {
         pageRequest: Pageable
     ): Page<Community>
     fun findByName(name: String): Community?
+    fun findByNameLikeAndDeletedFalse(keywordPattern: String): List<Community>
+    fun findByIdLessThanAndNameLikeAndDeletedFalseOrderByIdDesc(
+        lastCommunityId: Long,
+        keywordPattern: String,
+        pageRequest: Pageable
+    ): Page<Community>
 }

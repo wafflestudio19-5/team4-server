@@ -29,6 +29,7 @@ import wafflestudio.team4.reddit.domain.user.exception.UserNotFoundException
 import wafflestudio.team4.reddit.domain.user.model.User
 import wafflestudio.team4.reddit.domain.user.repository.UserRepository
 import wafflestudio.team4.reddit.domain.user.service.UserService
+import wafflestudio.team4.reddit.global.util.search.SearchHelper
 import java.time.LocalDateTime
 
 @Service
@@ -43,25 +44,96 @@ class CommunityService(
 ) {
 
     // used in search query
-    fun getCommunitiesPage(lastCommunityId: Long, size: Int, topicId: Long): Page<Community> {
+    fun getCommunitiesPage(lastCommunityId: Long, size: Int, topicId: Long, keyword: String?): Page<Community> {
         val pageRequest = Pageable.ofSize(size)
-        if (topicId == -1L) return communityRepository.findByIdLessThanAndDeletedFalseOrderByIdDesc(
+        if (topicId == -1L && keyword == null) return communityRepository.findByIdLessThanAndDeletedFalseOrderByIdDesc(
             lastCommunityId,
             pageRequest
         )
 
-        val communityTopics = communityTopicRepository.findByTopicIdEqualsAndDeletedFalse(topicId)
-        val communityIds = mutableListOf<Long>()
-        for (communityTopic in communityTopics) {
-            communityIds.add(communityTopic.community.id)
+        // keyword not null
+        if (topicId == -1L && keyword != null) {
+            val keywordPattern = SearchHelper.makeAbbreviationPattern(keyword)
+            return communityRepository.findByIdLessThanAndNameLikeAndDeletedFalseOrderByIdDesc(
+                lastCommunityId,
+                keywordPattern,
+                pageRequest
+            )
         }
+
+        // topicId not -1L
+        val communityIds = mutableListOf<Long>()
+        if (keyword == null) {
+            val communityTopics = communityTopicRepository.findByTopicIdEqualsAndDeletedFalse(topicId)
+            for (communityTopic in communityTopics) {
+                communityIds.add(communityTopic.community.id)
+            }
+        } else {
+            val keywordPattern = SearchHelper.makeAbbreviationPattern(keyword)
+            val communities = communityRepository.findByNameLikeAndDeletedFalse(keywordPattern)
+            for (community in communities) {
+                if (getTopics(community.id).map { it.id }.contains(topicId)) communityIds.add(community.id)
+            }
+        }
+        if (communityIds.isEmpty()) throw CommunityNotFoundException()
 
         return communityRepository.findByIdInAndIdLessThanAndDeletedFalseOrderByIdDesc(
             communityIds,
             lastCommunityId,
             pageRequest
         )
-        // TODO maybe change return type to list
+    }
+
+    // lastCommunityIds for each of community page links
+    fun getCommunityLinkIds(lastCommunityId: Long, size: Int, topicId: Long, keyword: String?): List<Long> {
+        // first, last, next, prev
+        val communityIds = mutableListOf<Long>()
+
+        if (topicId == -1L && keyword == null) {
+            return listOf<Long>(
+                Long.MAX_VALUE,
+                (size + 1).toLong(),
+                java.lang.Long.max(0, lastCommunityId - size),
+                (if ((lastCommunityId - Long.MAX_VALUE) + size > 0) Long.MAX_VALUE else lastCommunityId + size)
+            )
+        }
+
+        if (topicId == -1L && keyword != null) {
+            val keywordPattern = SearchHelper.makeAbbreviationPattern(keyword)
+            val communities = communityRepository.findByNameLikeAndDeletedFalse(keywordPattern)
+            for (community in communities) {
+                communityIds.add(community.id)
+            }
+        }
+
+        // topicId != -1L
+        else if (keyword == null) {
+            val communityTopics = communityTopicRepository.findByTopicIdEqualsAndDeletedFalse(topicId)
+            for (communityTopic in communityTopics) {
+                communityIds.add(communityTopic.community.id)
+            }
+        } else {
+            val keywordPattern = SearchHelper.makeAbbreviationPattern(keyword)
+            val communities = communityRepository.findByNameLikeAndDeletedFalse(keywordPattern)
+            for (community in communities) {
+                if (getTopics(community.id).map { it.id }.contains(topicId)) communityIds.add(community.id)
+            }
+        }
+
+        if (communityIds.isEmpty()) throw CommunityNotFoundException()
+        communityIds.sortDescending()
+        val first = communityIds[0] + 1
+        val last = if (communityIds.size - size >= 0) communityIds[communityIds.size - size] + 1
+        else communityIds[0] + 1
+        val indexOflastCommunity = if (lastCommunityId == Long.MAX_VALUE) 0
+        else communityIds.indexOf(lastCommunityId - 1)
+        val next = communityIds[
+            if (indexOflastCommunity + size < communityIds.size)
+                indexOflastCommunity + size - 1 else communityIds.size - 1
+        ]
+        val prev = communityIds[if (indexOflastCommunity - size >= 0) indexOflastCommunity - size else 0] + 1
+
+        return listOf(first, last, next, prev)
     }
 
     fun getCommunityById(communityId: Long): Community {
