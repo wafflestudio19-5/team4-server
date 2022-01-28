@@ -78,7 +78,7 @@ class UserController(
     @GetMapping("/me/")
 //    @Transactional
     fun getCurrentUser(@CurrentUser user: User): UserDto.Response {
-        val mergedUser = userService.getUserById(user.id) // Response로 넘어갈 때 persistence context에 있어야함
+        val mergedUser = userService.mergeUser(user) // Response로 넘어갈 때 persistence context에 있어야함
         return UserDto.Response(mergedUser)
     }
 

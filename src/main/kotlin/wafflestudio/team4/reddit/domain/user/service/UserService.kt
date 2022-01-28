@@ -135,6 +135,10 @@ class UserService(
         }
     }
 
+    fun mergeUser(user: User): User {
+        return userRepository.findByIdOrNull(user.id) ?: throw UserNotFoundException()
+    }
+
     private fun createNewProfileForOldUser(user: User): User {
         val newUserProfile = UserProfile(
             user,
