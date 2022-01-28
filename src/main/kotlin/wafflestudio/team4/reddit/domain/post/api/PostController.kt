@@ -1,6 +1,7 @@
 package wafflestudio.team4.reddit.domain.post.api
 
 import org.springframework.http.ResponseEntity
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
@@ -101,6 +102,7 @@ class PostController(
     }
 
     @PostMapping("/")
+    @Transactional
     fun createPost(
         @CurrentUser user: User,
         @Valid @RequestBody createRequest: PostDto.CreateRequest
@@ -111,6 +113,7 @@ class PostController(
     }
 
     @DeleteMapping("/{post_id}/")
+    @Transactional
     fun deletePost(
         @CurrentUser user: User,
         @PathVariable("post_id") id: Long
@@ -131,6 +134,7 @@ class PostController(
 //    }
 
     @PutMapping("/{post_id}/vote/")
+    @Transactional
     fun votePost(
         @CurrentUser user: User,
         @PathVariable("post_id") id: Long,
