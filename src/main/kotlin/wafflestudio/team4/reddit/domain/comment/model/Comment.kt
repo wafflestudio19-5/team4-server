@@ -7,7 +7,7 @@ import javax.persistence.Entity
 import javax.persistence.JoinColumn
 import javax.persistence.ManyToOne
 import javax.persistence.Table
-import javax.persistence.OneToOne
+import javax.persistence.CascadeType
 import javax.persistence.OneToMany
 import javax.validation.constraints.NotNull
 
@@ -31,13 +31,16 @@ class Comment(
     @field:NotNull
     val depth: Int,
 
-    @OneToOne
-    @JoinColumn(name = "parent_comment_id")
-    var parent: Comment? = null,
-
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "group_comment_id")
-    var group: Comment? = null,
+    var rootComment: Comment? = null,
+
+    @ManyToOne
+    @JoinColumn(name = "parent_comment_id")
+    var parentComment: Comment? = null,
+
+    @OneToMany(mappedBy = "parentComment", cascade = [CascadeType.PERSIST])
+    var childrenComments: MutableList<Comment> = mutableListOf(),
 
     @OneToMany(mappedBy = "comment")
     var votes: MutableList<CommentVote> = mutableListOf(),

@@ -39,8 +39,21 @@ class CommentController(
         @PathVariable("post_id") postId: Long,
         @Valid @RequestBody createRequest: CommentDto.CreateRequest,
     ): ResponseEntity<CommentDto.Response> {
-        val newComment = commentService.createComment(user, postId, createRequest)
+        val mergedUser = commentService.mergeUser(user)
+        val newComment = commentService.createComment(mergedUser, postId, createRequest)
         return ResponseEntity.status(201).body(CommentDto.Response(newComment))
+    }
+
+    @PostMapping("/{post_id}/{comment_id}/reply/")
+    fun replyComment(
+        @CurrentUser user: User,
+        @PathVariable("post_id") postId: Long,
+        @PathVariable("comment_id") commentId: Long,
+        @Valid @RequestBody replyRequest: CommentDto.ReplyRequest,
+    ): ResponseEntity<CommentDto.Response> {
+        val mergedUser = commentService.mergeUser(user)
+        val newReplyComment = commentService.replyComment(mergedUser, postId, commentId, replyRequest)
+        return ResponseEntity.status(201).body(CommentDto.Response(newReplyComment))
     }
 
     @DeleteMapping("/{comment_id}/")
@@ -48,7 +61,8 @@ class CommentController(
         @CurrentUser user: User,
         @PathVariable("comment_id") commentId: Long,
     ): ResponseEntity<String> {
-        commentService.deleteComment(user, commentId)
+        val mergedUser = commentService.mergeUser(user)
+        commentService.deleteComment(mergedUser, commentId)
         return ResponseEntity.noContent().build()
     }
 
@@ -58,7 +72,8 @@ class CommentController(
         @PathVariable("comment_id") commentId: Long,
         @Valid @RequestBody modifyRequest: CommentDto.ModifyRequest
     ): CommentDto.Response {
-        val modifiedComment = commentService.modifyComment(user, commentId, modifyRequest)
+        val mergedUser = commentService.mergeUser(user)
+        val modifiedComment = commentService.modifyComment(mergedUser, commentId, modifyRequest)
         return CommentDto.Response(modifiedComment)
     }
 
@@ -68,6 +83,7 @@ class CommentController(
         @PathVariable("comment_id") commentId: Long,
         @RequestParam(name = "isUp", required = true) isUp: Int,
     ): CommentDto.Response {
-        return CommentDto.Response(commentService.voteComment(user, commentId, isUp))
+        val mergedUser = commentService.mergeUser(user)
+        return CommentDto.Response(commentService.voteComment(mergedUser, commentId, isUp))
     }
 }

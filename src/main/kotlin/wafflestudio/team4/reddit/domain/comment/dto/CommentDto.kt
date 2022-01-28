@@ -1,6 +1,8 @@
 package wafflestudio.team4.reddit.domain.comment.dto
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import wafflestudio.team4.reddit.domain.comment.model.Comment
+import wafflestudio.team4.reddit.domain.user.dto.UserDto
 import java.time.LocalDateTime
 import javax.validation.constraints.NotBlank
 import javax.validation.constraints.NotNull
@@ -8,27 +10,31 @@ import javax.validation.constraints.NotNull
 class CommentDto {
     data class Response(
         val id: Long,
-        val userId: Long,
-        val userName: String,
-        val userImageUrl: String?,
+        val author: UserDto.Response,
         val text: String,
         val depth: Int,
-        val parentId: Long?,
-        val groupId: Long?,
+        @JsonProperty("root_comment_id")
+        val rootCommentId: Long,
+        @JsonProperty("parent_comment_id")
+        val parentCommentId: Long?,
+        @JsonProperty("children_comment_id_list")
+        val childrenCommentIdList: List<Long>,
+        @JsonProperty("num_up_votes")
         val numUpVotes: Int,
+        @JsonProperty("num_down_votes")
         val numDownVotes: Int,
         val deleted: Boolean,
+        @JsonProperty("created_at")
         val createdAt: LocalDateTime?
     ) {
         constructor(comment: Comment) : this(
             id = comment.id,
-            userId = comment.user.id,
-            userName = comment.user.username,
-            userImageUrl = comment.user.userProfile?.userImage?.url,
+            author = UserDto.Response(comment.user),
             text = comment.text,
             depth = comment.depth,
-            parentId = comment.parent?.id,
-            groupId = comment.group?.id,
+            rootCommentId = comment.rootComment!!.id,
+            parentCommentId = comment.parentComment?.id,
+            childrenCommentIdList = comment.childrenComments.map { it.id },
             numUpVotes = comment.votes.count { it.isUp == 2 },
             numDownVotes = comment.votes.count { it.isUp == 0 },
             deleted = comment.deleted == 1 || comment.deleted == 2,
@@ -37,18 +43,16 @@ class CommentDto {
     }
 
     data class CreateRequest(
+        @field:NotBlank
+        val text: String,
+    )
 
+    data class ReplyRequest(
         @field:NotBlank
         val text: String,
 
         @field:NotNull
-        val depth: Int,
-
-        @field:NotNull
-        val parentId: Long = 0L,
-
-        @field:NotNull
-        val groupId: Long = 0L,
+        val parentId: Long,
     )
 
     data class ModifyRequest(

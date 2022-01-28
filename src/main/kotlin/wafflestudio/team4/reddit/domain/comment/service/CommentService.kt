@@ -12,14 +12,22 @@ import wafflestudio.team4.reddit.domain.comment.repository.CommentRepository
 import wafflestudio.team4.reddit.domain.comment.repository.CommentVoteRepository
 import wafflestudio.team4.reddit.domain.post.exception.PostNotFoundException
 import wafflestudio.team4.reddit.domain.post.repository.PostRepository
+import wafflestudio.team4.reddit.domain.user.exception.UserNotFoundException
 import wafflestudio.team4.reddit.domain.user.model.User
+import wafflestudio.team4.reddit.domain.user.repository.UserRepository
 
 @Service
 class CommentService(
     private val commentRepository: CommentRepository,
     private val commentVoteRepository: CommentVoteRepository,
     private val postRepository: PostRepository,
+    private val userRepository: UserRepository,
 ) {
+
+    fun mergeUser(user: User): User {
+        return userRepository.findByIdOrNull(user.id) ?: throw UserNotFoundException()
+    }
+
     fun getComments(lastCommentId: Long, size: Int, postId: Long): List<Comment> {
         val post = postRepository.findByIdOrNull(postId) ?: throw PostNotFoundException()
         val pageRequest: PageRequest = PageRequest.of(0, size)
@@ -31,50 +39,37 @@ class CommentService(
             pageRequest
         ).content
 
-        var commentList = mutableListOf<Comment>()
-
-        parentCommentList.forEach {
-            var commentThread = commentRepository.findByPostIsAndGroupIsAndDeletedIsNotOrderByDepthAsc(
-                post,
-                it,
-                2
-            )
-            commentList.addAll(commentThread)
-        }
-        return commentList
+        return parentCommentList
     }
 
     fun createComment(user: User, postId: Long, request: CommentDto.CreateRequest): Comment {
         val post = postRepository.findByIdOrNull(postId) ?: throw PostNotFoundException()
-        var parentComment: Comment? = null
-        var groupComment: Comment? = null
+        val newComment = Comment(
+            user = user,
+            post = post,
+            text = request.text,
+            depth = 1
+        )
+        newComment.rootComment = newComment
+        return commentRepository.save(newComment)
+    }
 
-        // 대댓글 시 부모와 그룹 코멘트 엔티티 찾기
-        if (request.depth != 0) {
-            parentComment = commentRepository.findByIdIsAndDeletedIs(request.parentId, 0)
-                ?: throw CommentNotFoundException() // TODO 혼동 방지를 위해 exception 이름 변경
-            groupComment = commentRepository.findByIdIsAndDeletedIs(request.groupId, 0)
-                ?: throw CommentNotFoundException()
-        }
+    fun replyComment(user: User, postId: Long, parentCommentId: Long, request: CommentDto.ReplyRequest): Comment {
+        val post = postRepository.findByIdOrNull(postId) ?: throw PostNotFoundException()
+        val parentComment = commentRepository.findByIdOrNull(parentCommentId) ?: throw CommentNotFoundException()
 
         val newComment = Comment(
             user = user,
             post = post,
             text = request.text,
-            depth = request.depth,
-            parent = parentComment,
-            group = groupComment
+            depth = parentComment.depth + 1,
+            rootComment = parentComment.rootComment,
+            parentComment = parentComment
         )
-        commentRepository.save(newComment)
+        parentComment.childrenComments.add(newComment)
+        commentRepository.save(parentComment)
 
-        // 그냥 댓글 작성 시 스스로를 부모와 그룹 코멘트로 할당
-        if (request.depth == 0) {
-            newComment.parent = newComment
-            newComment.group = newComment
-        } else
-            return newComment
-
-        return commentRepository.save(newComment)
+        return newComment
     }
 
     fun deleteComment(user: User, commentId: Long): Comment {
@@ -86,11 +81,11 @@ class CommentService(
 
         // 코멘트 children 유무
         fun checkChildAndDelete(comment: Comment): Comment {
-            if (commentRepository.existsByParentIsAndDeletedIsNot(comment, 2) &&
-                commentRepository.findByParentIsAndDeletedIsNot(comment, 2).count() > 1
+            if (commentRepository.existsByParentCommentIsAndDeletedIsNot(comment, 2) &&
+                commentRepository.findByParentCommentIsAndDeletedIsNot(comment, 2).count() > 1
             ) {
                 comment.deleted = 1 // 삭제 보류
-                comment.text = "[deleted]" // reddit에서 이렇게 씀
+                comment.text = "[deleted]" // reddit 스타일
             } else
                 comment.deleted = 2
             return comment
@@ -98,8 +93,8 @@ class CommentService(
         commentRepository.save(checkChildAndDelete(comment))
 
         // parent가 삭제 보류 상태일시 확인하고 업데이트
-        if (comment.parent!!.deleted == 1) {
-            commentRepository.save(checkChildAndDelete(comment.parent!!))
+        if (comment.parentComment!!.deleted == 1) {
+            commentRepository.save(checkChildAndDelete(comment.parentComment!!))
         }
 
         return comment
