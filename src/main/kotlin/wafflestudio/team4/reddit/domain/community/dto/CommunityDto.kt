@@ -2,22 +2,35 @@ package wafflestudio.team4.reddit.domain.community.dto
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import wafflestudio.team4.reddit.domain.community.model.Community
+import wafflestudio.team4.reddit.domain.topic.dto.TopicDto
+import wafflestudio.team4.reddit.domain.user.dto.UserDto
 import javax.validation.constraints.NotBlank
 import javax.validation.constraints.NotNull
 
 class CommunityDto {
     data class Response(
         val id: Long,
+
         @field:NotBlank
         val name: String,
+
         @JsonProperty("num_members")
         @field:NotNull
         val numMembers: Int,
+
         @JsonProperty("num_managers")
         @field:NotNull
         val numManagers: Int,
+
+        @field:NotNull
+        val managers: List<UserDto.UsernameResponse>,
+
         // @field:NotBlank
         val description: String,
+
+        @field:NotNull
+        val topics: List<TopicDto.Response>,
+
         @field:NotNull
         val deleted: Boolean
     ) {
@@ -26,7 +39,9 @@ class CommunityDto {
             name = community.name,
             numMembers = community.num_members,
             numManagers = community.num_managers,
+            managers = community.users.filter { it.isManager }.map { UserDto.UsernameResponse(it.user) },
             description = community.description,
+            topics = community.topics.filter { !it.deleted }.map { TopicDto.Response(it.topic) },
             deleted = community.deleted
         )
     }
@@ -49,9 +64,7 @@ class CommunityDto {
 
     // ModifyDescriptionRequest
     data class ModifyDescriptionRequest(
-        // val name: String,
-        val description: String,
-        // val topics: List<String>,
+        val description: String
     )
 
     data class Description(

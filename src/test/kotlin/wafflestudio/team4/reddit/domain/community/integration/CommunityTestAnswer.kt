@@ -1,10 +1,11 @@
 package wafflestudio.team4.reddit.domain.community.integration
 
-import wafflestudio.team4.reddit.domain.community.dto.CommunityDto
-import wafflestudio.team4.reddit.global.common.exception.ErrorResponse
-import wafflestudio.team4.reddit.global.common.exception.ErrorType
-import wafflestudio.team4.reddit.global.util.TestAnswer
+// import wafflestudio.team4.reddit.domain.community.dto.CommunityDto
+// import wafflestudio.team4.reddit.global.common.exception.ErrorResponse
+// import wafflestudio.team4.reddit.global.common.exception.ErrorType
+// import wafflestudio.team4.reddit.global.util.TestAnswer
 
+/*
 object CommunityTestAnswer : TestAnswer {
     private val ans1 = arrayOf(
         // 1 1
@@ -151,3 +152,4 @@ object CommunityTestAnswer : TestAnswer {
 
     override val ans = arrayOf(ans1, ans2, ans3, ans4, ans5)
 }
+*/

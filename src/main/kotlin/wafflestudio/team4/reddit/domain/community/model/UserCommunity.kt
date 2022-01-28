@@ -15,12 +15,12 @@ class UserCommunity(
 
     // FK user User NOT NULL
     @field:NotNull
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     val user: User,
 
     // FK community Community NOT NULL
     @field:NotNull
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     val community: Community,
 
     // manager or user
