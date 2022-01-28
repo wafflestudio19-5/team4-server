@@ -9,6 +9,12 @@ interface UserRepository : JpaRepository<User, Long?> {
     fun findByEmail(email: String): User?
     fun existsByEmail(email: String): Boolean
     fun findByEmailAndPassword(email: String, password: String): User?
-    fun findByIdLessThanOrderByIdDesc(id: Long, pageable: Pageable): Page<User>
-    fun findByIdLessThanAndUsernameLikeOrderByIdDesc(id: Long, pattern: String, pageable: Pageable): Page<User>
+    fun findByIdLessThanOrderByIdDesc(lastUserid: Long, pageable: Pageable): Page<User>
+    fun findByIdLessThanAndDeletedIsFalseOrderByIdDesc(lastUserid: Long, pageable: Pageable): Page<User>
+    fun findByIdLessThanAndUsernameLikeOrderByIdDesc(lastUserid: Long, pattern: String, pageable: Pageable): Page<User>
+    fun findByIdLessThanAndDeletedIsFalseAndUsernameLikeOrderByIdDesc(
+        lastUserid: Long,
+        pattern: String,
+        pageable: Pageable
+    ): Page<User>
 }
