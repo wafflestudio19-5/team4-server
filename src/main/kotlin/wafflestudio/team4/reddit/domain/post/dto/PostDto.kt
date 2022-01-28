@@ -1,6 +1,7 @@
 package wafflestudio.team4.reddit.domain.post.dto
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import wafflestudio.team4.reddit.domain.community.dto.CommunityDto
 import wafflestudio.team4.reddit.domain.post.model.Post
 import wafflestudio.team4.reddit.domain.user.dto.UserDto
 import java.time.LocalDateTime
@@ -9,24 +10,21 @@ import javax.validation.constraints.NotBlank
 class PostDto {
     data class Response(
         val id: Long,
-        val userId: Long,
-        val community: String,
-        val userName: String,
-        val userImageUrl: String?,
+        val author: UserDto.Response,
+        val community: CommunityDto.Response,
         val title: String,
         val text: String?,
         val images: List<String>?, // S3 이미지 주소
         val numUpVotes: Int,
         val numDownVotes: Int,
+        @JsonProperty("created_at")
         val createdAt: LocalDateTime?
 //        val isDeleted: Boolean,
     ) {
         constructor(post: Post) : this(
             id = post.id,
-            userId = post.user.id,
-            community = post.community.name,
-            userName = post.user.username,
-            userImageUrl = post.user.userProfile?.userImage?.url,
+            author = UserDto.Response(post.user),
+            community = CommunityDto.Response(post.community),
             title = post.title,
             text = post.text,
             images = post.images?.map { it.url }, // S3적용 후 변경
