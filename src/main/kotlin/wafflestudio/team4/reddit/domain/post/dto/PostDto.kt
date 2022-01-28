@@ -15,7 +15,9 @@ class PostDto {
         val title: String,
         val text: String?,
         val images: List<String>?, // S3 이미지 주소
+        @JsonProperty("num_up_votes")
         val numUpVotes: Int,
+        @JsonProperty("num_down_votes")
         val numDownVotes: Int,
         @JsonProperty("created_at")
         val createdAt: LocalDateTime?

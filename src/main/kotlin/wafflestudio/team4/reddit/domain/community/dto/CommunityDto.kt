@@ -1,5 +1,6 @@
 package wafflestudio.team4.reddit.domain.community.dto
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import wafflestudio.team4.reddit.domain.community.model.Community
 import javax.validation.constraints.NotBlank
 import javax.validation.constraints.NotNull
@@ -9,10 +10,12 @@ class CommunityDto {
         val id: Long,
         @field:NotBlank
         val name: String,
+        @JsonProperty("num_members")
         @field:NotNull
-        val num_members: Int,
+        val numMembers: Int,
+        @JsonProperty("num_managers")
         @field:NotNull
-        val num_managers: Int,
+        val numManagers: Int,
         // @field:NotBlank
         val description: String,
         @field:NotNull
@@ -21,8 +24,8 @@ class CommunityDto {
         constructor(community: Community) : this(
             id = community.id,
             name = community.name,
-            num_members = community.num_members,
-            num_managers = community.num_managers,
+            numMembers = community.num_members,
+            numManagers = community.num_managers,
             description = community.description,
             deleted = community.deleted
         )
