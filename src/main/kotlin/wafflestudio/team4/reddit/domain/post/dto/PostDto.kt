@@ -2,6 +2,7 @@ package wafflestudio.team4.reddit.domain.post.dto
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import wafflestudio.team4.reddit.domain.post.model.Post
+import wafflestudio.team4.reddit.domain.user.dto.UserDto
 import java.time.LocalDateTime
 import javax.validation.constraints.NotBlank
 
@@ -38,14 +39,16 @@ class PostDto {
 
     data class PostNameResponse(
         val id: Long,
+        val author: UserDto.Response,
         val title: String,
-        @JsonProperty("date_joined")
-        val dateJoined: LocalDateTime?,
+        @JsonProperty("created_at")
+        val createdAt: LocalDateTime?,
     ) {
         constructor(post: Post) : this(
             id = post.id,
+            author = UserDto.Response(post.user),
             title = post.title,
-            dateJoined = post.createdAt,
+            createdAt = post.createdAt,
         )
     }
 
