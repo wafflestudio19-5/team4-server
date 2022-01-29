@@ -370,17 +370,11 @@ class CommunityService(
                     // community.num_managers += 1
                 } else {
                     val userCommunity = userCommunityRepository.getByUserAndCommunity(manager, community)
-                    if (userCommunity.joined) {
-                        // community.num_members -= 1
-                        // community.num_managers += 1
-                    } else { // not joined
-                        userCommunity.joined = true
-                        userCommunity.isManager = true
-                        userCommunityRepository.save(userCommunity)
-                        community.users.map {
-                            if (it.id == userCommunity.id)
-                                UserCommunity(it.user, it.community, true) else it
-                        }
+                    userCommunity.joined = true
+                    userCommunity.isManager = true
+                    userCommunityRepository.save(userCommunity)
+                    community.users.map {
+                        if (it.id == userCommunity.id) UserCommunity(it.user, it.community, true) else it
                         // community.num_managers += 1
                     }
                 }
