@@ -52,6 +52,7 @@ class UserService(
         return userRepository.save(newUser)
     }
 
+    @Transactional
     fun signin(signinRequest: UserDto.SigninRequest): User {
         return userRepository.findByEmailAndPassword(
             signinRequest.email,
@@ -78,6 +79,7 @@ class UserService(
         }
     }
 
+    @Transactional
     fun updateUser(user: User, updateRequest: UserDto.UpdateRequest): User {
         // TODO description, nickname update
         val newEncodedPassword =
@@ -86,6 +88,7 @@ class UserService(
         return userRepository.save(updatedUser)
     }
 
+    @Transactional
     fun deleteUser(user: User) {
         user.deleted = true
         userRepository.save(user)
@@ -123,6 +126,7 @@ class UserService(
         return amazonS3.generatePresignedUrl(request).toString()
     }
 
+    @Transactional
     fun updateProfile(user: User, updateRequest: UserDto.UpdateProfileRequest): UserProfile {
         return if (user.userProfile == null) {
             // old user

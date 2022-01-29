@@ -1,7 +1,6 @@
 package wafflestudio.team4.reddit.domain.post.api
 
 import org.springframework.http.ResponseEntity
-import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
@@ -17,7 +16,6 @@ import wafflestudio.team4.reddit.domain.post.service.PostService
 import wafflestudio.team4.reddit.domain.user.model.User
 import wafflestudio.team4.reddit.domain.user.service.UserService
 import wafflestudio.team4.reddit.global.auth.annotation.CurrentUser
-import wafflestudio.team4.reddit.global.common.dto.ListResponse
 import wafflestudio.team4.reddit.global.common.dto.PageLinkDto
 import wafflestudio.team4.reddit.global.common.dto.PageResponse
 import javax.validation.Valid
@@ -76,9 +74,9 @@ class PostController(
     fun getPostsByPopularity(
         @RequestParam(name = "lastPostId", defaultValue = Long.MAX_VALUE.toString()) lastPostId: Long,
         @RequestParam(name = "size", defaultValue = "10") size: Int
-    ): ListResponse<PostDto.Response> {
+    ): PageResponse<PostDto.Response> {
         val posts = postService.getPostsByPopularity(lastPostId, size)
-        return ListResponse(posts.map { PostDto.Response(it) })
+        return PageResponse(posts.map { PostDto.Response(it) }, posts.size, posts.size, null)
     }
 
     @GetMapping("/{post_id}/")
@@ -102,7 +100,6 @@ class PostController(
     }
 
     @PostMapping("/")
-    @Transactional
     fun createPost(
         @CurrentUser user: User,
         @Valid @RequestBody createRequest: PostDto.CreateRequest
@@ -113,7 +110,6 @@ class PostController(
     }
 
     @DeleteMapping("/{post_id}/")
-    @Transactional
     fun deletePost(
         @CurrentUser user: User,
         @PathVariable("post_id") id: Long
@@ -134,7 +130,6 @@ class PostController(
 //    }
 
     @PutMapping("/{post_id}/vote/")
-    @Transactional
     fun votePost(
         @CurrentUser user: User,
         @PathVariable("post_id") id: Long,

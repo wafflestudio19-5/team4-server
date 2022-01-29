@@ -15,7 +15,7 @@ import wafflestudio.team4.reddit.domain.comment.dto.CommentDto
 import wafflestudio.team4.reddit.domain.comment.service.CommentService
 import wafflestudio.team4.reddit.domain.user.model.User
 import wafflestudio.team4.reddit.global.auth.annotation.CurrentUser
-import wafflestudio.team4.reddit.global.common.dto.ListResponse
+import wafflestudio.team4.reddit.global.common.dto.PageResponse
 import javax.validation.Valid
 
 @RestController
@@ -28,9 +28,9 @@ class CommentController(
         @PathVariable("post_id") postId: Long,
         @RequestParam(name = "lastCommentId", defaultValue = Long.MAX_VALUE.toString()) lastCommentId: Long,
         @RequestParam(name = "size", defaultValue = "15") size: Int
-    ): ListResponse<CommentDto.Response> {
+    ): PageResponse<CommentDto.Response> {
         val comments = commentService.getComments(lastCommentId, size, postId)
-        return ListResponse(comments.map { CommentDto.Response(it) })
+        return PageResponse(comments.map { CommentDto.Response(it) }, comments.size, comments.size, null)
     }
 
     @GetMapping("/{post_id}/popular/")
@@ -38,9 +38,9 @@ class CommentController(
         @PathVariable("post_id") postId: Long,
         @RequestParam(name = "lastCommentId", defaultValue = Long.MAX_VALUE.toString()) lastCommentId: Long,
         @RequestParam(name = "size", defaultValue = "15") size: Int
-    ): ListResponse<CommentDto.Response> {
+    ): PageResponse<CommentDto.Response> {
         val comments = commentService.getCommentsByPopularity(lastCommentId, size, postId)
-        return ListResponse(comments.map { CommentDto.Response(it) })
+        return PageResponse(comments.map { CommentDto.Response(it) }, comments.size, comments.size, null)
     }
 
     @GetMapping("/comment/{comment_id}/")

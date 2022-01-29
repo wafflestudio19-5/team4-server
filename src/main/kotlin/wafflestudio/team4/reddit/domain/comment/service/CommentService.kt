@@ -3,6 +3,7 @@ package wafflestudio.team4.reddit.domain.comment.service
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import wafflestudio.team4.reddit.domain.comment.dto.CommentDto
 import wafflestudio.team4.reddit.domain.comment.exception.CommentNotFoundException
 import wafflestudio.team4.reddit.domain.comment.exception.NotCommentOwnerException
@@ -66,6 +67,7 @@ class CommentService(
         return commentPage
     }
 
+    @Transactional
     fun createComment(user: User, postId: Long, request: CommentDto.CreateRequest): Comment {
         val post = postRepository.findByIdOrNull(postId) ?: throw PostNotFoundException()
         val newComment = Comment(
@@ -78,6 +80,7 @@ class CommentService(
         return commentRepository.save(newComment)
     }
 
+    @Transactional
     fun replyComment(user: User, postId: Long, parentCommentId: Long, request: CommentDto.ReplyRequest): Comment {
         val post = postRepository.findByIdOrNull(postId) ?: throw PostNotFoundException()
         val parentComment = commentRepository.findByIdOrNull(parentCommentId) ?: throw CommentNotFoundException()
@@ -96,6 +99,7 @@ class CommentService(
         return newComment
     }
 
+    @Transactional
     fun deleteComment(user: User, commentId: Long): Comment {
         var comment = commentRepository.findByIdOrNull(commentId) ?: throw CommentNotFoundException()
 
@@ -124,6 +128,7 @@ class CommentService(
         return checkAndDelete(comment)
     }
 
+    @Transactional
     fun modifyComment(user: User, commentId: Long, request: CommentDto.ModifyRequest): Comment {
         val comment = commentRepository.findByIdOrNull(commentId) ?: throw CommentNotFoundException()
 
@@ -136,6 +141,7 @@ class CommentService(
         return commentRepository.save(comment)
     }
 
+    @Transactional
     fun voteComment(user: User, commentId: Long, isUp: Int): Comment {
         val comment = commentRepository.findByIdOrNull(commentId) ?: throw CommentNotFoundException()
         if (commentVoteRepository.existsByCommentAndUser(comment, user)) {
