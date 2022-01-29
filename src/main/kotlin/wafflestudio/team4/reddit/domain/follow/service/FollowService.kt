@@ -3,6 +3,7 @@ package wafflestudio.team4.reddit.domain.follow.service
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import wafflestudio.team4.reddit.domain.follow.exception.AlreadyFollowingException
 import wafflestudio.team4.reddit.domain.follow.exception.NotFollowingException
 import wafflestudio.team4.reddit.domain.follow.exception.SelfFollowException
@@ -22,6 +23,7 @@ class FollowService(
         return followRepository.findByToUserIdEqualsAndIdLessThanOrderByIdDesc(toUserId, lastFollowId, pageRequest)
     }
 
+    @Transactional
     fun follow(fromUser: User, toUserId: Long): Follow {
         if (fromUser.id == toUserId) throw SelfFollowException()
         val toUser = userService.getUserById(toUserId)
@@ -38,6 +40,7 @@ class FollowService(
         return follow
     }
 
+    @Transactional
     fun unfollow(fromUser: User, toUserId: Long): Follow {
         val toUser = userService.getUserById(toUserId)
         // check if already following

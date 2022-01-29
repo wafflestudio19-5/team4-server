@@ -2,6 +2,7 @@ package wafflestudio.team4.reddit.domain.topic.service
 
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import wafflestudio.team4.reddit.domain.topic.dto.TopicDto
 import wafflestudio.team4.reddit.domain.topic.exceptions.TopicAlreadyExistsException
 import wafflestudio.team4.reddit.domain.topic.exceptions.TopicDeletedException
@@ -32,6 +33,7 @@ class TopicService(
         return topic
     }
 
+    @Transactional
     fun createTopic(createRequest: TopicDto.CreateRequest, user: User): Topic {
         if (topicRepository.existsByName(createRequest.name)) {
             var oldTopic = topicRepository.getByName(createRequest.name)
@@ -45,6 +47,7 @@ class TopicService(
         return topic
     }
 
+    @Transactional
     fun modifyTopic(topicId: Long, modifyRequest: TopicDto.ModifyRequest): Topic {
         val topic = topicRepository.findByIdOrNull(topicId) ?: throw TopicNotFoundException()
         if (topic.deleted) throw TopicDeletedException()
@@ -53,6 +56,7 @@ class TopicService(
         return topic
     }
 
+    @Transactional
     fun deleteTopic(topicId: Long): Topic {
         val topic = topicRepository.findByIdOrNull(topicId) ?: throw TopicNotFoundException()
         if (topic.deleted) throw TopicDeletedException()

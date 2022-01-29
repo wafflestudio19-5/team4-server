@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import wafflestudio.team4.reddit.domain.community.exception.CommunityDeletedException
 import wafflestudio.team4.reddit.domain.community.exception.CommunityNotFoundException
 import wafflestudio.team4.reddit.domain.community.repository.CommunityRepository
@@ -91,6 +92,7 @@ class PostService(
         return amazonS3.generatePresignedUrl(request).toString()
     }
 
+    @Transactional
     fun createPost(user: User, request: PostDto.CreateRequest): Post {
         val community = communityRepository.findByName(request.community) ?: throw CommunityNotFoundException()
         if (community.deleted) throw CommunityDeletedException()
@@ -115,6 +117,7 @@ class PostService(
         return postRepository.save(newPost)
     }
 
+    @Transactional
     fun deletePost(user: User, postId: Long): Post {
         val post = postRepository.findByIdOrNull(postId) ?: throw PostNotFoundException()
 
@@ -138,6 +141,7 @@ class PostService(
 //        return postRepository.save(post)
 //    }
 
+    @Transactional
     fun vote(user: User, postId: Long, isUp: Int): Post {
         val post = postRepository.findByIdOrNull(postId) ?: throw PostNotFoundException()
 
