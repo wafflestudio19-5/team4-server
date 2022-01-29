@@ -1,7 +1,6 @@
 package wafflestudio.team4.reddit.domain.follow.api
 
 import org.springframework.http.ResponseEntity
-import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.GetMapping
@@ -48,7 +47,6 @@ class FollowController(
     }*/
 
     @PostMapping("/{toUser_id}/")
-    @Transactional
     fun follow(@CurrentUser fromUser: User, @PathVariable("toUser_id") toUserId: Long):
         ResponseEntity<FollowDto.Response> {
         val follow = followService.follow(fromUser, toUserId)
@@ -56,7 +54,6 @@ class FollowController(
     }
 
     @DeleteMapping("/{toUser_id}/")
-    @Transactional
     fun unfollow(@CurrentUser fromUser: User, @PathVariable("toUser_id") toUserId: Long):
         ResponseEntity<FollowDto.Response> {
         val follow = followService.unfollow(fromUser, toUserId)
