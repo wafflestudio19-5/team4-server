@@ -33,6 +33,24 @@ class CommentController(
         return ListResponse(comments.map { CommentDto.Response(it) })
     }
 
+    @GetMapping("/{post_id}/popular/")
+    fun getCommentsByPopularity(
+        @PathVariable("post_id") postId: Long,
+        @RequestParam(name = "lastCommentId", defaultValue = Long.MAX_VALUE.toString()) lastCommentId: Long,
+        @RequestParam(name = "size", defaultValue = "15") size: Int
+    ): ListResponse<CommentDto.Response> {
+        val comments = commentService.getCommentsByPopularity(lastCommentId, size, postId)
+        return ListResponse(comments.map { CommentDto.Response(it) })
+    }
+
+    @GetMapping("/comment/{comment_id}/")
+    fun getCommentById(
+        @PathVariable("comment_id") commentId: Long
+    ): CommentDto.Response {
+        val comment = commentService.getCommentById(commentId)
+        return CommentDto.Response(comment)
+    }
+
     @PostMapping("/{post_id}/")
     fun createComment(
         @CurrentUser user: User,

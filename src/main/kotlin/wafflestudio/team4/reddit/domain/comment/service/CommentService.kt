@@ -15,6 +15,7 @@ import wafflestudio.team4.reddit.domain.post.repository.PostRepository
 import wafflestudio.team4.reddit.domain.user.exception.UserNotFoundException
 import wafflestudio.team4.reddit.domain.user.model.User
 import wafflestudio.team4.reddit.domain.user.repository.UserRepository
+import java.util.Collections
 
 @Service
 class CommentService(
@@ -27,6 +28,9 @@ class CommentService(
     fun mergeUser(user: User): User {
         return userRepository.findByIdOrNull(user.id) ?: throw UserNotFoundException()
     }
+    fun getCommentById(commentId: Long): Comment {
+        return commentRepository.findByIdOrNull(commentId) ?: throw CommentNotFoundException()
+    }
 
     fun getComments(lastCommentId: Long, size: Int, postId: Long): List<Comment> {
         val post = postRepository.findByIdOrNull(postId) ?: throw PostNotFoundException()
@@ -35,11 +39,31 @@ class CommentService(
             post,
             lastCommentId,
             2,
-            0,
+            1,
             pageRequest
         ).content
 
         return parentCommentList
+    }
+
+    fun getCommentsByPopularity(lastCommentId: Long, size: Int, postId: Long): List<Comment> {
+        val post = postRepository.findByIdOrNull(postId) ?: throw PostNotFoundException()
+        // get all comments
+        val comments = commentRepository.findByPostIsAndDeletedIsNotAndDepthIs(post, 2, 1)
+
+        // sort
+        val commentComparator = CommentComparator()
+        commentComparator.order = "popular"
+        Collections.sort(comments, commentComparator)
+
+        // pagination
+        if (comments.isEmpty()) return comments
+        val lastComment: Comment? = comments.find { it.id == lastCommentId }
+        val lastCommentIndex = comments.indexOf(lastComment)
+        val firstIndex = lastCommentIndex + 1
+        val lastIndex = kotlin.math.min((firstIndex + (size - 1)), comments.lastIndex)
+        val commentPage = comments.slice(IntRange(firstIndex, lastIndex))
+        return commentPage
     }
 
     fun createComment(user: User, postId: Long, request: CommentDto.CreateRequest): Comment {
@@ -66,8 +90,8 @@ class CommentService(
             rootComment = parentComment.rootComment,
             parentComment = parentComment
         )
+        commentRepository.save(newComment)
         parentComment.childrenComments.add(newComment)
-        commentRepository.save(parentComment)
 
         return newComment
     }
@@ -79,25 +103,25 @@ class CommentService(
         val commentOwnerId = comment.user.id
         if (commentOwnerId != user.id) throw NotCommentOwnerException()
 
-        // 코멘트 children 유무
-        fun checkChildAndDelete(comment: Comment): Comment {
-            if (commentRepository.existsByParentCommentIsAndDeletedIsNot(comment, 2) &&
-                commentRepository.findByParentCommentIsAndDeletedIsNot(comment, 2).count() > 1
-            ) {
+        // 코멘트 children 유무 확인 및 parent의 children에서도 삭제
+        fun checkAndDelete(comment: Comment): Comment {
+            if (comment.childrenComments.isNotEmpty()) {
                 comment.deleted = 1 // 삭제 보류
                 comment.text = "[deleted]" // reddit 스타일
-            } else
+                return commentRepository.save(comment)
+            } else {
+                val check = comment.parentComment
                 comment.deleted = 2
+                comment.parentComment?.childrenComments?.remove(comment)
+                comment.parentComment = null
+                commentRepository.save(comment)
+                if (check != null && check!!.deleted == 1) {
+                    commentRepository.save(checkAndDelete(check))
+                }
+            }
             return comment
         }
-        commentRepository.save(checkChildAndDelete(comment))
-
-        // parent가 삭제 보류 상태일시 확인하고 업데이트
-        if (comment.parentComment!!.deleted == 1) {
-            commentRepository.save(checkChildAndDelete(comment.parentComment!!))
-        }
-
-        return comment
+        return checkAndDelete(comment)
     }
 
     fun modifyComment(user: User, commentId: Long, request: CommentDto.ModifyRequest): Comment {
