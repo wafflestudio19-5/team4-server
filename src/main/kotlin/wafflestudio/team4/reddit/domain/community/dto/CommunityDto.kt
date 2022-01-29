@@ -37,8 +37,8 @@ class CommunityDto {
         constructor(community: Community) : this(
             id = community.id,
             name = community.name,
-            numMembers = community.num_members,
-            numManagers = community.num_managers,
+            numMembers = community.users.filter { it.joined }.filter { !it.isManager }.size,
+            numManagers = community.users.filter { it.joined }.filter { it.isManager }.size,
             managers = community.users.filter { it.isManager }.map { UserDto.UsernameResponse(it.user) },
             description = community.description,
             topics = community.topics.filter { !it.deleted }.map { TopicDto.Response(it.topic) },
