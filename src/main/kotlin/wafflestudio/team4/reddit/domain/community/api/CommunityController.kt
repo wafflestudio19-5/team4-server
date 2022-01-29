@@ -75,9 +75,9 @@ class CommunityController(
         @PathVariable("community_id") communityId: Long,
         @RequestParam(required = false, defaultValue = Long.MAX_VALUE.toString()) lastPostId: Long,
         @RequestParam(required = false, defaultValue = "10") size: Int,
-    ): ListResponse<PostDto.Response> {
+    ): PageResponse<PostDto.Response> {
         val posts = communityService.getCommunityPosts(communityId, lastPostId, size)
-        return ListResponse(posts.map { PostDto.Response(it) })
+        return PageResponse(posts.map { PostDto.Response(it) }, posts.size, posts.size, null)
     }
 
     @GetMapping("/{community_id}/about/moderators/")
