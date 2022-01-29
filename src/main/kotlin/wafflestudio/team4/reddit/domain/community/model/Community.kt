@@ -16,11 +16,11 @@ class Community(
     @field:NotBlank
     var name: String,
 
-    @field:NotNull
-    var num_members: Int = 0,
+    // @field:NotNull
+    // var num_members: Int = 0,
 
-    @field:NotNull
-    var num_managers: Int = 0,
+    // @field:NotNull
+    // var num_managers: Int = 0,
 
     @OneToMany(mappedBy = "community", cascade = [CascadeType.ALL]) // why merge?
     var users: MutableSet<UserCommunity> = mutableSetOf(),

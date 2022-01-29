@@ -183,8 +183,8 @@ class CommunityService(
     fun createCommunity(createRequest: CommunityDto.CreateRequest, user: User): Community {
         var community = Community(
             name = createRequest.name,
-            num_members = 0, // managers not part of num_members
-            num_managers = 1,
+            // num_members = 0, // managers not part of num_members
+            // num_managers = 1,
             description = createRequest.description,
             deleted = false
         )
@@ -247,7 +247,7 @@ class CommunityService(
             else userCommunity.joined = true // rejoin
         }
 
-        community.num_members += 1
+        // community.num_members += 1
 
         userCommunityRepository.save(userCommunity)
         community = communityRepository.save(community)
@@ -265,12 +265,12 @@ class CommunityService(
         if (!userCommunity.joined) throw NotCurrentlyJoinedException()
 
         if (userCommunity.isManager) {
-            community.num_managers -= 1
+            // community.num_managers -= 1
             userCommunity.isManager = false
             // val managerCommunity = managerCommunityRepository.getByManagerAndCommunity(user, community)
             // managerCommunity.joined = false
             // managerCommunityRepository.save(managerCommunity)
-        } else community.num_members -= 1
+        } // else community.num_members -= 1
         userCommunity.joined = false
 
         userCommunityRepository.save(userCommunity)
@@ -345,8 +345,8 @@ class CommunityService(
                 if (managerCommunity.user.email !in modifyRequest.managers) {
                     managerCommunity.isManager = false
                     userCommunityRepository.save(managerCommunity)
-                    community.num_managers -= 1
-                    community.num_members += 1
+                    // community.num_managers -= 1
+                    // community.num_members += 1
                     community.users.map {
                         if (it.id == managerCommunity.id)
                             UserCommunity(it.user, it.community, false) else it
@@ -367,12 +367,12 @@ class CommunityService(
                     val newUserCommunity = UserCommunity(manager, community, true)
                     userCommunityRepository.save(newUserCommunity)
                     community.users.add(newUserCommunity)
-                    community.num_managers += 1
+                    // community.num_managers += 1
                 } else {
                     val userCommunity = userCommunityRepository.getByUserAndCommunity(manager, community)
                     if (userCommunity.joined) {
-                        community.num_members -= 1
-                        community.num_managers += 1
+                        // community.num_members -= 1
+                        // community.num_managers += 1
                     } else { // not joined
                         userCommunity.joined = true
                         userCommunity.isManager = true
@@ -381,7 +381,7 @@ class CommunityService(
                             if (it.id == userCommunity.id)
                                 UserCommunity(it.user, it.community, true) else it
                         }
-                        community.num_managers += 1
+                        // community.num_managers += 1
                     }
                 }
 
@@ -527,7 +527,7 @@ class CommunityService(
             // currently joined
             if (userCommunity.joined) {
                 if (userCommunity.isManager) throw AlreadyManagerException()
-                else community.num_members -= 1
+                // else community.num_members -= 1
             }
             // currently not joined
             if (!userCommunity.joined) { // rejoin
@@ -537,7 +537,7 @@ class CommunityService(
             userCommunityRepository.save(userCommunity)
         }
 
-        community.num_managers += 1
+        // community.num_managers += 1
         communityRepository.save(community)
         return community
     }
@@ -551,8 +551,8 @@ class CommunityService(
         managerCommunity.isManager = false
         userCommunityRepository.save(managerCommunity)
 
-        community.num_members += 1
-        community.num_managers -= 1
+        // community.num_members += 1
+        // community.num_managers -= 1
         communityRepository.save(community)
         return community
     }
